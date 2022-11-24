@@ -1,17 +1,19 @@
 'use strict';
 
-const faker = require('faker');
+const {faker} = require('@faker-js/faker');
 
 const testUser = () => {
   return {
     id: faker.datatype.uuid(),
-    firstName: faker.datatype.userName(),
-    lastName: faker.datatype.userName(),
+    firstName: faker.internet.userName(),
+    lastName: faker.internet.userName(),
     email: "test@rectpath.com",
     password: "e3274be5c857fb42ab72d786e281b4b8", //adminpassword
     phone:  '0712345679',
     username: 'testUser',
-    userType: 'student'
+    userType: 'student',
+    updatedAt: new Date(),
+    createdAt: new Date()
   }
 }
 

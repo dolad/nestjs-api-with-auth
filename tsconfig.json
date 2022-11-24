@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -11,6 +12,11 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": false
   }
 }

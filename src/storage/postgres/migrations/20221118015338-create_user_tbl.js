@@ -13,11 +13,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      first_name: {
+      firstName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      last_name: {
+      lastName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -33,16 +33,16 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      user_type: {
+      userType: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      created_at: {
+      createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
-      updated_at: {
+      updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,

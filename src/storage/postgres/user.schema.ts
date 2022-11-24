@@ -1,5 +1,6 @@
 import { CreationOptional, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import { Column, DataType, Table } from "sequelize-typescript";
+import { Column, DataType, Table, AfterCreate } from "sequelize-typescript";
+import { HashManager } from "../../auth/utils/hash";
 
 export enum UserType {
     student = 'student',
@@ -66,5 +67,17 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
         type: DataType.BOOLEAN
     })
     declare isConfirmed: boolean
+
+    // async isPasswordCorrect(password: string) {
+    //     return await new HashManager().bCompare(this.password, password);
+    //   }
+    
+    // @AfterCreate
+    // static async hashPassword(user: User) {
+    //     const hashPassword = await new HashManager().bHash(user.password);
+    //     user.password = hashPassword;
+    
+    //     await user.save();
+    // }
    
 }

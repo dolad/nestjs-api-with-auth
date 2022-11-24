@@ -7,9 +7,11 @@ import { BullModule } from '@nestjs/bull';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import appConfig from './config/app.config';
-import dbConfig from './config/db.config';
+import dbConfig from './config/dbConfig';
 import { IAppConfig, IRedis } from './config/interface';
 import { AllExceptionsFilter } from './exceptions/exception.handler';
+
+// @ts-ignore
 
 @Module({
   imports: [

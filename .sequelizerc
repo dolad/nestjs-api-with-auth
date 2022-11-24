@@ -3,4 +3,5 @@ const path = require('path');
 module.exports = {
   'migrations-path': path.resolve('src/storage/postgres', 'migrations'),
   'seeders-path': path.resolve('src/storage/postgres', 'seeders'),
+  'config': path.resolve('src/config', 'postgres.js'),
 }
