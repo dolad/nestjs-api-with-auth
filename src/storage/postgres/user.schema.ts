@@ -1,5 +1,5 @@
-import { CreationOptional, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import { Column, DataType, Table, AfterCreate } from "sequelize-typescript";
+import {  Optional } from "sequelize";
+import { Column, DataType, Table, Model, AfterCreate } from "sequelize-typescript";
 import { HashManager } from "../../auth/utils/hash";
 
 export enum UserType {
@@ -7,28 +7,60 @@ export enum UserType {
     mentor = 'mentor'
 }
 
-@Table
-export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+const scopes = {
+    removeSensitivePayload: {
+      attributes: { exclude: ['password'] },
+    },
+  };
+
+export type UserAttributes = {
+    id: number,
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    phone: string;
+    username: string;
+    userType: UserType;
+    isConfirmed: boolean
+    createdAt?: Date
+    updatedAt?: Date
+
+}
+
+export type UserCreateAttributes = Optional<UserAttributes, 'id'>
+
+@Table({
+    scopes: scopes,
+    modelName: 'users'
+})
+export class User extends Model<UserAttributes, UserCreateAttributes> {
     @Column({
         type: DataType.UUID,
         defaultValue: DataType.UUIDV4,
         primaryKey:true
     })
-    declare id: CreationOptional<string>;
+    id: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    declare firstName: string;
+    firstName: string;
 
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    declare lastName: string;
+    lastName: string;
 
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+        unique: true,
+    })
+    username: string;
 
     @Column({
         unique: true,
@@ -37,21 +69,21 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
             isEmail: true,
         }
     })
-    declare email: string;
+    email: string;
 
 
     @Column({
         allowNull: false,
         type: DataType.STRING
     })
-    declare password: string
+    password: string
 
 
     @Column({
         allowNull: false,
         type: DataType.STRING
     })
-    declare phone: string
+    phone: string
 
 
     @Column({
@@ -59,25 +91,29 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
         defaultValue: UserType.student,
         allowNull: false
     })
-    declare userType: UserType
+    userType: UserType
 
 
     @Column({
-        allowNull: false,
-        type: DataType.BOOLEAN
+        allowNull: true,
+        type: DataType.BOOLEAN,
+        defaultValue: false
     })
-    declare isConfirmed: boolean
+    isConfirmed: boolean
 
-    // async isPasswordCorrect(password: string) {
-    //     return await new HashManager().bCompare(this.password, password);
-    //   }
+
+    updatedAt: Date;
+    createdAt: Date;
+
+    async isPasswordCorrect(password: string): Promise<boolean> {
+        return await new HashManager().bCompare(this.password, password);
+      }
     
-    // @AfterCreate
-    // static async hashPassword(user: User) {
-    //     const hashPassword = await new HashManager().bHash(user.password);
-    //     user.password = hashPassword;
-    
-    //     await user.save();
-    // }
+    @AfterCreate
+    static async hashPassword(user: User): Promise<void> {
+        const hashPassword = await new HashManager().bHash(user.password);
+        user.password = hashPassword;
+        await user.save();
+    }
    
 }

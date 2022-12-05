@@ -12,6 +12,7 @@ module.exports = {
       username: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       firstName: {
         type: Sequelize.STRING,
@@ -24,6 +25,7 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true
       },
       password: {
         type: Sequelize.STRING,
@@ -31,6 +33,10 @@ module.exports = {
       },
       phone: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      isConfirmed: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
       },
       userType: {
