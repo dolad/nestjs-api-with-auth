@@ -105,12 +105,12 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     updatedAt: Date;
     createdAt: Date;
 
-    async isPasswordCorrect(password: string) {
+    async isPasswordCorrect(password: string): Promise<boolean> {
         return await new HashManager().bCompare(this.password, password);
       }
     
     @AfterCreate
-    static async hashPassword(user: User) {
+    static async hashPassword(user: User): Promise<void> {
         const hashPassword = await new HashManager().bHash(user.password);
         user.password = hashPassword;
         await user.save();
