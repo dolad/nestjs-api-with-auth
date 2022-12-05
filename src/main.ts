@@ -24,7 +24,7 @@ async function bootstrap() {
 
   app.use(loggerMiddleware);
 
-  app.setGlobalPrefix('api/v2', { exclude: ['/'] });
+  app.setGlobalPrefix('api/v1', { exclude: ['/'] });
 
   app.enableCors();
 

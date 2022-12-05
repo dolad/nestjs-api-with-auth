@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import * as dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
 dotenv.config();
 
-export default () => ({
+module.exports = {
   development: {
     dialect: 'postgres',
     host: process.env.POSTGRES_DATABASE_HOST,
@@ -75,4 +75,4 @@ export default () => ({
       idle: 10000,
     },
   },
-});
+};

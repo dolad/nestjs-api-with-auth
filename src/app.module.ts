@@ -7,9 +7,10 @@ import { BullModule } from '@nestjs/bull';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import appConfig from './config/app.config';
-import dbConfig from './config/dbConfig';
-import { IAppConfig, IRedis } from './config/interface';
 import { AllExceptionsFilter } from './exceptions/exception.handler';
+import { AuthModule } from './auth/auth.module';
+import { StorageModule } from './storage/storage.module';
+import { UserModule } from './user/user.module';
 
 // @ts-ignore
 
@@ -17,16 +18,9 @@ import { AllExceptionsFilter } from './exceptions/exception.handler';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, dbConfig],
+      load: [appConfig],
     }),
-    SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        ...dbConfig().postgres[config.get<IAppConfig>('app').environment],
-        dialect: 'postgres',
-      }),
-    }),
+    
     CacheModule.register({
       isGlobal: true,
     }),
@@ -34,15 +28,10 @@ import { AllExceptionsFilter } from './exceptions/exception.handler';
       ttl: 1,
       limit: 30,
     }),
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        redis: {
-          ...config.get<IRedis>('redis'),
-        },
-      }),
-    }),
+    StorageModule,
+    UserModule,
+    AuthModule
+
   ],
 
   controllers: [AppController],
