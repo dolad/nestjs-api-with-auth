@@ -14,11 +14,11 @@ const scopes = {
   };
 
 export type UserAttributes = {
-    id: number,
+    id?: string,
     firstName: string;
     lastName: string;
     email: string;
-    password: string;
+    password?: string;
     phone: string;
     username: string;
     userType: UserType;
