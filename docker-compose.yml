@@ -12,32 +12,12 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_HOST=redis
-      - POSTGRES_DATABASE_HOST=postgres
-      - POSTGRES_DATABASE_PASSWORD=password
-      - POSTGRES_DATABASE_NAME=rectpath_db
+      - REDIS_HOST=${REDIS_HOST}
     ports:
       - 3000:${APP_PORT}
     depends_on:
-      - postgres
       - redis
     restart: on-failure
-
-  postgres:
-    image: postgres
-    restart: unless-stopped
-    ports:
-      - 5432:5432
-    volumes:
-      - pg_data:/var/lib/postgresql/data/
-    healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
-
   redis:
     image: redis
     restart: unless-stopped
@@ -46,5 +26,4 @@ services:
     volumes:
       - redis_data:/data/redis
 volumes:
-  pg_data:
   redis_data:
