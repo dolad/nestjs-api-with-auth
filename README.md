@@ -1,6 +1,6 @@
 
 
-## Rectpath project
+## Flinke project starter backend
 
 ```bash
 $ npm install
