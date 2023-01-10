@@ -1,6 +1,6 @@
 
 
-## Flinke dev repo
+## Flinke production repo
 
 ```bash
 $ npm install
