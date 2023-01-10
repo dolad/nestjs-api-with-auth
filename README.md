@@ -1,6 +1,6 @@
 
 
-## Flinke project starter backend
+## Flinke dev repo
 
 ```bash
 $ npm install
