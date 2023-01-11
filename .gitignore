@@ -400,3 +400,7 @@ dist
 
 /pg_data
 /redis-service
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
