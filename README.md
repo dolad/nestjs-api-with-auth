@@ -1,6 +1,6 @@
 
 
-## Flinke production
+## Flinke production server
 
 ```bash
 $ npm install 
