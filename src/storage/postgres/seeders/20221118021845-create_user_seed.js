@@ -7,7 +7,7 @@ const testUser = () => {
     id: faker.datatype.uuid(),
     first_name: faker.internet.userName(),
     last_name: faker.internet.userName(),
-    email: "test@rectpath.com",
+    email: "test@flinke.io",
     password: "e3274be5c857fb42ab72d786e281b4b8", //adminpassword
     phone:  '0712345679',
     username: 'testUser',

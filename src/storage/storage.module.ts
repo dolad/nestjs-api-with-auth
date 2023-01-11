@@ -14,6 +14,7 @@ import dbConfig = require('../config/postgres')
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
+              
               models:[User],
               dialect: 'postgres',
               autoLoadModels: true,
