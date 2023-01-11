@@ -1,9 +1,9 @@
 
 
-## Flinke production repo
+## Flinke production
 
 ```bash
-$ npm install
+$ npm install 
 ```
 
 ## Running the app
