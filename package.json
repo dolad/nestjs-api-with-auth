@@ -10,6 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "deploy": "npm ci && npm run build && npm run start:prod",
     "start:debug": "nest start --debug --watch",
     "pgdb:migration:generate": "npx sequelize-cli migration:generate --name",
     "pgdb:migrate:undo": "npx sequelize-cli db:migrate:undo",
