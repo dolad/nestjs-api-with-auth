@@ -12,4 +12,4 @@ EXPOSE 8080
 
 RUN npm run build
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "deploy"]
