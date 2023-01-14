@@ -35,4 +35,4 @@ jobs:
           environment_name: Flinkebackend-env
           version_label: "flinke backend deploying-${{ steps.format-time.outputs.replaced }}"
           region: eu-west-1
-          deployment_package: "flinke-package-${{ github.sha }}.zip"
+          deployment_package: "deploy.zip"
