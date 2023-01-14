@@ -33,6 +33,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: flinke-backend
           environment_name: Flinkebackend-env
-          version_label: ${{ github.event.head_commit.message }}
+          version_label: "flinke backend deploying-${{ steps.format-time.outputs.replaced }}"
           region: eu-west-1
-          deployment_package: ${{ github.sha }}.zip
+          deployment_package: "flinke-package-${{ github.sha }}.zip"
