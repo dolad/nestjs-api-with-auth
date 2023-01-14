@@ -26,6 +26,6 @@ jobs:
           environment_name: Flinkebackend-env
           version_label: ${{ github.sha }}
           version_description: ${{ github.event.head_commit.message }}
-          region: ap-northeast-2
+          region: eu-west-1
           deployment_package: ${{ github.sha }}.zip
 
