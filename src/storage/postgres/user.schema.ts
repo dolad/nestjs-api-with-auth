@@ -3,8 +3,9 @@ import { Column, DataType, Table, Model, AfterCreate } from "sequelize-typescrip
 import { HashManager } from "../../auth/utils/hash";
 
 export enum UserType {
-    student = 'student',
-    mentor = 'mentor'
+    BUSINESS = 'business',
+    BANK = 'bank',
+    ADMIN = 'admin'
 }
 
 const scopes = {
@@ -19,10 +20,9 @@ export type UserAttributes = {
     lastName: string;
     email: string;
     password?: string;
-    phone: string;
-    username: string;
     userType: UserType;
-    isConfirmed: boolean
+    isConfirmed: boolean;
+    hasCompletedKYC: boolean;
     createdAt?: Date
     updatedAt?: Date
 
@@ -55,12 +55,6 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     })
     lastName: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-        unique: true,
-    })
-    username: string;
 
     @Column({
         unique: true,
@@ -80,15 +74,8 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
 
 
     @Column({
-        allowNull: false,
-        type: DataType.STRING
-    })
-    phone: string
-
-
-    @Column({
         type: DataType.STRING,
-        defaultValue: UserType.student,
+        defaultValue: UserType.BUSINESS,
         allowNull: false
     })
     userType: UserType
@@ -101,6 +88,12 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     })
     isConfirmed: boolean
 
+    @Column({
+        allowNull: true,
+        type: DataType.BOOLEAN,
+        defaultValue: false
+    })
+    hasCompletedKYC: boolean;
 
     updatedAt: Date;
     createdAt: Date;

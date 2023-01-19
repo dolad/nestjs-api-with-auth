@@ -46,7 +46,7 @@ export class AuthService {
      * @return User
      */
     async login(user: any): Promise<LoginOutput> {
-        const jwtPayload = {email: user.email, username:user.username};
+        const jwtPayload = {email: user.email, firstname:user.firstName};
         return {
             email: user.email,
             username: user.username,
@@ -57,14 +57,7 @@ export class AuthService {
     private async isRegistered(payload: RegistrationDTO): Promise<boolean> {        
             const user = await this.userRepos.findOne({
                 where: {
-                    [Op.or]: [
-                        {
-                            email:payload.email.toLowerCase(),
-                        },
-                        {
-                            username: payload.username.toLowerCase()
-                        }
-                    ]
+                        email:payload.email.toLowerCase(),
                 }
             })
             return !!user
