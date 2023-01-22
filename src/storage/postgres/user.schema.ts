@@ -1,6 +1,7 @@
 import {  Optional } from "sequelize";
-import { Column, DataType, Table, Model, AfterCreate } from "sequelize-typescript";
+import { Column, DataType, Table, Model, AfterCreate, HasOne } from "sequelize-typescript";
 import { HashManager } from "../../auth/utils/hash";
+import { Kyc } from "./kyc.schema";
 
 export enum UserType {
     BUSINESS = 'business',
@@ -25,6 +26,7 @@ export type UserAttributes = {
     hasCompletedKYC: boolean;
     createdAt?: Date
     updatedAt?: Date
+    kycId: string
 
 }
 
@@ -106,6 +108,10 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         defaultValue: new Date()
     })
     createdAt: Date;
+
+    @HasOne(() => Kyc)
+    @Column
+    kycId: Kyc
 
     async isPasswordCorrect(password: string): Promise<boolean> {
         return await new HashManager().bCompare(this.password, password);

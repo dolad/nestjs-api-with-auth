@@ -1,6 +1,7 @@
 import e from "express";
 import {  Optional } from "sequelize";
-import { Column, DataType, Table, Model, AfterCreate } from "sequelize-typescript";
+import { Column, DataType, Table, Model, AfterCreate, BelongsTo } from "sequelize-typescript";
+import { User } from "./user.schema";
 
 export enum Gender {
     MALE = 'male',
@@ -57,6 +58,7 @@ export type KycAttributes = {
     businessCountry?: string;
     businessCity?: string;
     bank?: string;
+    userId: string;
 
 }
 
@@ -177,11 +179,15 @@ export class Kyc extends Model<KycAttributes, KycCreateAttributes> {
         defaultValue: null
     })
     businessCity?: string;
-    
+
     @Column({
         type: DataType.STRING,
         allowNull: true,
         defaultValue: null
     })
     bank?: string;
+
+    @BelongsTo(() => User)
+    @Column
+    user: string
 }
