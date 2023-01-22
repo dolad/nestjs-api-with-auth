@@ -15,7 +15,7 @@ module.exports = {
     database: process.env.POSTGRES_DATABASE_NAME,
     logging: false,
     define: {
-      underscored: true,
+      underscored: false,
     },
     autoLoadModels: true,
     seederStorage: 'sequelize',
@@ -32,7 +32,7 @@ module.exports = {
     database: process.env.POSTGRES_DATABASE_NAME,
     logging: false,
     define: {
-      underscored: true,
+      underscored: false,
     },
     autoLoadModels: true,
     pool: {
@@ -56,7 +56,7 @@ module.exports = {
     database: process.env.POSTGRES_DATABASE_NAME,
     logging: false,
     define: {
-      underscored: true,
+      underscored: false,
     },
     ssl: true,
     autoLoadModels: true,

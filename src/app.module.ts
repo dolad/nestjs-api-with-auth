@@ -28,9 +28,9 @@ import { UserModule } from './user/user.module';
       ttl: 1,
       limit: 30,
     }),
-    // StorageModule,
-    // UserModule,
-    // AuthModule
+    StorageModule,
+    UserModule,
+    AuthModule
 
   ],
 

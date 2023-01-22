@@ -48,7 +48,6 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     })
     firstName: string;
 
-
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -64,7 +63,6 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         }
     })
     email: string;
-
 
     @Column({
         allowNull: false,
@@ -95,7 +93,18 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     })
     hasCompletedKYC: boolean;
 
+    @Column({
+        allowNull: true,
+        type: DataType.DATE,
+        defaultValue: new Date()
+    })
     updatedAt: Date;
+
+    @Column({
+        allowNull: true,
+        type: DataType.DATE,
+        defaultValue: new Date()
+    })
     createdAt: Date;
 
     async isPasswordCorrect(password: string): Promise<boolean> {

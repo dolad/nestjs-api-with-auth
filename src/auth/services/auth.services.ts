@@ -15,7 +15,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ){}
     async register(payload: RegistrationDTO): Promise<string> {
-        const isRegistered = await this.isRegistered(payload)
+        const isRegistered = await this.isRegistered(payload);
         if(isRegistered) throw new ForbiddenException("User already exist");
         await this.userRepos.create({
             ...payload
@@ -49,7 +49,7 @@ export class AuthService {
         const jwtPayload = {email: user.email, firstname:user.firstName};
         return {
             email: user.email,
-            username: user.username,
+            firstName: user.firstName,
             token: this.jwtService.sign(jwtPayload)
         }
     }
