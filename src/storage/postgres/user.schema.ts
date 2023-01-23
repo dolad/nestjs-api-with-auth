@@ -1,5 +1,5 @@
 import {  Optional } from "sequelize";
-import { Column, DataType, Table, Model, AfterCreate, HasOne } from "sequelize-typescript";
+import { Column, DataType, Table, Model, AfterCreate, HasOne, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { HashManager } from "../../auth/utils/hash";
 import { Kyc } from "./kyc.schema";
 
@@ -109,9 +109,17 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     })
     createdAt: Date;
 
-    @HasOne(() => Kyc)
-    @Column
-    kycId: Kyc
+   
+   @ForeignKey(() => Kyc)
+   @Column({
+    allowNull: false,
+    onUpdate: 'CASCADE',
+    type: DataType.UUID,
+     })
+    kycId: string;
+
+    @BelongsTo(() => Kyc)
+    kyc: Kyc;
 
     async isPasswordCorrect(password: string): Promise<boolean> {
         return await new HashManager().bCompare(this.password, password);

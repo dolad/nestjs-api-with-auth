@@ -1,6 +1,5 @@
-import e from "express";
 import {  Optional } from "sequelize";
-import { Column, DataType, Table, Model, AfterCreate, BelongsTo } from "sequelize-typescript";
+import { Column, DataType, Table, Model,  BelongsTo, ForeignKey } from "sequelize-typescript";
 import { User } from "./user.schema";
 
 export enum Gender {
@@ -62,6 +61,7 @@ export type KycAttributes = {
 
 }
 
+
 export type KycCreateAttributes = Optional<KycAttributes, 'id'>
 
 @Table({
@@ -104,7 +104,7 @@ export class Kyc extends Model<KycAttributes, KycCreateAttributes> {
     dateOfBirth: Date;
 
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.FLOAT,
         allowNull: false,
     })
     personalCreditLimit: number;
@@ -134,7 +134,7 @@ export class Kyc extends Model<KycAttributes, KycCreateAttributes> {
     residentialPostcode: string;
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.INTEGER,
         allowNull: true,
         defaultValue: 0
     })
@@ -187,7 +187,11 @@ export class Kyc extends Model<KycAttributes, KycCreateAttributes> {
     })
     bank?: string;
 
-    @BelongsTo(() => User)
-    @Column
-    user: string
+    @ForeignKey(() => User)
+    @Column({
+        allowNull: false,
+        onUpdate: 'CASCADE',
+        type: DataType.UUID,
+         })
+    userId: string
 }
