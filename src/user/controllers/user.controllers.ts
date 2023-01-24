@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { Kyc } from 'src/storage/postgres/kyc.schema';
@@ -11,8 +11,7 @@ export class UserController {
 
   @Post('kyc')
   @UseGuards(JwtAuthGuard)
-  async getHello(@Request() req, payload: CreateKyCDto): Promise<Kyc> {
-    return req.user
-    // this.kycService.createKycUser(payload);
+  async getHello(@Request() req, @Body() payload: CreateKyCDto): Promise<Kyc> {
+    return await this.kycService.createKycUser(payload, req.user);
   }
 }

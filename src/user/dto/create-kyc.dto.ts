@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsEmail, IsString, IsDateString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsDateString, IsNumber } from 'class-validator';
 
 export class CreateKyCDto {
     @ApiProperty()

@@ -65,7 +65,7 @@ export type KycAttributes = {
 export type KycCreateAttributes = Optional<KycAttributes, 'id'>
 
 @Table({
-    modelName: 'kyc'
+    modelName: 'kycs'
 })
 export class Kyc extends Model<KycAttributes, KycCreateAttributes> {
     @Column({
@@ -169,7 +169,8 @@ export class Kyc extends Model<KycAttributes, KycCreateAttributes> {
 
     @Column({
         type: DataType.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     })
     businessCountry?: string;
 

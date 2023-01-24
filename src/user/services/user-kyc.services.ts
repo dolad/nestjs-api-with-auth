@@ -2,6 +2,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Kyc } from "src/storage/postgres/kyc.schema";
 import { KYC_REPOSITORY } from "../../utils/constants";
 import { CreateKyCDto } from "../dto/create-kyc.dto";
+import { IAuthUser } from "../types/user.types";
+
 
 @Injectable()
 export class KycServices {
@@ -11,15 +13,13 @@ export class KycServices {
         
     }
 
-    async createKycUser(payload:CreateKyCDto): Promise<Kyc>{
-
-       
-        const newKyc = await this.kycRepos.create({
+    async createKycUser(payload:CreateKyCDto, user: IAuthUser): Promise<any>{
+        return await this.kycRepos.create({
             ...payload,
-            userId: "sdgagdsgafd",
+            userId: user.userId,
             kycStep: 1,
         })
-        return newKyc
+        
     }
 
 }
