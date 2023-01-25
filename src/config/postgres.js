@@ -2,7 +2,6 @@
 const dotenv = require('dotenv');
 
 dotenv.config();
-console.log(process.env.POSTGRES_DATABASE_NAME)
 module.exports = {
   development: {
     dialect: 'postgres',

@@ -56,7 +56,6 @@ export class AuthService {
         const jwtPayload = { email: user.email, userId: user.id, };
         const { isConfirmed } = await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
         if (!isConfirmed) {
-            console.log("here")
             await this.sendRegistrationToken(user.email);
             throw new UnauthorizedException("user not confirm please check your mail and verify")
         }

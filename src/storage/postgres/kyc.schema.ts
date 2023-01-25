@@ -188,11 +188,13 @@ export class Kyc extends Model<KycAttributes, KycCreateAttributes> {
     })
     bank?: string;
 
+    @BelongsTo(() => User)
+    user: User
+
     @ForeignKey(() => User)
     @Column({
-        allowNull: false,
-        onUpdate: 'CASCADE',
-        type: DataType.UUID,
-         })
-    userId: string
+      type: DataType.UUID,
+      allowNull: false,
+    })
+    userId: string;
 }

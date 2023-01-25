@@ -52,3 +52,41 @@ export class CreateKyCDto {
     @IsString()
     residentialPostcode: string
 }
+
+
+export class AddBusinessInformationDTO {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    businessName: string
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    businessType: string
+
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    businessAddress: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    businessPostcode: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    businessCountry: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    businessCity: string;
+
+
+
+
+}
