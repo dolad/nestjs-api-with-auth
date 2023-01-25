@@ -101,14 +101,13 @@ export class AuthService {
             }
         })
         const registrationToken = await this.generateRegisterationToken(user.email, user.userType);
-
         const emailPayload: IEmailNotification = {
             type: "VERIFICATION_EMAIL",
             to: user.email,
             verificationEmail: {
                 context: {
                     firstName: user.firstName,
-                    host: `http://${process.env.APP_URL}:${process.env.APP_PORT}/api/v1/auth/verify/${registrationToken}`
+                    host: `http://${process.env.APP_URL}/api/v1/auth/verify/${registrationToken}`
                 }
             }
         }
