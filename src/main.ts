@@ -20,12 +20,12 @@ async function bootstrap() {
     }),
   );
 
-  setupSwagger(app);
 
   app.use(loggerMiddleware);
 
   app.setGlobalPrefix('api/v1', { exclude: ['/'] });
 
+  setupSwagger(app);
   app.enableCors();
 
   const configService = app.get<ConfigService>(ConfigService);
