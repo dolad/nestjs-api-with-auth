@@ -9,7 +9,7 @@ import { KycServices } from '../services/user-kyc.services';
 export class UserController {
   constructor(private readonly kycService: KycServices) {}
 
-  @Post('kyc')
+  @Post('user/kyc/add-owner-information')
   @UseGuards(JwtAuthGuard)
   async getHello(@Request() req, @Body() payload: CreateKyCDto): Promise<Kyc> {
     return await this.kycService.createKycUser(payload, req.user);

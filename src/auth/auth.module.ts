@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { SequelizeModule } from "@nestjs/sequelize";
@@ -8,7 +9,6 @@ import { AuthController } from "./controller/auth.controller";
 import { AuthService } from "./services/auth.services";
 import { JWTStrategy } from "./strategy/jwt.strategy";
 import { LocalStrategy } from "./strategy/local.strategy";
-import { jwtConst } from "./utils/auth.constant";
 
 @Module({
     imports: [
@@ -16,7 +16,7 @@ import { jwtConst } from "./utils/auth.constant";
         UserModule,
         PassportModule,
         JwtModule.register({
-            secret:jwtConst.secret,
+            secret:process.env.JWT_SECRET,
             signOptions:{
                 expiresIn: '24h'
             }

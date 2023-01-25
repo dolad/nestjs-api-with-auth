@@ -112,14 +112,14 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
    
    @ForeignKey(() => Kyc)
    @Column({
-    allowNull: false,
+    allowNull: true,
     onUpdate: 'CASCADE',
     type: DataType.UUID,
      })
     kycId: string;
 
     @BelongsTo(() => Kyc)
-    kyc: Kyc;
+    kyc?: Kyc;
 
     async isPasswordCorrect(password: string): Promise<boolean> {
         return await new HashManager().bCompare(this.password, password);
