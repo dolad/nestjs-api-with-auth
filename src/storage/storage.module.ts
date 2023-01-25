@@ -6,6 +6,7 @@ import { IAppConfig, IRedis } from "../config/interface";
 import { User } from "./postgres/user.schema";
 
 import dbConfig = require('../config/postgres')
+import { Kyc } from "./postgres/kyc.schema";
 
 @Module({
     imports: [
@@ -15,7 +16,7 @@ import dbConfig = require('../config/postgres')
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
               
-              models:[User],
+              models:[User, Kyc],
               dialect: 'postgres',
               autoLoadModels: true,
                sync: {

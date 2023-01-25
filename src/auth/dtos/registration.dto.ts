@@ -17,19 +17,6 @@ export class RegistrationDTO {
     @IsString()
     firstName: string
 
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    username: string
-
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    phone: string
-
-
     @ApiProperty()
     @IsNotEmpty()
     @IsString()

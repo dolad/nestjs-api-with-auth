@@ -9,11 +9,6 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
       firstName: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -31,13 +26,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      phone: {
-        type: Sequelize.STRING,
+      hasCompletedKYC: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
+        defaultValue: false,
       },
       isConfirmed: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
+        defaultValue: false,
       },
       userType: {
         type: Sequelize.STRING,
@@ -59,6 +56,5 @@ module.exports = {
 
   async down (queryInterface, Sequelize) {
      await queryInterface.dropTable('users');
-     
   }
 };

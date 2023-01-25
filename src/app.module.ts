@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { BullModule } from '@nestjs/bull';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import appConfig from './config/app.config';
@@ -11,6 +10,9 @@ import { AllExceptionsFilter } from './exceptions/exception.handler';
 import { AuthModule } from './auth/auth.module';
 import { StorageModule } from './storage/storage.module';
 import { UserModule } from './user/user.module';
+import { NotificationModule } from './notification/notification.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import emailConfiig from './config/email.confiig';
 
 // @ts-ignore
 
@@ -18,7 +20,13 @@ import { UserModule } from './user/user.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
+      load: [appConfig,emailConfiig],
+    }),
+
+    EventEmitterModule.forRoot({
+      newListener: true,
+      removeListener: true,
+      verboseMemoryLeak: true,
     }),
     
     CacheModule.register({
@@ -28,9 +36,11 @@ import { UserModule } from './user/user.module';
       ttl: 1,
       limit: 30,
     }),
-    // StorageModule,
-    // UserModule,
-    // AuthModule
+    
+    StorageModule,
+    UserModule,
+    NotificationModule,
+    AuthModule
 
   ],
 

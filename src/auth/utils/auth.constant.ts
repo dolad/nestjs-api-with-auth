@@ -1,3 +1,3 @@
-export const jwtConst = {
-    secret: "rectpath-secret"
-}
+// export const jwtConst = {
+//     secret: "rectpath-secret"
+// }

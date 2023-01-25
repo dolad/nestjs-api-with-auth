@@ -1,6 +1,6 @@
 
 export type LoginOutput = {
     email: string;
-    username: string;
+    id: string;
     token: string;
 }
