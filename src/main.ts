@@ -10,7 +10,9 @@ async function bootstrap() {
   const logger = new Logger('bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: false, //remove after ssl
+  }));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -22,6 +24,7 @@ async function bootstrap() {
 
 
   app.use(loggerMiddleware);
+  app.use()
 
   app.setGlobalPrefix('api/v1', { exclude: ['/'] });
 
