@@ -151,6 +151,12 @@ export class AuthService {
         return newUser;
     }
 
+    async authUser(user: any): Promise<User>{
+      return await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
+    }
+
+    
+
 
 
 

@@ -1,9 +1,11 @@
 import { Body, Controller, Post, UseGuards, Request, Param, Get, Req } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
+import { User } from "src/storage/postgres/user.schema";
 import { LoginDTO } from "../dtos/login.dto";
 import { RegistrationDTO } from "../dtos/registration.dto";
 import { ResendRegistationDTO } from "../dtos/resendRegistration.dto";
+import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.services";
 import { LoginOutput } from "../types/loginOut.type";
@@ -58,11 +60,17 @@ export class AuthController {
 
    @ApiResponse({
       status: 200,
-      description: 'verify Email link',
+      description: 'social authentication',
    })
    @Get('google/redirect')
    @UseGuards(AuthGuard('google'))
    async googleAuthRedirect(@Req() req): Promise<LoginOutput>{
       return this.authServices.googleLogin(req)
    }
+
+  @Get('auth-user')
+  @UseGuards(JwtAuthGuard)
+  async createBusinessOwnerInformation(@Request() req): Promise<User> {
+    return await this.authServices.authUser(req.user);
+  }
 }
