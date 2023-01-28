@@ -73,4 +73,17 @@ export class AuthController {
   async createBusinessOwnerInformation(@Request() req): Promise<User> {
     return await this.authServices.authUser(req.user);
   }
+
+
+   // @ApiResponse({
+   //    status: 200,
+   //    description: 'Password Reset',
+   // })
+   // @ApiResponse({ status: 500, description: 'Internal Server Error' })
+   // @Post('reset-password')
+   // async resetPassword(@Body() resetPasswordDto:ResendRegistationDTO): Promise<string> {
+   //    await this.authServices.sendRegistrationToken(resetPasswordDto.email);
+   //    return "verification email send successfully"
+   // }
+
 }
