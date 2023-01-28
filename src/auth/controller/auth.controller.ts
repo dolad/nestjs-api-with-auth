@@ -30,7 +30,7 @@ export class AuthController {
    @ApiResponse({ status: 500, description: 'Internal Server Error' })
    @UseGuards(LocalAuthGuard)
    @Post('login')
-   async login(@Request() req): Promise<LoginOutput>{
+   async login(@Request() req, @Body() loginDto: LoginDTO): Promise<LoginOutput>{
       return await this.authServices.login(req.user);
    }
 
