@@ -155,6 +155,7 @@ export class AuthService {
       return await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
     }
 
+    // 
     async resetPassword(email: any): Promise<string>{
         await this.userService.findByEmailOrFailed(email);
         // 
