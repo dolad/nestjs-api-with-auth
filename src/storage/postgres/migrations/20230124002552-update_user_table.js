@@ -4,11 +4,10 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
    
-     await queryInterface.removeColumn('kycs', 'businessCountry')
-     await queryInterface.addColumn('kycs', 'businessCountry', {
-      type: Sequelize.STRING,
+     await queryInterface.addColumn('users', 'IsGoogleSign', {
+      type: Sequelize.BOOLEAN,
       allowNull: true,
-      defaultValue: null
+      defaultValue: false
      } )
     
   },
