@@ -1,4 +1,5 @@
-import { Body, Controller, Post, UseGuards, Request, Param, Get } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Request, Param, Get, Req } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LoginDTO } from "../dtos/login.dto";
 import { RegistrationDTO } from "../dtos/registration.dto";
@@ -53,5 +54,15 @@ export class AuthController {
    async verifyEmailLink(@Param('token') token:string): Promise<string> {
       await this.authServices.verifyEmailLink(token);
       return "link verification succesfull"
+   }
+
+   @ApiResponse({
+      status: 200,
+      description: 'verify Email link',
+   })
+   @Get('google/redirect')
+   @UseGuards(AuthGuard('google'))
+   async googleAuthRedirect(@Req() req): Promise<LoginOutput>{
+      return this.authServices.googleLogin(req)
    }
 }

@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { User, UserAttributes } from "src/storage/postgres/user.schema";
+import { User, UserAttributes, UserType } from "src/storage/postgres/user.schema";
 import { USER_REPOSITORY } from "src/utils/constants";
 import { RegistrationDTO } from "../dtos/registration.dto";
 import { Op } from "sequelize";
@@ -9,6 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { IEmailNotification } from "src/notification/interface/email-notification.interface";
 import { ConfigService } from "@nestjs/config";
+import { GoogleUserSignInPayload } from "../types/google.type";
+import { UserServices } from "src/user/services/user.services";
 
 @Injectable()
 export class AuthService {
@@ -17,7 +19,8 @@ export class AuthService {
         @Inject(USER_REPOSITORY) private userRepos: typeof User,
         private readonly jwtService: JwtService,
         private eventEmitter: EventEmitter2,
-        private readonly config: ConfigService
+        private readonly config: ConfigService,
+        private readonly userService: UserServices
     ) { }
     async register(payload: RegistrationDTO): Promise<string> {
         const isRegistered = await this.isRegistered(payload);
@@ -37,11 +40,7 @@ export class AuthService {
     * @return User
     */
     async validate(payload: LoginDTO): Promise<User> {
-        const user = await this.userRepos.findOne({
-            where: { email: payload.email.toLowerCase() }
-        })
-
-        if (!user) throw new NotFoundException("user does not exist")
+        const user = await this.userService.findByEmailOrFailed(payload.email)
         const isPasswordCorrect = await user.isPasswordCorrect(payload.password);
         if (!isPasswordCorrect) throw new ForbiddenException("Invalid credentials");
         return user
@@ -53,7 +52,6 @@ export class AuthService {
      * @return User
      */
     async login(user: any): Promise<LoginOutput> {
-        const jwtPayload = { email: user.email, userId: user.id, };
         const { isConfirmed } = await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
         if (!isConfirmed) {
             await this.sendRegistrationToken(user.email);
@@ -62,10 +60,15 @@ export class AuthService {
         return {
             email: user.email,
             id: user.id,
-            token: this.jwtService.sign(jwtPayload, {
-                secret:this.config.get('jwt').jwtSecret
-            })
+            token: await this.generateAccessToken(user)
         }
+    }
+    private async generateAccessToken(user: any){
+
+       const jwtPayload = { email: user.email, userId: user.id};
+        return this.jwtService.sign(jwtPayload, {
+            secret:this.config.get('jwt').jwtSecret
+        })
     }
 
     private async isRegistered(payload: RegistrationDTO): Promise<boolean> {
@@ -78,12 +81,7 @@ export class AuthService {
     }
 
     private async generateRegisterationToken(email: string, userType: string) {
-        const user = await this.userRepos.findOne({
-            where: {
-                email,
-            }
-        })
-        if (!user) throw new NotFoundException("User not found exception");
+        await this.userService.findByEmailOrFailed(email)
         const registrationToken = {
             email: email,
             userType: userType
@@ -94,11 +92,7 @@ export class AuthService {
     }
 
     async sendRegistrationToken(email: string): Promise<void> {
-        const user = await this.userRepos.findOne({
-            where:{
-                email
-            }
-        })
+        const user = await this.userService.findByEmail(email);
         const registrationToken = await this.generateRegisterationToken(user.email, user.userType);
         const emailPayload: IEmailNotification = {
             type: "VERIFICATION_EMAIL",
@@ -125,14 +119,36 @@ export class AuthService {
             secret: this.config.get('jwt').registrationToken
         }) 
         if(!user) throw new NotFoundException("Invalid verification link");
-        const updateUser = await this.userRepos.findOne({
-            where:{
-                email: user.email
-            }
-        })   
+        const updateUser = await this.userService.findByEmail(user.email);
         updateUser.isConfirmed = true;
         updateUser.save(); 
         this.logger.log(`email link verification verified successfull for ${user.email}`);
+    }
+
+    async googleLogin(googleUser: GoogleUserSignInPayload): Promise<LoginOutput>{
+        let userExist: User;
+        if(!googleUser){
+            throw new UnauthorizedException("No user is returned from google account");
+        }
+        userExist = await this.userService.findByEmail(googleUser.email);
+        if(!userExist){
+           userExist = await this.createGoogleUser(googleUser)
+        }
+        return {
+            email: userExist.email,
+            id: userExist.id,
+            token: await this.generateAccessToken(googleUser)
+        }
+    }
+
+    private async createGoogleUser(user: GoogleUserSignInPayload): Promise<User>{
+        const newUser = await this.userRepos.create({
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.firstName,
+           isGoogleSign: true
+        })
+        return newUser;
     }
 
 

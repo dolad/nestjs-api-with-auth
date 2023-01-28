@@ -9,5 +9,21 @@ export class UserServices {
     ){
         
     }
+    async findByEmail(email:string): Promise<User>{
+        return await this.userRepos.findOne({
+            where: {
+                email: email.toLowerCase(),
+            }
+        })
+    }
+
+    async findByEmailOrFailed(email:string): Promise<User>{
+        const user = await this.findByEmail(email);
+        if(!user){
+            throw new Error("User not found");
+        }
+
+        return user;
+    }
 
 }

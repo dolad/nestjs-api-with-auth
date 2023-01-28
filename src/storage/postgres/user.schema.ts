@@ -22,11 +22,12 @@ export type UserAttributes = {
     email: string;
     password?: string;
     userType: UserType;
-    isConfirmed: boolean;
-    hasCompletedKYC: boolean;
-    createdAt?: Date
-    updatedAt?: Date
-    kycId: string
+    isConfirmed?: boolean;
+    hasCompletedKYC?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    isGoogleSign: boolean;
+    kyc: string
 
 }
 
@@ -67,10 +68,18 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     email: string;
 
     @Column({
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
         type: DataType.STRING
     })
-    password: string
+    password?: string
+
+    @Column({
+        allowNull: true,
+        defaultValue: false,
+        type: DataType.BOOLEAN
+    })
+    isGoogleSign?: boolean
 
 
     @Column({
@@ -78,7 +87,7 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         defaultValue: UserType.BUSINESS,
         allowNull: false
     })
-    userType: UserType
+    userType?: UserType
 
 
     @Column({
@@ -86,14 +95,14 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         type: DataType.BOOLEAN,
         defaultValue: false
     })
-    isConfirmed: boolean
+    isConfirmed?: boolean
 
     @Column({
         allowNull: true,
         type: DataType.BOOLEAN,
         defaultValue: false
     })
-    hasCompletedKYC: boolean;
+    hasCompletedKYC?: boolean;
 
     @Column({
         allowNull: true,
