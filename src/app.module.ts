@@ -13,6 +13,7 @@ import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import emailConfiig from './config/email.confiig';
+import { BusinessModule } from './business/business.module';
 
 // @ts-ignore
 
@@ -39,6 +40,7 @@ import emailConfiig from './config/email.confiig';
     
     StorageModule,
     UserModule,
+    BusinessModule,
     NotificationModule,
     AuthModule
 

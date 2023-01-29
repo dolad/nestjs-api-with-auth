@@ -1,11 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { BusinessServices } from "src/business/services/business.services";
 import { User } from "../../storage/postgres/user.schema";
 import { USER_REPOSITORY } from "../../utils/constants";
 
 @Injectable()
 export class UserServices {
     constructor(
-        @Inject(USER_REPOSITORY) private userRepos: typeof User,
+        @Inject(USER_REPOSITORY) private userRepos: typeof User
     ){
         
     }

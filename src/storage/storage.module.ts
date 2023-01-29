@@ -7,6 +7,7 @@ import { User } from "./postgres/user.schema";
 
 import dbConfig = require('../config/postgres')
 import { Kyc } from "./postgres/kyc.schema";
+import { BusinessType } from "./postgres/busines-type.schema";
 
 @Module({
     imports: [
@@ -16,7 +17,7 @@ import { Kyc } from "./postgres/kyc.schema";
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
               
-              models:[User, Kyc],
+              models:[User, Kyc, BusinessType],
               dialect: 'postgres',
               autoLoadModels: true,
                sync: {

@@ -21,22 +21,6 @@ export enum EmploymentStatus {
 
 }
 
-export enum BusinessType {
-    BUSINESS_2_CONSUMER = 'business 2 Consumer',
-    BUSINESS_2_BUSINESS = 'business 2 business',
-    FMCG = 'fmcg',
-    TELECOM = 'telecom',
-    TECHNOLOGY = 'technology',
-    BUSINESS_2_GOVERMENT = 'business 2 Government',
-    CONSUMER_2_CONSUMER = 'consumer 2 consumer',
-    FURNITURE = 'furniture',
-    LUXURY = 'luxury',
-    CONSUMER_2_GOVERNMENT = 'consumer 2 Government',
-    FASHION_AND_APPAREL = 'fashion and Apparel',
-    HEALTH_AND_BEAUTY = 'health & beaulty'
-
-}
-
 export type KycAttributes = {
     id?: string;
     title: string;
