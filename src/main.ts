@@ -5,7 +5,6 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { setupSwagger } from './swagger';
 import { loggerMiddleware } from './middleware';
-import { HttpExceptionFilter } from './utils/filters/exception.filter';
 
 async function bootstrap() {
   const logger = new Logger('bootstrap');
