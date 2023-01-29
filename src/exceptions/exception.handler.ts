@@ -30,12 +30,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const responseBody = {
       statusCode: httpStatus,
-      timestamp: new Date().toISOString(),
-      path: httpAdapter.getRequestUrl(ctx.getRequest()),
+      status: false,
+      data: null,
+      // timestamp: new Date().toISOString(),
+      // path: httpAdapter.getRequestUrl(ctx.getRequest()),
       message: httpMessage,
     };
 
-    this.logger.error(exception.message, exception.stack, responseBody);
+    this.logger.error(exception.message, exception.stack, responseBody, );
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }

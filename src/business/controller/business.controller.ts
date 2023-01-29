@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { BusinessType } from "src/storage/postgres/busines-type.schema";
+import { wrapResponseMessage, IResponseMessage } from "src/utils/response.map";
 import { BusinessServices } from "../services/business.services";
 
 @Controller('business-type')
@@ -9,7 +9,8 @@ export class BusinessTypeController {
     constructor(private readonly businessTypeService: BusinessServices){}
 
     @Get('')
-    async listBusinessType(): Promise<BusinessType[]>{
-        return this.businessTypeService.listBusinesType()
+    async listBusinessType(): Promise<IResponseMessage>{
+        const response = await this.businessTypeService.listBusinesType()
+        return wrapResponseMessage("list of business fetch successfull", response);
     }
 }
