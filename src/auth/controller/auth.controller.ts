@@ -8,7 +8,7 @@ import { ResendRegistationDTO } from "../dtos/resendRegistration.dto";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.services";
-
+import { LoginOutput } from "../types/loginOut.type";
 
 @Controller('auth')
 @ApiTags('Authentication')
