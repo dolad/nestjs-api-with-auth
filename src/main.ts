@@ -11,7 +11,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet({
-    contentSecurityPolicy: false, //remove after ssl
   }));
 
   app.useGlobalPipes(
