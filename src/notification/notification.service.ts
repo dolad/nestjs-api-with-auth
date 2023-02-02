@@ -48,4 +48,36 @@ export class NotificationService {
       );
     }
   }
+
+  @OnEvent('two-fa-auth.email')
+  async sendTwoFaEmail(payload: IEmailNotification) {
+    try {
+      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
+      let options: ISendEmail;
+      const defaultOptions = {
+        to: payload.to,
+        type: 'twoFA'
+      };
+
+          options = {
+            ...payload.verificationEmail,
+            ...defaultOptions,
+            subject: 'Verify Email',
+            template: 'twoFa',
+      }
+
+      if (options) {
+        await this.emailService.sendEmail(options);
+
+        this.logger.verbose(
+          `${payload.type} sent to ${payload.to} successfully.`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `An error occured while sending ${payload.type} to ${payload.to}.`,
+        error,
+      );
+    }
+  }
 }

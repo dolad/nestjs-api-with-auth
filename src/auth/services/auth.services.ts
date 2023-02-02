@@ -11,6 +11,7 @@ import { IEmailNotification } from "src/notification/interface/email-notificatio
 import { ConfigService } from "@nestjs/config";
 import { GoogleUserSignInPayload } from "../types/google.type";
 import { UserServices } from "src/user/services/user.services";
+import { IAuthUser } from "src/user/types/user.types";
 
 @Injectable()
 export class AuthService {
@@ -51,25 +52,31 @@ export class AuthService {
      * @param payload LoginDTO
      * @return User
      */
-    async login(user: any): Promise<LoginOutput> {
-        const { isConfirmed } = await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
+    async login(user: IAuthUser): Promise<LoginOutput| string> {
+        const userExist = await this.userRepos.scope('removeSensitivePayload').findByPk(user.userId);
+        const { isConfirmed, twoFactorAuth } = userExist;
         if (!isConfirmed) {
             await this.sendRegistrationToken(user.email);
             throw new UnauthorizedException("user not confirm please check your mail and verify")
         }
+        if(twoFactorAuth){
+            return await this.send2FAToken(userExist);
+        }
+        
         return {
             email: user.email,
-            id: user.id,
+            id: user.userId,
             token: await this.generateAccessToken(user)
         }
     }
-    private async generateAccessToken(user: any){
 
+    private async generateAccessToken(user: any){
        const jwtPayload = { email: user.email, userId: user.id};
         return this.jwtService.sign(jwtPayload, {
             secret:this.config.get('jwt').jwtSecret
         })
     }
+
 
     private async isRegistered(payload: RegistrationDTO): Promise<boolean> {
         const user = await this.userRepos.findOne({
@@ -109,9 +116,7 @@ export class AuthService {
             'notification.email',
             emailPayload
         )
-
         this.logger.log("email notification sent successfull");
-
     }
 
     async verifyEmailLink(token: string): Promise<void> {       
@@ -155,12 +160,43 @@ export class AuthService {
       return await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
     }
 
-    // 
-    async resetPassword(email: any): Promise<string>{
-        await this.userService.findByEmailOrFailed(email);
-        // 
-        return 
+   
+    // async resetPassword(email: any): Promise<string>{
+    //     await this.userService.findByEmailOrFailed(email);
+       
+    //     return 
+    // }
+
+    async send2FAToken(user: User): Promise<string>{
+        if(user.twoFactorAuth === 'email'){
+           return this.dispatchTwoFaTokenEmail(user.email);
+        }
+        return
     }
+
+
+    dispatchTwoFaTokenEmail(email: string): string {
+        const twoFaToken = Math.random().toString().substring(2, 8);
+        const emailPayload: IEmailNotification = {
+            type: "TWO_FA_AUTHENTICATION",
+            to: email,
+            twoFaEmail: {
+                context: {
+                    twoFaToken,
+                },
+            }
+        }
+
+        this.eventEmitter.emit(
+            'two-fa-auth.email',
+            emailPayload
+        )
+
+        this.logger.log("email notification sent successfull");
+        return "authentication login code has been sent to your email or phone number"
+    }
+    
+
 
     
 

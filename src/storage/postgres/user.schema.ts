@@ -117,7 +117,7 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         type: DataType.STRING,
         defaultValue: null
     })
-    twoFactorAuth?: boolean;
+    twoFactorAuth?: string ;
 
     @Column({
         allowNull: true,
