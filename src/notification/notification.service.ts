@@ -63,7 +63,7 @@ export class NotificationService {
             ...payload.verificationEmail,
             ...defaultOptions,
             subject: 'Verify Email',
-            template: 'twoFa',
+            template: 'two-fa',
       }
 
       if (options) {
