@@ -45,7 +45,7 @@ export class AuthController {
    @ApiResponse({ status: 500, description: 'Internal Server Error' })
    @Post('resend-registration-token')
    async resendRegistration(@Body() resendRegistrationDto:ResendRegistationDTO): Promise<IResponseMessage> {
-      const response = await this.authServices.sendRegistrationToken(resendRegistrationDto.email);
+      const response = await this.authServices.resendRegistrationToken(resendRegistrationDto.email);
       return wrapResponseMessage("verification email send successfully", response);
       
    }

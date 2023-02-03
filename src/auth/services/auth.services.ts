@@ -23,6 +23,7 @@ export class AuthService {
         private readonly config: ConfigService,
         private readonly userService: UserServices
     ) { }
+
     async register(payload: RegistrationDTO): Promise<string> {
         const isRegistered = await this.isRegistered(payload);
         if (isRegistered) throw new ForbiddenException("User already exist");
@@ -30,7 +31,7 @@ export class AuthService {
         const user = await this.userRepos.create({
             ...payload
         })
-        await this.sendRegistrationToken(user.email);
+        await this.sendRegistrationToken(user);
         this.logger.log("user registration successfull");
         return "user registration successfully please check your email"
     }
@@ -52,31 +53,99 @@ export class AuthService {
      * @param payload LoginDTO
      * @return User
      */
-    async login(user: IAuthUser): Promise<LoginOutput| string> {
-        const userExist = await this.userRepos.scope('removeSensitivePayload').findByPk(user.userId);
-        const { isConfirmed, twoFactorAuth } = userExist;
-        if (!isConfirmed) {
-            await this.sendRegistrationToken(user.email);
-            throw new UnauthorizedException("user not confirm please check your mail and verify")
-        }
-        if(twoFactorAuth){
-            return await this.send2FAToken(userExist);
-        }
-        
+    async login(user: User): Promise<LoginOutput | string> {
+        const { twoFactorAuth } = user;
+        await this.sendRegistrationToken(user);
+        if(twoFactorAuth) return await this.send2FAToken(user);
+        this.logger.log("user loggedIn successfull");
         return {
             email: user.email,
-            id: user.userId,
+            id: user.id,
             token: await this.generateAccessToken(user)
         }
     }
 
-    private async generateAccessToken(user: any){
-       const jwtPayload = { email: user.email, userId: user.id};
-        return this.jwtService.sign(jwtPayload, {
-            secret:this.config.get('jwt').jwtSecret
-        })
+    async authUser(user: any): Promise<User> {
+        return await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
     }
 
+
+    async resendRegistrationToken(email: string) {
+        const user = await this.userService.findByEmailOrFailed(email);
+        await this.sendRegistrationToken(user);
+        
+    }
+
+    async verifyEmailLink(token: string): Promise<void> {
+        const user = await this.jwtService.verify(token, {
+            secret: this.config.get('jwt').registrationToken
+        })
+        if (!user) throw new NotFoundException("Invalid verification link");
+        const updateUser = await this.userService.findByEmail(user.email);
+        updateUser.isConfirmed = true;
+        updateUser.save();
+        this.logger.log(`email link verification verified successfull for ${user.email}`);
+    }
+
+    async googleLogin(googleUser: GoogleUserSignInPayload): Promise<LoginOutput> {
+        let userExist: User;
+        if (!googleUser) {
+            throw new UnauthorizedException("No user is returned from google account");
+        }
+        userExist = await this.userService.findByEmail(googleUser.email);
+        if (!userExist) {
+            userExist = await this.createGoogleUser(googleUser)
+        }
+        return {
+            email: userExist.email,
+            id: userExist.id,
+            token: await this.generateAccessToken(googleUser)
+        }
+    }
+
+    private async sendRegistrationToken(user: User): Promise<void> {
+        if (user.isConfirmed) {
+            return
+        }
+        const registrationToken = await this.generateRegisterationToken(user.email, user.userType);
+        const emailPayload: IEmailNotification = {
+            type: "VERIFICATION_EMAIL",
+            to: user.email,
+            verificationEmail: {
+                context: {
+                    firstName: user.firstName,
+                    host: `http://${process.env.APP_URL}/api/v1/auth/verify/${registrationToken}`
+                }
+            }
+        }
+
+        this.eventEmitter.emit(
+            'notification.email',
+            emailPayload
+        )
+        this.logger.log("email notification sent successfull");
+        throw new UnauthorizedException("user not confirm please check your mail and verify")
+
+    }
+
+   
+
+    private async createGoogleUser(user: GoogleUserSignInPayload): Promise<User> {
+        const newUser = await this.userRepos.create({
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.firstName,
+            isGoogleSign: true
+        })
+        return newUser;
+    }
+
+    private async generateAccessToken(user: any) {
+        const jwtPayload = { email: user.email, userId: user.id };
+        return this.jwtService.sign(jwtPayload, {
+            secret: this.config.get('jwt').jwtSecret
+        })
+    }
 
     private async isRegistered(payload: RegistrationDTO): Promise<boolean> {
         const user = await this.userRepos.findOne({
@@ -98,84 +167,23 @@ export class AuthService {
         })
     }
 
-    async sendRegistrationToken(email: string): Promise<void> {
-        const user = await this.userService.findByEmail(email);
-        const registrationToken = await this.generateRegisterationToken(user.email, user.userType);
-        const emailPayload: IEmailNotification = {
-            type: "VERIFICATION_EMAIL",
-            to: user.email,
-            verificationEmail: {
-                context: {
-                    firstName: user.firstName,
-                    host: `http://${process.env.APP_URL}/api/v1/auth/verify/${registrationToken}`
-                }
-            }
-        }
+  
 
-        this.eventEmitter.emit(
-            'notification.email',
-            emailPayload
-        )
-        this.logger.log("email notification sent successfull");
-    }
-
-    async verifyEmailLink(token: string): Promise<void> {       
-        const user = await this.jwtService.verify(token, {
-            secret: this.config.get('jwt').registrationToken
-        }) 
-        if(!user) throw new NotFoundException("Invalid verification link");
-        const updateUser = await this.userService.findByEmail(user.email);
-        updateUser.isConfirmed = true;
-        updateUser.save(); 
-        this.logger.log(`email link verification verified successfull for ${user.email}`);
-    }
-
-    async googleLogin(googleUser: GoogleUserSignInPayload): Promise<LoginOutput>{
-        let userExist: User;
-        if(!googleUser){
-            throw new UnauthorizedException("No user is returned from google account");
-        }
-        userExist = await this.userService.findByEmail(googleUser.email);
-        if(!userExist){
-           userExist = await this.createGoogleUser(googleUser)
-        }
-        return {
-            email: userExist.email,
-            id: userExist.id,
-            token: await this.generateAccessToken(googleUser)
-        }
-    }
-
-    private async createGoogleUser(user: GoogleUserSignInPayload): Promise<User>{
-        const newUser = await this.userRepos.create({
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.firstName,
-           isGoogleSign: true
-        })
-        return newUser;
-    }
-
-    async authUser(user: any): Promise<User>{
-      return await this.userRepos.scope('removeSensitivePayload').findByPk(user.id);
-    }
-
-   
     // async resetPassword(email: any): Promise<string>{
     //     await this.userService.findByEmailOrFailed(email);
-       
+
     //     return 
     // }
 
-    async send2FAToken(user: User): Promise<string>{
-        if(user.twoFactorAuth === 'email'){
-           return this.dispatchTwoFaTokenEmail(user.email);
+    private async send2FAToken(user: User): Promise<string> {
+        if (user.twoFactorAuth && user.twoFactorAuth === 'email') {
+            return this.dispatchTwoFaTokenEmail(user.email);
         }
         return
     }
 
 
-    dispatchTwoFaTokenEmail(email: string): string {
+    private dispatchTwoFaTokenEmail(email: string): string {
         const twoFaToken = Math.random().toString().substring(2, 8);
         const emailPayload: IEmailNotification = {
             type: "TWO_FA_AUTHENTICATION",
@@ -195,10 +203,10 @@ export class AuthService {
         this.logger.log("email notification sent successfull");
         return "authentication login code has been sent to your email or phone number"
     }
-    
 
 
-    
+
+
 
 
 
