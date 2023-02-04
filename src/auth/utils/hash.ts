@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 export class HashManager {
     // expensive hashing in term of memory-optimization
     async bHash(payload: string): Promise<string>{
+        if(!payload) return
         return bcrypt.hashSync(payload, 10);
     }
 

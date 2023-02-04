@@ -7,13 +7,13 @@ import { IEmailNotification, ISendEmail } from './interface/email-notification.i
 export class NotificationService {
   private logger: Logger = new Logger(NotificationService.name);
 
-  constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly emailService: EmailService) { }
 
   @OnEvent('notification.email')
   async emailNotification(payload: IEmailNotification) {
     try {
       this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-  
+
       let options: ISendEmail;
       const defaultOptions = {
         to: payload.to,
@@ -59,11 +59,11 @@ export class NotificationService {
         type: 'twoFA'
       };
 
-          options = {
-            ...payload.verificationEmail,
-            ...defaultOptions,
-            subject: 'Verify Email',
-            template: 'two-fa',
+      options = {
+        ...payload.twoFaEmail,
+        ...defaultOptions,
+        subject: 'Login Verification',
+        template: 'two-fa',
       }
 
       if (options) {
