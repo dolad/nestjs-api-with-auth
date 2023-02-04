@@ -45,7 +45,7 @@ export class AuthController {
    @ApiResponse({ status: 500, description: 'Internal Server Error' })
    @Post('resend-registration-token')
    async resendRegistration(@Body() resendRegistrationDto:ResendRegistationDTO): Promise<IResponseMessage> {
-      const response = await this.authServices.sendRegistrationToken(resendRegistrationDto.email);
+      const response = await this.authServices.resendRegistrationToken(resendRegistrationDto.email);
       return wrapResponseMessage("verification email send successfully", response);
       
    }
@@ -61,14 +61,25 @@ export class AuthController {
       return wrapResponseMessage("link verification succesfull", null);
    }
 
+
    @ApiResponse({
       status: 200,
       description: 'social authentication',
    })
-   @Get('google/redirect')
+   @Get('google/sign-in')
+   @UseGuards(AuthGuard('google'))
+   async googleSignin(@Req() req): Promise<void>{
+     
+   }
+
+   @ApiResponse({
+      status: 200,
+      description: 'social authentication',
+   })
+   @Get('google/oauth')
    @UseGuards(AuthGuard('google'))
    async googleAuthRedirect(@Req() req): Promise<IResponseMessage>{
-      const response = await this.authServices.googleLogin(req)
+      const response = await this.authServices.googleLogin(req.user)
       return wrapResponseMessage("google redirection succesfull", response);
 
    }

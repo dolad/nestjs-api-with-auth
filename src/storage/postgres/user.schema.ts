@@ -9,6 +9,11 @@ export enum UserType {
     ADMIN = 'admin'
 }
 
+export enum TwoFactorAuth {
+    EMAIL = 'email',
+    SMS = 'sms',
+}
+
 const scopes = {
     removeSensitivePayload: {
       attributes: { exclude: ['password'] },
@@ -27,7 +32,10 @@ export type UserAttributes = {
     createdAt?: Date;
     updatedAt?: Date;
     isGoogleSign: boolean;
-    kyc: string
+    kyc: string;
+    twoFactorAuth: string;
+    
+
 
 }
 
@@ -103,6 +111,13 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         defaultValue: false
     })
     hasCompletedKYC?: boolean;
+
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    twoFactorAuth?: string ;
 
     @Column({
         allowNull: true,

@@ -1,8 +1,15 @@
 
 export interface IEmailNotification {
-  type: 'VERIFICATION_EMAIL';
-  verificationEmail: IVerifyEmail;
+  type: 'VERIFICATION_EMAIL' | 'TWO_FA_AUTHENTICATION';
+  verificationEmail?: IVerifyEmail;
+  twoFaEmail?: ITwoFaEmail;
   to: string;
+}
+
+export interface ITwoFaEmail {
+  context: {
+    twoFaToken: string
+  };
 }
 
 export interface IVerifyEmail {

@@ -7,13 +7,13 @@ import { IEmailNotification, ISendEmail } from './interface/email-notification.i
 export class NotificationService {
   private logger: Logger = new Logger(NotificationService.name);
 
-  constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly emailService: EmailService) { }
 
   @OnEvent('notification.email')
   async emailNotification(payload: IEmailNotification) {
     try {
       this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-  
+
       let options: ISendEmail;
       const defaultOptions = {
         to: payload.to,
@@ -32,6 +32,38 @@ export class NotificationService {
 
         default:
           break;
+      }
+
+      if (options) {
+        await this.emailService.sendEmail(options);
+
+        this.logger.verbose(
+          `${payload.type} sent to ${payload.to} successfully.`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `An error occured while sending ${payload.type} to ${payload.to}.`,
+        error,
+      );
+    }
+  }
+
+  @OnEvent('two-fa-auth.email')
+  async sendTwoFaEmail(payload: IEmailNotification) {
+    try {
+      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
+      let options: ISendEmail;
+      const defaultOptions = {
+        to: payload.to,
+        type: 'twoFA'
+      };
+
+      options = {
+        ...payload.twoFaEmail,
+        ...defaultOptions,
+        subject: 'Login Verification',
+        template: 'two-fa',
       }
 
       if (options) {

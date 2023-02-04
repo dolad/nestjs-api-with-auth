@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { BusinessServices } from "src/business/services/business.services";
 import { User } from "../../storage/postgres/user.schema";
 import { USER_REPOSITORY } from "../../utils/constants";
+import { IAuthUser } from "../types/user.types";
 
 @Injectable()
 export class UserServices {
@@ -25,6 +26,16 @@ export class UserServices {
         }
 
         return user;
+    }
+    async enableTwoFaAuth(user: IAuthUser, twoFactorAuth: string): Promise<string>{
+        await this.userRepos.update({
+            twoFactorAuth,
+        },{
+            where: {
+                email: user.email
+            }
+        })
+        return "Two Factor Authentication Enabled Succesfully"
     }
 
 }
