@@ -82,7 +82,7 @@ export class AuthService {
   async authUser(user: any): Promise<User> {
     return await this.userRepos
       .scope('removeSensitivePayload')
-      .findByPk(user.id);
+      .findByPk(user.userId);
   }
 
   async resendRegistrationToken(email: string) {
