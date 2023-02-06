@@ -10,9 +10,7 @@ async function bootstrap() {
   const logger = new Logger('bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  app.use(helmet({
-    contentSecurityPolicy: false, //remove after ssl
-  }));
+  app.use(helmet());
 
   app.useGlobalPipes(
     new ValidationPipe({
