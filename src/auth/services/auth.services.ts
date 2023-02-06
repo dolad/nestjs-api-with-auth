@@ -68,8 +68,10 @@ export class AuthService {
    */
   async login(user: User): Promise<LoginOutput | string> {
     const { twoFactorAuth } = user;
-    await this.sendRegistrationToken(user);
-    console.log(twoFactorAuth)
+    if(!user.isConfirmed){
+        await this.sendRegistrationToken(user);
+        return 'user registration not successfully please check your email';
+    }
     if (twoFactorAuth) return await this.send2FAToken(user);
     this.logger.log('user loggedIn successfull');
     return {
@@ -134,9 +136,9 @@ export class AuthService {
 
     this.eventEmitter.emit('notification.email', emailPayload);
     this.logger.log('email notification sent successfull');
-    throw new UnauthorizedException(
-      'user not confirm please check your mail and verify',
-    );
+    // throw new UnauthorizedException(
+    //   'user not confirm please check your mail and verify',
+    // );
   }
 
   private async createGoogleUser(user: GoogleUserSignInPayload): Promise<User> {
