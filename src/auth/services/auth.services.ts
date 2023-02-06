@@ -25,6 +25,9 @@ import { ConfigService } from '@nestjs/config';
 import { GoogleUserSignInPayload } from '../types/google.type';
 import { UserServices } from 'src/user/services/user.services';
 import { IAuthUser } from 'src/user/types/user.types';
+import { GoogleSignDto } from '../dtos/google-signin-dto';
+import { googleOathVerify } from '../dtos/google-oath-service';
+
 
 @Injectable()
 export class AuthService {
@@ -105,14 +108,11 @@ export class AuthService {
     );
   }
 
-  async googleLogin(googleUserPayload: any): Promise<LoginOutput| string> {
-    if(!googleUserPayload) throw new BadRequestException();
-    let user: User = await this.userService.findByEmail(googleUserPayload.email);
-    if(!user){
-        user = await this.createGoogleUser(googleUserPayload);
-        return await this.login(user)
-    }
-    return await this.login(user);
+  async googleLogin(googleUserPayload:GoogleSignDto): Promise<any> {
+    const {code } = googleUserPayload;
+    const userData = await googleOathVerify(code);
+    return userData;
+   
   }
 
   private async sendRegistrationToken(user: User): Promise<void> {
