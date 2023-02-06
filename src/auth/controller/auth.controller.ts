@@ -2,6 +2,7 @@ import { Body, Controller, Post, UseGuards, Request, Param, Get, Req } from "@ne
 import { AuthGuard } from "@nestjs/passport";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { IResponseMessage, wrapResponseMessage } from "src/utils/response.map";
+import { GoogleSignDto } from "../dtos/google-signin-dto";
 import { LoginDTO } from "../dtos/login.dto";
 import { RegistrationDTO } from "../dtos/registration.dto";
 import { ResendRegistationDTO } from "../dtos/resendRegistration.dto";
@@ -61,25 +62,13 @@ export class AuthController {
       return wrapResponseMessage("link verification succesfull", null);
    }
 
-
    @ApiResponse({
       status: 200,
       description: 'social authentication',
    })
-   @Get('google/sign-in')
-   @UseGuards(AuthGuard('google'))
-   async googleSignin(@Req() req): Promise<void>{
-     
-   }
-
-   @ApiResponse({
-      status: 200,
-      description: 'social authentication',
-   })
-   @Get('google/oauth')
-   @UseGuards(AuthGuard('google'))
-   async googleAuthRedirect(@Req() req): Promise<IResponseMessage>{
-      const response = await this.authServices.googleLogin(req.user)
+   @Get('google/signin')
+   async googleAuthRedirect(@Body() googleSignToken: GoogleSignDto): Promise<IResponseMessage>{
+      const response = await this.authServices.googleLogin(googleSignToken)
       return wrapResponseMessage("google redirection succesfull", response);
 
    }
