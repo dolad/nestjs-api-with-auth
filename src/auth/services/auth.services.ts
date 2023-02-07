@@ -24,9 +24,8 @@ import { IEmailNotification } from 'src/notification/interface/email-notificatio
 import { ConfigService } from '@nestjs/config';
 import { GoogleUserSignInPayload } from '../types/google.type';
 import { UserServices } from 'src/user/services/user.services';
-import { IAuthUser } from 'src/user/types/user.types';
 import { GoogleSignDto } from '../dtos/google-signin-dto';
-import { googleOathVerify } from '../dtos/google-oath-service';
+import { googleOathVerify } from './google-oath-service';
 
 
 @Injectable()
