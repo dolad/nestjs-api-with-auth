@@ -5,7 +5,7 @@ import { IResponseMessage, wrapResponseMessage } from "src/utils/response.map";
 import { GoogleSignDto } from "../dtos/google-signin-dto";
 import { LoginDTO } from "../dtos/login.dto";
 import { RegistrationDTO } from "../dtos/registration.dto";
-import { ResendRegistationDTO } from "../dtos/resendRegistration.dto";
+import { ResendRegistationDTO, ResetPasswordVerfiyDTO, UpdatePasswordDTO } from "../dtos/resendRegistration.dto";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.services";
@@ -57,7 +57,7 @@ export class AuthController {
    })
    @ApiResponse({ status: 500, description: 'Internal Server Error' })
    @Get('verify/:token')
-   async verifyEmailLink(@Param('token') token:string): Promise<IResponseMessage> {
+   async verifyRegistrationEmailLink(@Param('token') token:string): Promise<IResponseMessage> {
       await this.authServices.verifyEmailLink(token);
       return wrapResponseMessage("link verification succesfull", null);
    }
@@ -80,15 +80,27 @@ export class AuthController {
     return wrapResponseMessage("auth user fetched succesfull", response);
   }
 
-   // @ApiResponse({
-   //    status: 200,
-   //    description: 'Password Reset',
-   // })
-   // @ApiResponse({ status: 500, description: 'Internal Server Error' })
-   // @Post('reset-password')
-   // async resetPassword(@Body() resetPasswordDto:ResendRegistationDTO): Promise<string> {
-   //    await this.authServices.sendRegistrationToken(resetPasswordDto.email);
-   //    return "verification email send successfully"
-   // }
+   @ApiResponse({
+      status: 200,
+      description: 'Password Reset',
+   })
+   @ApiResponse({ status: 500, description: 'Internal Server Error' })
+   @Post('reset-password')
+   async resetPassword(@Body() resetPasswordDto:ResendRegistationDTO): Promise<IResponseMessage> {
+      await this.authServices.resetPassword(resetPasswordDto.email);
+      return wrapResponseMessage("verification email send successfully", "verification email send successfully")
+   }
+
+ 
+   @ApiResponse({
+      status: 200,
+      description: 'Password Update Password',
+   })
+   @ApiResponse({ status: 500, description: 'Internal Server Error' })
+   @Post('reset-password/update')
+   async resetPasswordUpdate(@Body() updatePasswordDto:UpdatePasswordDTO): Promise<IResponseMessage> {
+      await this.authServices.updatePassword(updatePasswordDto);
+      return wrapResponseMessage(" password updated successful", "OK")
+   }
 
 }

@@ -26,6 +26,8 @@ import { GoogleUserSignInPayload } from '../types/google.type';
 import { UserServices } from 'src/user/services/user.services';
 import { GoogleSignDto } from '../dtos/google-signin-dto';
 import { googleOathVerify } from './google-oath-service';
+import { UpdatePasswordDTO } from '../dtos/resendRegistration.dto';
+import { HashManager } from '../utils/hash';
 
 
 @Injectable()
@@ -179,11 +181,25 @@ export class AuthService {
     });
   }
 
-  // async resetPassword(email: any): Promise<string>{
-  //     await this.userService.findByEmailOrFailed(email);
+  async resetPassword(email: any): Promise<string>{
+      const user = await this.userService.findByEmailOrFailed(email);
+      const token = await this.generateRegisterationToken(user.email, user.userType);
+      console.log(token);
+      const verificationLink = `${process.env.FRONT_END_URL}/reset-password?token=${token}`
+      const passwordResetPayload:  IEmailNotification = {
+        type: 'RESET_PASSWORD_EMAIL',
+        to: user.email,
+        resetPasswordEmail: {
+          context: {
+            verificationLink,
+          },
+        },
+      }; 
 
-  //     return
-  // }
+      this.eventEmitter.emit('password-reset-notification.email', passwordResetPayload);
+      this.logger.log('password reset email sent successfull');
+      return 'password reset link has been sent to your email or phone number';     
+  }
 
   private async send2FAToken(user: User): Promise<string> {
     if (user.twoFactorAuth && user.twoFactorAuth === 'email') {
@@ -209,4 +225,32 @@ export class AuthService {
     this.logger.log('email notification sent successfull');
     return 'authentication login code has been sent to your email or phone number';
   }
+
+  private async verifyResetPasswordEmailLink(token: string): Promise<any> {
+    const user = await this.jwtService.verify(token, {
+      secret: this.config.get('jwt').registrationToken,
+    });
+    return user;
+  }
+
+  async updatePassword(payload: UpdatePasswordDTO): Promise<string> {
+    const verify = await this.verifyResetPasswordEmailLink(payload.token);
+    if(payload.newPassword != payload.confirmNewPassword){
+      throw new BadRequestException("Confirmed password does not merge");
+    }
+    const hashManager = new HashManager();
+    const password = await hashManager.bHash(payload.newPassword)
+     await this.userRepos.update({
+      password,
+    },{
+      where: {
+        email:verify.email
+      }
+    })
+
+      return "user password Updated"
+    
+  }
+
+  
 }

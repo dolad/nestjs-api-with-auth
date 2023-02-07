@@ -1,14 +1,21 @@
 
 export interface IEmailNotification {
-  type: 'VERIFICATION_EMAIL' | 'TWO_FA_AUTHENTICATION';
+  type: 'VERIFICATION_EMAIL' | 'TWO_FA_AUTHENTICATION' | 'RESET_PASSWORD_EMAIL';
   verificationEmail?: IVerifyEmail;
   twoFaEmail?: ITwoFaEmail;
+  resetPasswordEmail?:IResetPassword
   to: string;
 }
 
 export interface ITwoFaEmail {
   context: {
     twoFaToken: string
+  };
+}
+
+export interface IResetPassword {
+  context: {
+    verificationLink: string
   };
 }
 
