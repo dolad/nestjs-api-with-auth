@@ -80,4 +80,36 @@ export class NotificationService {
       );
     }
   }
+
+  @OnEvent('password-reset-notification.email')
+  async resetPasswordEmailNotification(payload: IEmailNotification) {
+    try {
+      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
+      let options: ISendEmail;
+      const defaultOptions = {
+        to: payload.to,
+        type: 'Password Reset'
+      };
+
+      options = {
+        ...payload.resetPasswordEmail,
+        ...defaultOptions,
+        subject: 'Reset password Verification',
+        template: 'reset-password',
+      }
+
+      if (options) {
+        await this.emailService.sendEmail(options);
+
+        this.logger.verbose(
+          `${payload.type} sent to ${payload.to} successfully.`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `An error occured while sending ${payload.type} to ${payload.to}.`,
+        error,
+      );
+    }
+  }
 }
