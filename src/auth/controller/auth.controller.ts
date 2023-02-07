@@ -85,7 +85,7 @@ export class AuthController {
       description: 'Password Reset',
    })
    @ApiResponse({ status: 500, description: 'Internal Server Error' })
-   @Post('reset-password')
+   @Post('reset-password/send-email')
    async resetPassword(@Body() resetPasswordDto:ResendRegistationDTO): Promise<IResponseMessage> {
       await this.authServices.resetPassword(resetPasswordDto.email);
       return wrapResponseMessage("verification email send successfully", "verification email send successfully")
