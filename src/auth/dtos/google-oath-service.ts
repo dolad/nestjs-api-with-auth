@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import {google} from "googleapis";
+import { GoogleUserSignInPayload } from "../types/google.type";
 
-export async function googleOathVerify (tokenCode: string): Promise<any> {
+export async function googleOathVerify (tokenCode: string): Promise<GoogleUserSignInPayload> {
     
     const clientLibary = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
@@ -17,6 +18,6 @@ export async function googleOathVerify (tokenCode: string): Promise<any> {
       });
     
     const googleUserInfo = await googleAuth.userinfo.get();
-    return googleUserInfo.data;
+    return googleUserInfo.data as GoogleUserSignInPayload;
    
 }
