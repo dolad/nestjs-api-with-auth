@@ -7,7 +7,6 @@ import { UserModule } from "src/user/user.module";
 import { User } from "../storage/postgres/user.schema";
 import { AuthController } from "./controller/auth.controller";
 import { AuthService } from "./services/auth.services";
-import { GoogleStrategy } from "./strategy/google.strategy";
 import { JWTStrategy } from "./strategy/jwt.strategy";
 import { LocalStrategy } from "./strategy/local.strategy";
 
@@ -24,7 +23,7 @@ import { LocalStrategy } from "./strategy/local.strategy";
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JWTStrategy, LocalStrategy, GoogleStrategy],
+    providers: [AuthService, JWTStrategy, LocalStrategy],
     exports: [AuthService]
 })
 

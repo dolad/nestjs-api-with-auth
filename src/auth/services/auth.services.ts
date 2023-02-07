@@ -108,11 +108,15 @@ export class AuthService {
     );
   }
 
-  async googleLogin(googleUserPayload:GoogleSignDto): Promise<any> {
+  async googleLogin(googleUserPayload:GoogleSignDto): Promise<LoginOutput | string> {
     const {code } = googleUserPayload;
     const userData = await googleOathVerify(code);
-    return userData;
-   
+    let user = await this.userService.findByEmail(userData.email);
+    if (!user){
+       user = await this.createGoogleUser(userData)
+       return await this.login(user);
+    }
+    return await this.login(user);
   }
 
   private async sendRegistrationToken(user: User): Promise<void> {
@@ -136,16 +140,13 @@ export class AuthService {
 
     this.eventEmitter.emit('notification.email', emailPayload);
     this.logger.log('email notification sent successfull');
-    // throw new UnauthorizedException(
-    //   'user not confirm please check your mail and verify',
-    // );
   }
 
   private async createGoogleUser(user: GoogleUserSignInPayload): Promise<User> {
     const newUser = await this.userRepos.create({
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.firstName,
+      firstName: user.given_name,
+      lastName: user.family_name,
       isGoogleSign: true,
       isConfirmed: true,
     });
