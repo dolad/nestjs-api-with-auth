@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import {google} from "googleapis";
 
 export async function googleOathVerify (tokenCode: string): Promise<any> {
+    
     const clientLibary = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_SECRET,
