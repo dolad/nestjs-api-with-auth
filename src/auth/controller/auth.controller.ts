@@ -66,7 +66,7 @@ export class AuthController {
       status: 200,
       description: 'social authentication',
    })
-   @Post('google/sign-in')
+   @Post('google/login')
    async googleAuthRedirect(@Body() googleSignToken: GoogleSignDto): Promise<IResponseMessage>{
       const response = await this.authServices.googleLogin(googleSignToken)
       return wrapResponseMessage("google redirection succesfull", response);
