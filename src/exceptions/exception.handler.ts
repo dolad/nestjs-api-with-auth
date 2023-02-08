@@ -23,18 +23,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const httpMessage =
-      httpStatus < 500
-        ? exception.getResponse()['message']
-        : 'oops! something occured, your request cannot be processed at the moment.';
-
+    console.log(exception.getResponse);
+  
     const responseBody = {
       statusCode: httpStatus,
       status: false,
       data: null,
       // timestamp: new Date().toISOString(),
       // path: httpAdapter.getRequestUrl(ctx.getRequest()),
-      message: httpMessage,
+      message: exception.message,
     };
 
     this.logger.error(exception.message, exception.stack, responseBody, );
