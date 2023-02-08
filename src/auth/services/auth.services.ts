@@ -74,7 +74,7 @@ export class AuthService {
     const { twoFactorAuth } = user;
     if(!user.isConfirmed){
         await this.sendRegistrationToken(user);
-        return 'user registration not successfully please check your email';
+        throw new BadRequestException('user registration is not complete please check your email and verify')
     }
     if (twoFactorAuth) return await this.send2FAToken(user);
     this.logger.log('user loggedIn successfull');
