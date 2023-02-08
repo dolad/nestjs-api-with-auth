@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { BusinessServices } from "src/business/services/business.services";
 import { User } from "../../storage/postgres/user.schema";
 import { USER_REPOSITORY } from "../../utils/constants";
@@ -22,7 +22,7 @@ export class UserServices {
     async findByEmailOrFailed(email:string): Promise<User>{
         const user = await this.findByEmail(email);
         if(!user){
-            throw new Error("User not found");
+            throw new NotFoundException("User not found");
         }
 
         return user;
