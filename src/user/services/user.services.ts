@@ -1,5 +1,4 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { BusinessServices } from "src/business/services/business.services";
 import { User } from "../../storage/postgres/user.schema";
 import { USER_REPOSITORY } from "../../utils/constants";
 import { IAuthUser } from "../types/user.types";

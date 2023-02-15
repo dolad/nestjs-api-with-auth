@@ -28,7 +28,7 @@ module.exports = {
       : 5432,
     username: process.env.POSTGRES_DATABASE_USER,
     password: process.env.POSTGRES_DATABASE_PASSWORD,
-    database: process.env.POSTGRES_DATABASE_NAME,
+    database: process.env.POSTGRES_DATABASE_NAME_TEST,
     logging: false,
     define: {
       underscored: false,

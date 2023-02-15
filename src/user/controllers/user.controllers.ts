@@ -1,7 +1,7 @@
 import { Controller, Post, UseGuards, Request, Body, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { IResponseMessage, wrapResponseMessage } from 'src/utils/response.map';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { IResponseMessage, wrapResponseMessage } from '../../utils/response.map';
 import { AddBusinessInformationDTO, CreateKyCDto } from '../dto/create-kyc.dto';
 import { EnabledTwoFaAuthPayload } from '../dto/enable-2fa.dto';
 import { KycServices } from '../services/user-kyc.services';

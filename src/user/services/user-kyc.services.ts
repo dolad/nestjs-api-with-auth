@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import { Kyc } from "src/storage/postgres/kyc.schema";
-import { User } from "src/storage/postgres/user.schema";
+import { Kyc } from "../../storage/postgres/kyc.schema";
+import { User } from "../../storage/postgres/user.schema";
 import { KYC_REPOSITORY, USER_REPOSITORY } from "../../utils/constants";
 import { AddBusinessInformationDTO, CreateKyCDto } from "../dto/create-kyc.dto";
 import { IAuthUser } from "../types/user.types";

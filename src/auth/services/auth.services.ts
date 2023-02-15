@@ -1,29 +1,24 @@
 import {
-    BadGatewayException,
   BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
   Logger,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
-  User,
-  UserAttributes,
-  UserType,
+  User
 } from 'src/storage/postgres/user.schema';
-import { USER_REPOSITORY } from 'src/utils/constants';
+import { USER_REPOSITORY } from '../../utils/constants';
 import { RegistrationDTO } from '../dtos/registration.dto';
-import { Op } from 'sequelize';
 import { LoginDTO } from '../dtos/login.dto';
 import { LoginOutput } from '../types/loginOut.type';
 import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { IEmailNotification } from 'src/notification/interface/email-notification.interface';
+import { IEmailNotification } from '../../notification/interface/email-notification.interface';
 import { ConfigService } from '@nestjs/config';
 import { GoogleUserSignInPayload } from '../types/google.type';
-import { UserServices } from 'src/user/services/user.services';
+import { UserServices } from '../../user/services/user.services';
 import { GoogleSignDto } from '../dtos/google-signin-dto';
 import { googleOathVerify } from './google-oath-service';
 import { UpdatePasswordDTO } from '../dtos/resendRegistration.dto';

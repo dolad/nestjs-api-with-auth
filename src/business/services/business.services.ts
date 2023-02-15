@@ -1,6 +1,6 @@
 import { Inject } from "@nestjs/common";
-import { BusinessType } from "src/storage/postgres/busines-type.schema";
-import { BUSINESS_TYPE_REPOSITORY } from "src/utils/constants";
+import { BusinessType } from "../../storage/postgres/busines-type.schema";
+import { BUSINESS_TYPE_REPOSITORY } from "../../utils/constants";
 
 
 

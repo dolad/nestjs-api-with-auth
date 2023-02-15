@@ -1,15 +1,13 @@
 import { Body, Controller, Post, UseGuards, Request, Param, Get, Req } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { IResponseMessage, wrapResponseMessage } from "src/utils/response.map";
+import { IResponseMessage, wrapResponseMessage } from "../../utils/response.map";
 import { GoogleSignDto } from "../dtos/google-signin-dto";
 import { LoginDTO } from "../dtos/login.dto";
 import { RegistrationDTO } from "../dtos/registration.dto";
-import { ResendRegistationDTO, ResetPasswordVerfiyDTO, UpdatePasswordDTO } from "../dtos/resendRegistration.dto";
+import { ResendRegistationDTO,  UpdatePasswordDTO } from "../dtos/resendRegistration.dto";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.services";
-import { LoginOutput } from "../types/loginOut.type";
 
 @Controller('auth')
 @ApiTags('Authentication')
