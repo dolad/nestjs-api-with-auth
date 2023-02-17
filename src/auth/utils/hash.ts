@@ -1,6 +1,3 @@
-import { scrypt, randomBytes, createHash } from "crypto";
-
-import { promisify } from "util";
 import * as bcrypt from 'bcrypt';
 
 export class HashManager {

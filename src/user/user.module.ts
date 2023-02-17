@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { BusinessModule } from "src/business/business.module";
+import { BusinessModule } from "../business/business.module";
 import { UserController } from "./controllers/user.controllers";
 import { KycServices } from "./services/user-kyc.services";
 import { UserServices } from "./services/user.services";

@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { wrapResponseMessage, IResponseMessage } from "src/utils/response.map";
+import { wrapResponseMessage, IResponseMessage } from "../../utils/response.map";
 import { BusinessServices } from "../services/business.services";
 
 @Controller('business-type')

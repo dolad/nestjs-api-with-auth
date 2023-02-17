@@ -9,6 +9,8 @@ import dbConfig = require('../config/postgres')
 import { Kyc } from "./postgres/kyc.schema";
 import { BusinessType } from "./postgres/busines-type.schema";
 
+console.log(process.env.NODE_ENV)
+
 @Module({
     imports: [
           SequelizeModule.forRootAsync({
@@ -16,9 +18,7 @@ import { BusinessType } from "./postgres/busines-type.schema";
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
-              
               models:[User, Kyc, BusinessType],
-              dialect: 'postgres',
               autoLoadModels: true,
                sync: {
                 force: false,
