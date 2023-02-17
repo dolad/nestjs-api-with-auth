@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Request, Param, Get, Req } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Request, Param, Get, Req, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { IResponseMessage, wrapResponseMessage } from "../../utils/response.map";
 import { GoogleSignDto } from "../dtos/google-signin-dto";
@@ -30,6 +30,7 @@ export class AuthController {
          description: 'User login',
    })
    @ApiResponse({ status: 500, description: 'Internal Server Error' })
+   @HttpCode(HttpStatus.OK)
    @UseGuards(LocalAuthGuard)
    @Post('login')
    async login(@Request() req, @Body() loginDto: LoginDTO): Promise<IResponseMessage>{
