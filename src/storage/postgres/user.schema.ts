@@ -166,19 +166,19 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
 
     @Column({
         type: DataType.FLOAT,
-        allowNull: false,
+        allowNull: true,
     })
     annualIncome?: number;
 
      @Column({
         type: DataType.DATE,
-        allowNull: false,
+        allowNull: true,
     })
     dateOfBirth?: Date;
 
     @Column({
         type: DataType.FLOAT,
-        allowNull: false,
+        allowNull: true,
     })
     personalCreditLimit?: number;
 
@@ -211,8 +211,8 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
 
     @ForeignKey(() => BusinessEntity)
     @Column({ type: DataType.UUID,
-        allowNull: false,})
-    businessEntityId: string;
+        allowNull: true,})
+    businessEntityId?: string;
 
     @BelongsTo(() => BusinessEntity)
     businessEntity: BusinessEntity;
