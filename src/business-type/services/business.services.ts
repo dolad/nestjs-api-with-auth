@@ -4,7 +4,7 @@ import { BUSINESS_TYPE_REPOSITORY } from "../../utils/constants";
 
 
 
-export class BusinessServices {
+export class BusinessTypeServices {
     constructor(
         @Inject(BUSINESS_TYPE_REPOSITORY) private businessTypeRepo: typeof BusinessType 
     ){}

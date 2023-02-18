@@ -8,6 +8,8 @@ import { User } from "./postgres/user.schema";
 import dbConfig = require('../config/postgres')
 import { Kyc } from "./postgres/kyc.schema";
 import { BusinessType } from "./postgres/busines-type.schema";
+import { BusinessEntity } from "./postgres/business-entity.schema";
+import { BusinessInformation } from "./postgres/business-information.schema";
 
 console.log(process.env.NODE_ENV)
 
@@ -18,7 +20,7 @@ console.log(process.env.NODE_ENV)
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
-              models:[User, Kyc, BusinessType],
+              models:[User, Kyc, BusinessInformation, BusinessType, BusinessEntity],
               autoLoadModels: true,
                sync: {
                 force: false,

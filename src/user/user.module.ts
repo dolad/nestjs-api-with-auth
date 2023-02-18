@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
-import { BusinessModule } from "../business/business.module";
+import { BusinessTypeModule } from "../business-type/business.module";
 import { UserController } from "./controllers/user.controllers";
 import { KycServices } from "./services/user-kyc.services";
 import { UserServices } from "./services/user.services";
 import { kycProviders, userProviders } from "./user.provider";
 
 @Module({
-    imports: [BusinessModule],
+    imports: [BusinessTypeModule],
     providers: [userProviders, kycProviders, KycServices, UserServices],
     exports: [userProviders, UserServices],
     controllers: [UserController]

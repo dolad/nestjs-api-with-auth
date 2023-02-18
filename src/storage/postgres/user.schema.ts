@@ -1,6 +1,7 @@
 import {  Optional } from "sequelize";
 import { Column, DataType, Table, Model, AfterCreate, HasOne, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { HashManager } from "../../auth/utils/hash";
+import { BusinessEntity } from "./business-entity.schema";
 import { Kyc } from "./kyc.schema";
 
 export enum UserType {
@@ -34,8 +35,18 @@ export type UserAttributes = {
     isGoogleSign: boolean;
     kyc: string;
     twoFactorAuth: string;
-    
-
+    businessEntityId?: string;
+    businessEntity?: BusinessEntity;
+    title?: string;
+    gender?: string;
+    employmentStatus?: string;
+    annualIncome?: number;
+    dateOfBirth?: Date;
+    personalCreditLimit?: number;
+    country?: string;
+    city?: string;
+    residentialAddress?: string;
+    residentialPostcode?: string;
 
 }
 
@@ -133,6 +144,78 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     })
     createdAt: Date;
 
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    title?: string;
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    gender?: string;
+
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    employmentStatus?: string;
+
+    @Column({
+        type: DataType.FLOAT,
+        allowNull: true,
+    })
+    annualIncome?: number;
+
+     @Column({
+        type: DataType.DATE,
+        allowNull: true,
+    })
+    dateOfBirth?: Date;
+
+    @Column({
+        type: DataType.FLOAT,
+        allowNull: true,
+    })
+    personalCreditLimit?: number;
+
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    country?: string;
+
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    city?: string;
+
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    residentialAddress?: string;
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    residentialPostcode?: string;
+
+    @ForeignKey(() => BusinessEntity)
+    @Column({ type: DataType.UUID,
+        allowNull: true,})
+    businessEntityId?: string;
+
+    @BelongsTo(() => BusinessEntity)
+    businessEntity: BusinessEntity;
    
    @HasOne(() => Kyc)
     kyc: Kyc;

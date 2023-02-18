@@ -46,7 +46,7 @@ export const authenticationEndpoint = () => {
         const response = await request.post('/auth/login').send(testUser);
         expect(response.body.status).toBe(true);
         expect(response.statusCode).toBe(HttpStatus.OK);
-        expect(response.body.data.token).toBeDefined()
+        expect(response.body.data.token).toBeDefined();
      })
 
 }
