@@ -129,7 +129,7 @@ export class AuthService {
       verificationEmail: {
         context: {
           firstName: user.firstName,
-          host: `${process.env.FRONT_END_URL}/verify-email/:${registrationToken}`,
+          host: `${process.env.FRONT_END_URL}/verify-email/${registrationToken}`,
         },
       },
     };
