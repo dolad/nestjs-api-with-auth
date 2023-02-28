@@ -23,17 +23,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    console.log(exception.getResponse);
-  
+    const errorResponse = exception.getResponse() as any;
     const responseBody = {
       statusCode: httpStatus,
       status: false,
       data: null,
-      // timestamp: new Date().toISOString(),
-      // path: httpAdapter.getRequestUrl(ctx.getRequest()),
-      message: exception.message,
+      message: errorResponse.message || errorResponse,
+     
     };
-
+    
     this.logger.error(exception.message, exception.stack, responseBody, );
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);

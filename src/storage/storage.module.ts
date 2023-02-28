@@ -20,7 +20,7 @@ console.log(process.env.NODE_ENV)
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
-              models:[User, Kyc, BusinessInformation, BusinessType, BusinessEntity],
+              models:[User, Kyc, BusinessEntity, BusinessInformation, BusinessType],
               autoLoadModels: true,
                sync: {
                 force: false,

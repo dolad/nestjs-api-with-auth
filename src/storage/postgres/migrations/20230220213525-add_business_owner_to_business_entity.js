@@ -3,15 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-     await queryInterface.addColumn('users', 'twoFactorAuth', {
+    await queryInterface.addColumn('businessEntities', 'business_owner', {
       type: Sequelize.STRING,
-      allowNull: true,
-      defaultValue: null
+      allowNull: false
      });
-     
   },
 
   async down (queryInterface, Sequelize) {
-     await queryInterface.removeColumn('users', 'twoFactorAuth');
+    await queryInterface.removeColumn('businessEntities', 'business_owner');
   }
 };
+

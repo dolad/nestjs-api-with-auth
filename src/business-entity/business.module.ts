@@ -1,13 +1,20 @@
 import { Module } from "@nestjs/common";
+import { SequelizeModule } from "@nestjs/sequelize";
+import { User } from "../storage/postgres/user.schema";
+import { BusinessEntity } from "../storage/postgres/business-entity.schema";
 import { BusinessEntityController } from "./controller/business-entity.controller";
-import { businessTypeProviders } from "./providers/provider";
+import { businessEntityProviders } from "./providers/provider";
 import { BusinessEntityServices } from "./services/business-entity.services";
+import { UserModule } from "../user/user.module";
 
 @Module({
-    imports: [],
+    imports: [
+        SequelizeModule.forFeature([BusinessEntity, User]),
+        UserModule
+    ],
     controllers: [BusinessEntityController],
-    providers: [BusinessEntityServices, businessTypeProviders],
-    exports: [BusinessEntityServices],
+    providers: [BusinessEntityServices, businessEntityProviders],
+    exports: [BusinessEntityServices]
 })
 
-export class BusinessEntityModule {}
+export class BusinessEntityModule {} 

@@ -2,9 +2,8 @@ import request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { AppModule } from './../src/app.module';
 import { INestApplication } from '@nestjs/common';
-import { authenticationEndpoint } from './auth/auth.e2e.spec';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-
+import { authenticationEndpoint } from './auth/auth.spec';
+import {businessEntityEndpoint, UnauthoriedBusinessEntityEndpoint} from "./business-entity/business-entity.spec"
 
 export let app: INestApplication;
 describe('AppController (e2e)', () => {
@@ -20,6 +19,9 @@ describe('AppController (e2e)', () => {
   });
 
   describe('Authentication endpoint (e2e)', authenticationEndpoint)
+  describe('Business endpoint (e2e) Unauthorized', UnauthoriedBusinessEntityEndpoint)
+  describe('Business endpoint (e2e)', businessEntityEndpoint)
+
 
   it('/ (GET)', () => {
     return request(app.getHttpServer())

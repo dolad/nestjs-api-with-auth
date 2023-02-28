@@ -1,16 +1,90 @@
-import { Controller, Get } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
-import { wrapResponseMessage, IResponseMessage } from "../../utils/response.map";
-import { BusinessEntityServices } from "../services/business-entity.services";
+import {
+  Body,
+  Controller,
+  ParseArrayPipe,
+  Post,
+  Request,
+  UseGuards,
+  Get,
+  Param,
+  Patch,
+  HttpCode,
+  HttpStatus,
+  Delete,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import {
+  IResponseMessage,
+  wrapResponseMessage,
+} from '../../utils/response.map';
+import { CreateBusinessOwnerDto, UpdateBusinessOwnerDto } from '../dto/create-business-owner.dto';
+import { BusinessEntityServices } from '../services/business-entity.services';
 
-@Controller('business-type')
+@Controller('business-entity')
 @ApiTags('Business')
 export class BusinessEntityController {
-    constructor(private readonly businessTypeService: BusinessEntityServices){}
+  constructor(private readonly businessEntityService: BusinessEntityServices) {}
 
-    @Get('')
-    async listBusinessType(): Promise<IResponseMessage>{
-        const response = await this.businessTypeService.listBusinesType()
-        return wrapResponseMessage("list of business fetch successfull", response);
-    }
+  @Post('/kyc/stage-1')
+  @UseGuards(JwtAuthGuard)
+  async createBusinessEntity(
+    @Request() req,
+    @Body(new ParseArrayPipe({ items: CreateBusinessOwnerDto }))
+    createBodyPayload: CreateBusinessOwnerDto[],
+  ): Promise<IResponseMessage> {
+    const response = await this.businessEntityService.createBusinessOwners(
+      createBodyPayload,
+      req.user,
+    );
+    return wrapResponseMessage(
+      'Business entity and Kyc record Created',
+      response,
+    );
+  }
+
+  @Get('/kyc')
+  @UseGuards(JwtAuthGuard)
+  async getBusinessEntity(
+    @Request() req,
+  ): Promise<IResponseMessage> {
+    const response = await this.businessEntityService.fetchBusinessEntity(
+      req.user,
+    );
+    return wrapResponseMessage(
+      'Business entity and Kyc Record Fetched',
+      response,
+    );
+  }
+
+  @Patch('/kyc/updateShareHolders/:shareHolderId')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async updateShareHolders(
+    @Param("shareHolderId") shareHolderId: string,
+    @Body() updateShareHolderDetails: UpdateBusinessOwnerDto
+  ): Promise<IResponseMessage> {
+    const response = await this.businessEntityService.updateShareHoldersDetails(
+        shareHolderId,
+        updateShareHolderDetails
+    );
+    return wrapResponseMessage(
+      'Business entity and Kyc Record Updated Successfully',
+      "shareHolderUploaded Successfully",
+    );
+  }
+
+  @Delete('/kyc/deleteShareHolder/:shareHolderId')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteShareHolders(
+    @Param("shareHolderId") shareHolderId: string
+  ): Promise<IResponseMessage> {
+    const response = await this.businessEntityService.deleteShareHoldersDetails(
+        shareHolderId);
+    return wrapResponseMessage(
+      'Business entity and Kyc Record Fetched',
+      response,
+    );
+  }
 }

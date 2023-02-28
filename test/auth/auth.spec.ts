@@ -4,15 +4,9 @@ import { app } from "../app.e2e-spec"
 import { HttpStatus } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { User } from "../../src/storage/postgres/user.schema";
+import { testUser } from "./mockUser";
 
 
-
-const testUser = {
-    email: "adolad2019@gmail.com",
-    password: "adminpassword",
-    firstName: "developer",
-    lastName: "testing"
-}
 
 export const authenticationEndpoint = () => {
     let request: SuperTest<Test>;

@@ -7,7 +7,9 @@ import { Kyc } from "./kyc.schema";
 export enum UserType {
     BUSINESS = 'business',
     BANK = 'bank',
-    ADMIN = 'admin'
+    ADMIN = 'admin',
+    SHAREHOLDER = 'shareholders',
+    BUSINESS_OWNER = 'businessOwner',
 }
 
 export enum TwoFactorAuth {
@@ -25,7 +27,7 @@ export type UserAttributes = {
     id?: string,
     firstName: string;
     lastName: string;
-    email: string;
+    email?: string;
     password?: string;
     userType: UserType;
     isConfirmed?: boolean;
@@ -78,13 +80,13 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
 
 
     @Column({
-        unique: true,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
         validate: {
             isEmail: true,
         }
     })
-    email: string;
+    email?: string;
 
     @Column({
         allowNull: true,

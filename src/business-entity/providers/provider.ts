@@ -1,8 +1,8 @@
-import { BusinessType } from "../../storage/postgres/busines-type.schema";
+import { BusinessEntity } from "../../storage/postgres/business-entity.schema";
 import { BUSINESS_ENTITY_REPOSITORY } from "../../utils/constants";
 
-export const businessTypeProviders = 
+export const businessEntityProviders = 
     {
         provide: BUSINESS_ENTITY_REPOSITORY,
-        useValue: BusinessType  
+        useValue: BusinessEntity  
     }

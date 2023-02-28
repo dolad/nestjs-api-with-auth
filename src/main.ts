@@ -1,10 +1,11 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { setupSwagger } from './swagger';
 import { loggerMiddleware } from './middleware';
+import { ValidationError } from 'class-validator';
 
 async function bootstrap() {
   const logger = new Logger('bootstrap');

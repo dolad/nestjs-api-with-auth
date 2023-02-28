@@ -7,8 +7,9 @@ import { User } from "./user.schema";
 export type BusinessEntityAttribute = {
     id?: string;
     shareholders: User[];
-    owner: string;
+    creator: string;
     kycStep?: number;
+    businessOwner: string;
     businessInformation?: BusinessInformation;
     // financeAccounts?: BusinessFinanceInformation;
     // salesSoftwares?: SalesSoftwares;
@@ -34,7 +35,12 @@ export class BusinessEntity extends Model<BusinessEntityAttribute, BusinessEntit
     @Column({
         type: DataType.STRING,
     })
-    ownerId: string;
+    creator: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    businessOwner: string;
 
     @HasOne(() => BusinessInformation)
     businessInformation: BusinessInformation;

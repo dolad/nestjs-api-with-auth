@@ -14,6 +14,8 @@ import { NotificationModule } from './notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import emailConfiig from './config/email.confiig';
 import { BusinessTypeModule } from './business-type/business.module';
+import { BusinessEntityModule } from './business-entity/business.module';
+import { BusinessInformationModule } from './business-information/business.module';
 
 // @ts-ignore
 
@@ -42,7 +44,9 @@ import { BusinessTypeModule } from './business-type/business.module';
     UserModule,
     BusinessTypeModule,
     NotificationModule,
-    AuthModule
+    BusinessEntityModule,
+    AuthModule,
+    BusinessInformationModule
 
   ],
 
