@@ -6,11 +6,13 @@ import { BusinessEntityController } from "./controller/business-entity.controlle
 import { businessEntityProviders } from "./providers/provider";
 import { BusinessEntityServices } from "./services/business-entity.services";
 import { UserModule } from "../user/user.module";
+import { BusinessInformationModule } from "src/business-information/business.module";
 
 @Module({
     imports: [
         SequelizeModule.forFeature([BusinessEntity, User]),
-        UserModule
+        UserModule,
+        BusinessInformationModule,
     ],
     controllers: [BusinessEntityController],
     providers: [BusinessEntityServices, businessEntityProviders],

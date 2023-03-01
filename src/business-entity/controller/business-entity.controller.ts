@@ -18,7 +18,7 @@ import {
   IResponseMessage,
   wrapResponseMessage,
 } from '../../utils/response.map';
-import { CreateBusinessOwnerDto, UpdateBusinessOwnerDto } from '../dto/create-business-owner.dto';
+import { CreateBusinessEntity, AddBusinessOwnerDto, UpdateBusinessOwnerDto } from '../dto/create-business-owner.dto';
 import { BusinessEntityServices } from '../services/business-entity.services';
 
 @Controller('business-entity')
@@ -30,15 +30,31 @@ export class BusinessEntityController {
   @UseGuards(JwtAuthGuard)
   async createBusinessEntity(
     @Request() req,
-    @Body(new ParseArrayPipe({ items: CreateBusinessOwnerDto }))
-    createBodyPayload: CreateBusinessOwnerDto[],
+    @Body() createBodyPayload: CreateBusinessEntity,
+  ): Promise<IResponseMessage> {
+    const response = await this.businessEntityService.createBusinessEntity(
+      createBodyPayload,
+      req.user,
+    );
+    return wrapResponseMessage(
+      'Business entity and Kyc record Created',
+      response,
+    );
+  }
+
+  @Post('/kyc/stage-2')
+  @UseGuards(JwtAuthGuard)
+  async addBusinessOwner(
+    @Request() req,
+    @Body(new ParseArrayPipe({ items: AddBusinessOwnerDto }))
+    createBodyPayload: AddBusinessOwnerDto[],
   ): Promise<IResponseMessage> {
     const response = await this.businessEntityService.createBusinessOwners(
       createBodyPayload,
       req.user,
     );
     return wrapResponseMessage(
-      'Business entity and Kyc record Created',
+      'Business Owner added and Kyc record created',
       response,
     );
   }

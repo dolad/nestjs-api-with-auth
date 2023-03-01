@@ -9,7 +9,7 @@ export type BusinessEntityAttribute = {
     shareholders: User[];
     creator: string;
     kycStep?: number;
-    businessOwner: string;
+    businessOwner?: string;
     businessInformation?: BusinessInformation;
     // financeAccounts?: BusinessFinanceInformation;
     // salesSoftwares?: SalesSoftwares;
@@ -39,6 +39,9 @@ export class BusinessEntity extends Model<BusinessEntityAttribute, BusinessEntit
 
     @Column({
         type: DataType.STRING,
+        allowNull: true,
+        defaultValue: null
+    
     })
     businessOwner: string;
 

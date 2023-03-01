@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString, IsDateString, IsNumber, IsOptional } from 'class-validator';
 
-export class CreateBusinessOwnerDto {
+export class AddBusinessOwnerDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
@@ -128,7 +128,7 @@ export class UpdateBusinessOwnerDto {
 }
 
 
-export class AddBusinessInformationDTO {
+export class CreateBusinessEntity {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()

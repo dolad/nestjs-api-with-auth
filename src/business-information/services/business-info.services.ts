@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { BusinessInformation } from "../../storage/postgres/business-information.schema";
 import { BUSINESS_INFORMATION_REPOSITORY } from "../../utils/constants";
-import { CreateBusinessInformationDTO } from "../dto/business-info.dto";
+import { ICreateBusinessInformationDTO } from "../dto/business-info.dto";
 
 
 
@@ -10,11 +10,12 @@ export class BusinessInformationServices {
         @Inject(BUSINESS_INFORMATION_REPOSITORY) private businessInfoRepo: typeof BusinessInformation 
     ){}
 
-     async create(payload: CreateBusinessInformationDTO): Promise<any>{
+     async create(payload: ICreateBusinessInformationDTO, transaction: any): Promise<any>{
       return await this.businessInfoRepo.create(
           {
             ...payload,
-          }
+          },
+          {transaction}
         )
     }
 

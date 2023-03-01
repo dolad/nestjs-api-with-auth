@@ -14,7 +14,6 @@ import {
   wrapResponseMessage,
   IResponseMessage,
 } from '../../utils/response.map';
-import { CreateBusinessInformationDTO } from '../dto/business-info.dto';
 import { BusinessInformationServices } from '../services/business-info.services';
 
 @Controller('business-information')
@@ -26,9 +25,8 @@ export class BusinessInfoController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async addBusinessInfo(
-    @Body() createBodyPayload: CreateBusinessInformationDTO,
   ): Promise<IResponseMessage> {
-    const response = await this.businessInfo.create(createBodyPayload);
-    return wrapResponseMessage('business Information Successfully', response);
+   
+    return wrapResponseMessage('business Information Successfully', "not implemented");
   }
 }
