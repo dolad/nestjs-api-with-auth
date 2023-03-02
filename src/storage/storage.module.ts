@@ -10,6 +10,9 @@ import { Kyc } from "./postgres/kyc.schema";
 import { BusinessType } from "./postgres/busines-type.schema";
 import { BusinessEntity } from "./postgres/business-entity.schema";
 import { BusinessInformation } from "./postgres/business-information.schema";
+import { BankProviderCountries } from "./postgres/bank-provider-countries";
+import { BankProvider } from "./postgres/bank-provider";
+import { FinancialConnectDetails } from "./postgres/financial-account";
 
 console.log(process.env.NODE_ENV)
 
@@ -20,7 +23,7 @@ console.log(process.env.NODE_ENV)
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
-              models:[User, Kyc, BusinessEntity, BusinessInformation, BusinessType],
+              models:[User, Kyc, BusinessEntity, BusinessInformation, BusinessType, BankProviderCountries, BankProvider, FinancialConnectDetails],
               autoLoadModels: true,
                sync: {
                 force: false,

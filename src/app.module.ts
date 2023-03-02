@@ -16,6 +16,7 @@ import emailConfiig from './config/email.confiig';
 import { BusinessTypeModule } from './business-type/business.module';
 import { BusinessEntityModule } from './business-entity/business.module';
 import { BusinessInformationModule } from './business-information/business.module';
+import { FinancialInformationModule } from './financial-information/financial-info.module';
 
 // @ts-ignore
 
@@ -46,7 +47,8 @@ import { BusinessInformationModule } from './business-information/business.modul
     NotificationModule,
     BusinessEntityModule,
     AuthModule,
-    BusinessInformationModule
+    BusinessInformationModule,
+    FinancialInformationModule
 
   ],
 

@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import {
   BUSINESS_ENTITY_REPOSITORY,
   USER_REPOSITORY,
@@ -15,6 +15,7 @@ import { IAuthUser } from '../../user/types/user.types';
 import { BusinessInformation } from '../../storage/postgres/business-information.schema';
 import { BusinessInformationServices } from 'src/business-information/services/business-info.services';
 
+@Injectable()
 export class BusinessEntityServices {
   private readonly logger = new Logger(BusinessEntityServices.name);
   constructor(

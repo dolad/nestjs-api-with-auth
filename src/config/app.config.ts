@@ -10,5 +10,10 @@ export default () => ({
   jwt: {
     registrationToken: process.env.JWT_REGISTRATION || 'registrationToken',
     jwtSecret: process.env.JWT_SECRET || 'flinke-secret'
+  },
+  saltEdge:{
+    appId: process.env.SALTEDGE_APP_ID,
+    secret: process.env.SALTEDGE_SECRET,
+    baseUrl: process.env.SALTEDGE_BASE_URL
   }
 });
