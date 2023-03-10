@@ -16,7 +16,7 @@ import { BusinessInformationModule } from "src/business-information/business.mod
     ],
     controllers: [BusinessEntityController],
     providers: [BusinessEntityServices, businessEntityProviders],
-    exports: [BusinessEntityServices]
+    exports: [BusinessEntityServices, businessEntityProviders]
 })
 
 export class BusinessEntityModule {} 

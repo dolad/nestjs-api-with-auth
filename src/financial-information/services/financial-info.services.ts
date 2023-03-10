@@ -1,9 +1,11 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { BankProvider } from 'src/storage/postgres/bank-provider';
-import { BankProviderCountries } from 'src/storage/postgres/bank-provider-countries';
-import { FinancialConnectDetails } from 'src/storage/postgres/financial-account';
-import { IAuthUser } from 'src/user/types/user.types';
+import { Inject, Injectable } from '@nestjs/common';
+import { BankProvider } from '../../storage/postgres/bank-provider';
+import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
+import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
+import { FinancialConnectDetails } from '../../storage/postgres/financial-account';
+import { IAuthUser } from '../../user/types/user.types';
 import {
+  BUSINESS_ENTITY_REPOSITORY,
   FINANCIAL_CONNECT_PROVIDER,
   SUPORTED_BANK_PROVIDER,
   SUPORTED_BANK_PROVIDER_COUNTRIES,
@@ -21,7 +23,9 @@ export class FinancialInformationServices {
     @Inject(FINANCIAL_CONNECT_PROVIDER)
     private readonly financialSupportRepo: typeof FinancialConnectDetails,
     private readonly saltEdgeServices: SaltEdge,
-  ) {}
+    @Inject(BUSINESS_ENTITY_REPOSITORY)
+    private readonly businessEntityRepo: typeof BusinessEntity)
+  {}
 
   /**
    *
@@ -67,6 +71,13 @@ export class FinancialInformationServices {
     const response = await this.saltEdgeServices.createConnectionSession(
       fetchConnectDetails.saltEdgeCustomerId,
     );
+    await this.businessEntityRepo.update({
+      kycStep: 3
+    }, {
+      where: {
+        creator: user.userId
+      }
+    });
     return response.data.data;
   }
 
