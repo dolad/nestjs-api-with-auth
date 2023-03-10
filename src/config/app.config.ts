@@ -15,5 +15,11 @@ export default () => ({
     appId: process.env.SALTEDGE_APP_ID,
     secret: process.env.SALTEDGE_SECRET,
     baseUrl: process.env.SALTEDGE_BASE_URL
+  },
+  rutter:{
+    appId: process.env.RUTTER_APP_ID,
+    secret: process.env.RUTTER_SECRET,
+    baseUrl: process.env.RUTTER_BASE_URL
+
   }
 });

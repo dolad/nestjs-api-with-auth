@@ -17,6 +17,7 @@ import { BusinessTypeModule } from './business-type/business.module';
 import { BusinessEntityModule } from './business-entity/business.module';
 import { BusinessInformationModule } from './business-information/business.module';
 import { FinancialInformationModule } from './financial-information/financial-info.module';
+import { SoftwareInformationModule } from './software-information/software-info.module';
 
 // @ts-ignore
 
@@ -48,7 +49,8 @@ import { FinancialInformationModule } from './financial-information/financial-in
     BusinessEntityModule,
     AuthModule,
     BusinessInformationModule,
-    FinancialInformationModule
+    FinancialInformationModule,
+    SoftwareInformationModule
 
   ],
 
