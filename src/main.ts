@@ -5,7 +5,8 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { setupSwagger } from './swagger';
 import { loggerMiddleware } from './middleware';
-import { ValidationError } from 'class-validator';
+
+
 
 async function bootstrap() {
   const logger = new Logger('bootstrap');
@@ -20,6 +21,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+ 
 
 
   app.use(loggerMiddleware);

@@ -7,11 +7,6 @@ export const userProviders =
         provide: USER_REPOSITORY,
         useValue: User
     }
-export const kycProviders = 
-    {
-        provide: KYC_REPOSITORY,
-        useValue: Kyc
-    }
 
 
 

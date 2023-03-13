@@ -1,28 +1,37 @@
-import { Controller, Post, UseGuards, Request, Body, Get } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, Get, Session as GetSession } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { SessionGuard } from 'src/auth/guards/session.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { IResponseMessage, wrapResponseMessage } from '../../utils/response.map';
-import { AddBusinessInformationDTO, CreateKyCDto } from '../dto/create-kyc.dto';
 import { EnabledTwoFaAuthPayload } from '../dto/enable-2fa.dto';
-import { KycServices } from '../services/user-kyc.services';
 import { UserServices } from '../services/user.services';
+import { UserSession } from '../types/user.types';
+
 
 @Controller('user')
 @ApiTags('User')
 export class UserController {
-  constructor(private readonly kycService: KycServices, private readonly userService: UserServices) {}
+  constructor(private readonly userService: UserServices) {}
 
-  @Post('kyc/add-owner-information')
+  
+  @UseGuards(SessionGuard)
+  @Post('session/check')
   @UseGuards(JwtAuthGuard)
-  async createBusinessOwnerInformation(@Request() req, @Body() payload: CreateKyCDto): Promise<IResponseMessage> {
-    const response = await this.kycService.createKycUser(payload, req.user);
-     return wrapResponseMessage("owner information added succesfully", response);
+  async createBusinessInformation(@Request() req, @GetSession() session: UserSession ): Promise<any> {
+    const response = await this.userService.getUserSession(req.user); 
+    return wrapResponseMessage("business information added", response);
   }
 
-  @Post('kyc/add-business-information')
+  @UseGuards(SessionGuard)
+  @Post('session/destroy')
   @UseGuards(JwtAuthGuard)
-  async createBusinessInformation(@Request() req, @Body() payload: AddBusinessInformationDTO): Promise<IResponseMessage> {
-    const response = await this.kycService.addBusinessName(payload, req.user);
+  async destroySession(@Request() req, @GetSession() session: UserSession ): Promise<IResponseMessage> {
+    const response = new Promise((resolve, reject) => {
+      session.destroy((err) => {
+      if (err) reject(err);
+      resolve(undefined);
+      })
+    });
     return wrapResponseMessage("business information added", response);
   }
 

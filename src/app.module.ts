@@ -1,7 +1,6 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { CacheModule, Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,6 +17,12 @@ import { BusinessEntityModule } from './business-entity/business.module';
 import { BusinessInformationModule } from './business-information/business.module';
 import { FinancialInformationModule } from './financial-information/financial-info.module';
 import { SoftwareInformationModule } from './software-information/software-info.module';
+import IoRedis from 'ioredis'
+import { REDIS, RedisModule } from './storage/redis';
+import session from 'express-session';
+import RedisStore from 'connect-redis';
+import passport from 'passport'
+
 
 // @ts-ignore
 
@@ -37,17 +42,18 @@ import { SoftwareInformationModule } from './software-information/software-info.
     CacheModule.register({
       isGlobal: true,
     }),
+
     ThrottlerModule.forRoot({
       ttl: 1,
       limit: 30,
     }),
-    
     StorageModule,
     UserModule,
     BusinessTypeModule,
     NotificationModule,
     BusinessEntityModule,
     AuthModule,
+    RedisModule,
     BusinessInformationModule,
     FinancialInformationModule,
     SoftwareInformationModule
@@ -63,4 +69,26 @@ import { SoftwareInformationModule } from './software-information/software-info.
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
   ],
 })
-export class AppModule {}
+
+
+export class AppModule implements NestModule {
+  constructor(@Inject(REDIS) private readonly redis: IoRedis){}
+  configure(consumer: MiddlewareConsumer){
+    const redisStore = new RedisStore({
+      client: this.redis,
+    })
+    consumer.apply(
+      session({
+        store: redisStore,
+        secret: appConfig().session.secret,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          httpOnly: true,
+          sameSite:true,
+          maxAge: 1000 * 60 * 15
+        }
+      })
+    ).forRoutes('*');
+  }
+}

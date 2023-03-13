@@ -20,6 +20,11 @@ export default () => ({
     appId: process.env.RUTTER_APP_ID,
     secret: process.env.RUTTER_SECRET,
     baseUrl: process.env.RUTTER_BASE_URL
-
+  },
+  session:{
+    secret: process.env.SESSION_SECRET,
+  },
+  redis: {
+    url: process.env.REDIS_URL
   }
 });

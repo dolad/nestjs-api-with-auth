@@ -9,7 +9,7 @@ import {
 import {
   User
 } from 'src/storage/postgres/user.schema';
-import { USER_REPOSITORY } from '../../utils/constants';
+import { USER_REPOSITORY, USER_SESSION } from '../../utils/constants';
 import { RegistrationDTO } from '../dtos/registration.dto';
 import { LoginDTO } from '../dtos/login.dto';
 import { LoginOutput } from '../types/loginOut.type';
@@ -23,13 +23,16 @@ import { GoogleSignDto } from '../dtos/google-signin-dto';
 import { googleOathVerify } from './google-oath-service';
 import { UpdatePasswordDTO } from '../dtos/resendRegistration.dto';
 import { HashManager } from '../utils/hash';
-
+import { UserSession } from '../../storage/postgres/user-session.schema';
+import { SessionTypeParams } from '../types/session.types';
+import { UserSession as SessionParams } from 'src/user/types/user.types';
 
 @Injectable()
 export class AuthService {
   private logger: Logger = new Logger(AuthService.name);
   constructor(
     @Inject(USER_REPOSITORY) private userRepos: typeof User,
+    @Inject(USER_SESSION) private userSession: typeof UserSession,
     private readonly jwtService: JwtService,
     private eventEmitter: EventEmitter2,
     private readonly config: ConfigService,
@@ -54,10 +57,11 @@ export class AuthService {
    * @return User
    */
   async validate(payload: LoginDTO): Promise<User> {
-    const user = await this.userService.findByEmailOrFailed(payload.email);
+    let user = await this.userService.findByEmailOrFailed(payload.email);
     const isPasswordCorrect = await user.isPasswordCorrect(payload.password);
     if (!isPasswordCorrect) throw new ForbiddenException('Invalid credentials');
-    return user;
+    const returnUser = await this.userRepos.scope('removeSensitivePayload').findByPk(user.id) 
+    return returnUser;
   }
 
   /**
@@ -65,7 +69,18 @@ export class AuthService {
    * @param payload LoginDTO
    * @return User
    */
-  async login(user: User): Promise<LoginOutput | string> {
+  async login(user: User, loginDto?:LoginDTO, session?: SessionParams,): Promise<LoginOutput | string> {
+    if(session){
+      const userSessionPayload: SessionTypeParams = {
+        userId: user.id,
+        sessionId: session["passport"].user,
+        deviceInfo:loginDto.deviceName,
+        city:loginDto.city,
+        country:loginDto.country
+      }
+      await this.createUserSession(userSessionPayload);
+    }
+   
     const { twoFactorAuth } = user;
     if(!user.isConfirmed){
         await this.sendRegistrationToken(user);
@@ -79,6 +94,45 @@ export class AuthService {
       token: await this.generateAccessToken(user),
     };
   }
+
+  async createUserSession(sessionPayload:SessionTypeParams): Promise<void> {
+    // does user have any session at all
+    const userSession = await this.userSession.findAll({
+      where: {
+        userId:sessionPayload.userId
+      }
+    });
+
+    if(!userSession.length){
+     await this.userSession.create({
+      ...sessionPayload,
+      lastLoggedIn: new Date()
+     })
+    } 
+
+
+    // find last session and update with same devices
+    const lastSession = await this.userSession.findOne({
+      where:{
+        sessionId:sessionPayload.sessionId,
+        userId: sessionPayload.userId,
+        deviceInfo: sessionPayload.deviceInfo
+      }
+    });
+
+    if(!lastSession){
+      await this.userSession.create({
+        ...sessionPayload,
+        lastLoggedIn: new Date()
+       })
+    }
+    lastSession.city=sessionPayload.city;
+    lastSession.country=sessionPayload.country;
+    lastSession.lastLoggedIn= new Date();
+    lastSession.save();
+
+  }
+
 
   async authUser(user: any): Promise<User> {
     return await this.userRepos
@@ -149,7 +203,7 @@ export class AuthService {
     return newUser;
   }
 
-  private async generateAccessToken(user: any) {
+  private async generateAccessToken(user: any): Promise<string> {
     const jwtPayload = { email: user.email, userId: user.id };
     return this.jwtService.sign(jwtPayload, {
       secret: this.config.get('jwt').jwtSecret,

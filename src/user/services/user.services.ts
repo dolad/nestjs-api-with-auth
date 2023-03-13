@@ -37,4 +37,12 @@ export class UserServices {
         return "Two Factor Authentication Enabled Succesfully"
     }
 
+    async findById(id: string): Promise<User>{
+       return await this.userRepos.scope('removeSensitivePayload').findByPk(id);
+    }
+
+    async getUserSession(user: IAuthUser): Promise<any>{
+       return user;
+    }
+
 }

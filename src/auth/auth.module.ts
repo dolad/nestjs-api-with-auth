@@ -8,6 +8,8 @@ import { AuthController } from "./controller/auth.controller";
 import { AuthService } from "./services/auth.services";
 import { JWTStrategy } from "./strategy/jwt.strategy";
 import { LocalStrategy } from "./strategy/local.strategy";
+import { SessionSerializer } from "./serializer/session.serializer";
+import { userSessionProvider } from "./providers/user-session.provider";
 
 @Module({
     imports: [
@@ -15,14 +17,14 @@ import { LocalStrategy } from "./strategy/local.strategy";
         UserModule,
         PassportModule,
         JwtModule.register({
-            secret:process.env.JWT_SECRET,
+            secret: process.env.JWT_SECRET,
             signOptions:{
                 expiresIn: '24h'
             }
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JWTStrategy, LocalStrategy],
+    providers: [AuthService, JWTStrategy, LocalStrategy, SessionSerializer, userSessionProvider],
     exports: [AuthService]
 })
 
