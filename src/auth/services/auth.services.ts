@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
   Inject,
   Injectable,
   Logger,
@@ -25,7 +26,7 @@ import { UpdatePasswordDTO } from '../dtos/resendRegistration.dto';
 import { HashManager } from '../utils/hash';
 import { UserSession } from '../../storage/postgres/user-session.schema';
 import { SessionTypeParams } from '../types/session.types';
-import { UserSession as SessionParams } from 'src/user/types/user.types';
+import { IAuthUser, UserSession as SessionParams } from 'src/user/types/user.types';
 
 @Injectable()
 export class AuthService {
@@ -36,6 +37,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private eventEmitter: EventEmitter2,
     private readonly config: ConfigService,
+    @Inject(forwardRef(() => UserServices))
     private readonly userService: UserServices,
   ) {}
 
@@ -169,7 +171,7 @@ export class AuthService {
     return await this.login(user);
   }
 
-  private async sendRegistrationToken(user: User): Promise<void> {
+  async sendRegistrationToken(user: User): Promise<void> {
     if (user.isConfirmed) {
       return;
     }
@@ -299,6 +301,15 @@ export class AuthService {
 
       return "user password Updated"
     
+  }
+
+  async getUserSessions(user:IAuthUser): Promise<UserSession[]> {
+    return await this.userSession.findAll({
+      where: {
+        userId: user.userId
+      }
+    })
+  
   }
 
   

@@ -7,6 +7,8 @@ import { Kyc } from "./kyc.schema";
 export enum UserType {
     BUSINESS = 'business',
     BANK = 'bank',
+    EDITOR = 'editor',
+    VEIWER = 'viewer',
     ADMIN = 'admin',
     SHAREHOLDER = 'shareholders',
     BUSINESS_OWNER = 'businessOwner',
@@ -229,6 +231,11 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
     @AfterCreate
     static async hashPassword(user: User): Promise<void> {
         const hashPassword = await new HashManager().bHash(user.password);
+        user.password = hashPassword;
+        await user.save();
+    }
+    async updatePassword(user: User, newPassword:string): Promise<void> {
+        const hashPassword = await new HashManager().bHash(newPassword);
         user.password = hashPassword;
         await user.save();
     }

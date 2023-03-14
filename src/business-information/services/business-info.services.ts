@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { BusinessInformation } from "../../storage/postgres/business-information.schema";
 import { BUSINESS_INFORMATION_REPOSITORY } from "../../utils/constants";
-import { ICreateBusinessInformationDTO } from "../dto/business-info.dto";
+import { ICreateBusinessInformationDTO, UpdateBusinessInformationDTO } from "../dto/business-info.dto";
 
 
  
@@ -16,6 +16,20 @@ export class BusinessInformationServices {
             ...payload,
           },
           {transaction}
+        )
+    }
+
+    async update(payload: UpdateBusinessInformationDTO): Promise<any>{
+    
+      return await this.businessInfoRepo.update(
+          {
+            ...payload,
+          },
+          {
+            where:{
+              businessId:payload.businessId
+            }
+          }
         )
     }
 
