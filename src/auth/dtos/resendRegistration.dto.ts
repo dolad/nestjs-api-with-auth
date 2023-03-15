@@ -8,6 +8,13 @@ export class ResendRegistationDTO {
     email: string
 }
 
+export class Verify2FaToken {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    token: string
+}
+
 
 export class ResetPasswordVerfiyDTO {
     @ApiProperty()

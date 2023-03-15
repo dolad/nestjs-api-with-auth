@@ -254,16 +254,20 @@ export class AuthService {
 
   private async send2FAToken(user: User): Promise<string> {
     if (user.twoFactorAuth && user.twoFactorAuth === 'email') {
-      return this.dispatchTwoFaTokenEmail(user.email);
+      return this.dispatchTwoFaTokenEmail(user);
     }
-    return;
+   
+   
   }
 
-  private dispatchTwoFaTokenEmail(email: string): string {
+
+  private dispatchTwoFaTokenEmail(user: User): string {
     const twoFaToken = Math.random().toString().substring(2, 8);
+    user.twoFaToken = twoFaToken;
+    user.save();
     const emailPayload: IEmailNotification = {
       type: 'TWO_FA_AUTHENTICATION',
-      to: email,
+      to: user.email,
       twoFaEmail: {
         context: {
           twoFaToken,
@@ -282,6 +286,25 @@ export class AuthService {
       secret: this.config.get('jwt').registrationToken,
     });
     return user;
+  }
+
+   async verify2fa(token: string): Promise<LoginOutput | string> {
+    const user = await this.userRepos.findOne({
+      where: {
+        twoFaToken:token
+      }
+    });
+    user.twoFaToken = null;
+    user.save();
+    
+    if(!user){
+      throw new NotFoundException("Invalid token")
+    }
+    return {
+      email: user.email,
+      id: user.id,
+      token: await this.generateAccessToken(user),
+    };
   }
 
   async updatePassword(payload: UpdatePasswordDTO): Promise<string> {

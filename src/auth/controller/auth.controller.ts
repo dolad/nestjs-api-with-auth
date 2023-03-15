@@ -5,7 +5,7 @@ import { IResponseMessage, wrapResponseMessage } from "../../utils/response.map"
 import { GoogleSignDto } from "../dtos/google-signin-dto";
 import { LoginDTO } from "../dtos/login.dto";
 import { RegistrationDTO } from "../dtos/registration.dto";
-import { ResendRegistationDTO,  UpdatePasswordDTO } from "../dtos/resendRegistration.dto";
+import { ResendRegistationDTO,  UpdatePasswordDTO, Verify2FaToken } from "../dtos/resendRegistration.dto";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.services";
@@ -89,6 +89,17 @@ export class AuthController {
    async resetPassword(@Body() resetPasswordDto:ResendRegistationDTO): Promise<IResponseMessage> {
       await this.authServices.resetPassword(resetPasswordDto.email);
       return wrapResponseMessage("verification email send successfully", "verification email send successfully")
+   }
+
+   @ApiResponse({
+      status: 200,
+      description: 'Password Reset',
+   })
+   @ApiResponse({ status: 500, description: 'Internal Server Error' })
+   @Post('verify-2fa')
+   async verify2fa(@Body() verify2FaTokenPayload:Verify2FaToken): Promise<IResponseMessage> {
+      const response = await this.authServices.verify2fa(verify2FaTokenPayload.token);
+      return wrapResponseMessage("verification email send successfully", response)
    }
 
  
