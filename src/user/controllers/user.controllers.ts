@@ -76,7 +76,7 @@ export class UserController {
 
   
 
-  @Post('sessions')
+  @Get('sessions')
   @UseGuards(JwtAuthGuard)
   async getUserSession(@Request() req): Promise<IResponseMessage> {
     const response = await this.userService.getUserSession(req.user);
