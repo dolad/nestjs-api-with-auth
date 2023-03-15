@@ -51,6 +51,7 @@ export type UserAttributes = {
     city?: string;
     residentialAddress?: string;
     residentialPostcode?: string;
+    twoFaToken: string;
 
 }
 
@@ -206,6 +207,14 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         defaultValue: null
     })
     residentialAddress?: string;
+
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    twoFaToken?: string;
+    
     @Column({
         allowNull: true,
         type: DataType.STRING,
