@@ -8,12 +8,12 @@ services:
       context: .
     env_file:
       - .env
-    environment:
-      - REDIS_HOST=${REDIS_HOST}
+    # environment:
+    #   - REDIS_HOST=${REDIS_HOST}
     ports:
       - 80:${APP_PORT}
-    depends_on:
-      - redis
+    # depends_on:
+    #   - redis
     restart: on-failure
   # redis:
   #   image: redis:7.0
