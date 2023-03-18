@@ -27,7 +27,8 @@ import { HashManager } from '../utils/hash';
 import { UserSession } from '../../storage/postgres/user-session.schema';
 import { SessionTypeParams } from '../types/session.types';
 import { IAuthUser, UserSession as SessionParams } from 'src/user/types/user.types';
-
+import { v4 as uuidv4 } from "uuid";
+ 
 @Injectable()
 export class AuthService {
   private logger: Logger = new Logger(AuthService.name);
@@ -71,17 +72,17 @@ export class AuthService {
    * @param payload LoginDTO
    * @return User
    */
-  async login(user: User, loginDto?:LoginDTO, session?: SessionParams,): Promise<LoginOutput | string> {
-    if(session){
+  async login(user: User, loginDto?:LoginDTO): Promise<LoginOutput | string> {
+    
       const userSessionPayload: SessionTypeParams = {
         userId: user.id,
-        sessionId: session["passport"].user,
+        sessionId: uuidv4(),
         deviceInfo:loginDto.deviceName,
         city:loginDto.city,
         country:loginDto.country
       }
       await this.createUserSession(userSessionPayload);
-    }
+    
    
     const { twoFactorAuth } = user;
     if(!user.isConfirmed){
@@ -111,10 +112,10 @@ export class AuthService {
       lastLoggedIn: new Date()
      })
     } 
-
+    let lastSession: UserSession
 
     // find last session and update with same devices
-    const lastSession = await this.userSession.findOne({
+     lastSession = await this.userSession.findOne({
       where:{
         sessionId:sessionPayload.sessionId,
         userId: sessionPayload.userId,
@@ -123,12 +124,13 @@ export class AuthService {
     });
 
     if(!lastSession){
-      await this.userSession.create({
+     lastSession = await this.userSession.create({
         ...sessionPayload,
         lastLoggedIn: new Date()
        })
     }
-    lastSession.city=sessionPayload.city;
+
+    lastSession.city= sessionPayload.city;
     lastSession.country=sessionPayload.country;
     lastSession.lastLoggedIn= new Date();
     lastSession.save();

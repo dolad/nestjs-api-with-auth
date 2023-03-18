@@ -8,7 +8,7 @@ import { AuthController } from "./controller/auth.controller";
 import { AuthService } from "./services/auth.services";
 import { JWTStrategy } from "./strategy/jwt.strategy";
 import { LocalStrategy } from "./strategy/local.strategy";
-import { SessionSerializer } from "./serializer/session.serializer";
+// import { SessionSerializer } from "./serializer/session.serializer";
 import { userSessionProvider } from "./providers/user-session.provider";
 
 @Module({
@@ -24,7 +24,9 @@ import { userSessionProvider } from "./providers/user-session.provider";
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JWTStrategy, LocalStrategy, SessionSerializer, userSessionProvider],
+    providers: [AuthService, JWTStrategy, LocalStrategy,
+        //  SessionSerializer, 
+         userSessionProvider],
     exports: [AuthService]
 })
 

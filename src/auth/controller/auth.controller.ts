@@ -1,6 +1,5 @@
-import { Body, Controller, Post, UseGuards, Request, Param, Get, Req, HttpCode, HttpStatus, Session as GetSession } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Request, Param, Get, Req, HttpCode, HttpStatus, } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { UserSession } from "src/user/types/user.types";
 import { IResponseMessage, wrapResponseMessage } from "../../utils/response.map";
 import { GoogleSignDto } from "../dtos/google-signin-dto";
 import { LoginDTO } from "../dtos/login.dto";
@@ -34,8 +33,8 @@ export class AuthController {
    @HttpCode(HttpStatus.OK)
    @UseGuards(LocalAuthGuard)
    @Post('login')
-   async login(@Request() req, @Body() loginDto: LoginDTO, @GetSession() session: UserSession): Promise<IResponseMessage>{
-      const response = await this.authServices.login(req.user,loginDto, session);
+   async login(@Request() req, @Body() loginDto: LoginDTO): Promise<IResponseMessage>{
+      const response = await this.authServices.login(req.user,loginDto,);
       return wrapResponseMessage("User login successful", response);
    }
 

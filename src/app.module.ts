@@ -17,14 +17,12 @@ import { BusinessEntityModule } from './business-entity/business.module';
 import { BusinessInformationModule } from './business-information/business.module';
 import { FinancialInformationModule } from './financial-information/financial-info.module';
 import { SoftwareInformationModule } from './software-information/software-info.module';
-import IoRedis from 'ioredis'
-import { REDIS, RedisModule } from './storage/redis';
-import session from 'express-session';
-import RedisStore from 'connect-redis';
-import passport from 'passport'
+// import IoRedis from 'ioredis'
+// import { REDIS, RedisModule } from './storage/redis';
+// import session from 'express-session';
+// import RedisStore from 'connect-redis';
 
 
-// @ts-ignore
 
 @Module({
   imports: [
@@ -53,7 +51,7 @@ import passport from 'passport'
     NotificationModule,
     BusinessEntityModule,
     AuthModule,
-    RedisModule,
+    // RedisModule,
     BusinessInformationModule,
     FinancialInformationModule,
     SoftwareInformationModule
@@ -71,24 +69,28 @@ import passport from 'passport'
 })
 
 
-export class AppModule implements NestModule {
-  constructor(@Inject(REDIS) private readonly redis: IoRedis){}
-  configure(consumer: MiddlewareConsumer){
-    const redisStore = new RedisStore({
-      client: this.redis,
-    })
-    consumer.apply(
-      session({
-        store: redisStore,
-        secret: appConfig().session.secret,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-          httpOnly: true,
-          sameSite:true,
-          maxAge: 1000 * 60 * 15
-        }
-      })
-    ).forRoutes('*');
-  }
-}
+export class AppModule{}
+
+
+// export class AppModule implements NestModule {
+//   constructor(@Inject(REDIS) private readonly redis: IoRedis){}
+//   configure(consumer: MiddlewareConsumer){
+//     const redisStore = new RedisStore({
+//       client: this.redis,
+//     })
+
+//     consumer.apply(
+//       session({
+//         store: redisStore,
+//         secret: appConfig().session.secret,
+//         resave: false,
+//         saveUninitialized: false,
+//         cookie: {
+//           httpOnly: true,
+//           sameSite:true,
+//           maxAge: 1000 * 60 * 15
+//         }
+//       })
+//     ).forRoutes('*');
+//   }
+// }
