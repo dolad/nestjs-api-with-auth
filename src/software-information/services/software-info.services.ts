@@ -19,25 +19,24 @@ export class SoftwareInformationServices {
     private readonly businessEntityRepo: typeof BusinessEntity) {}
 
   async connect(user:IAuthUser, token: string): Promise<string> {
-    const response = await this.rutterServices.exchangeToken(token);
-    await this.softwareConnect.create({
-      customerEmail: user.email,
-      customerId: user.userId,
-      accessToken: response.data.access_token,
-      softwarePlatform:response.data.platform
-    })
-    
-    await this.businessEntityRepo.update({
-      kycStep: 4
-    }, {
-      where: {
-        creator: user.userId
-      }
-    });
- 
-    return CONNECT_SOFTWARE_CONNECT;
-
-  }
-
- 
+      const response = await this.rutterServices.exchangeToken(token);
+      await this.softwareConnect.create({
+        customerEmail: user.email,
+        customerId: user.userId,
+        accessToken: response.data.access_token,
+        softwarePlatform:response.data.platform
+      })
+      
+      await this.businessEntityRepo.update({
+        kycStep: 4
+      }, {
+        where: {
+          creator: user.userId
+        }
+      });
+   
+      return CONNECT_SOFTWARE_CONNECT;
+  
+    }
+   
 }

@@ -13,16 +13,21 @@ export class RutterServices {
     // instantiate saltEdgeClient
     private async initialClient(): Promise<void> {
         this.rutterClient = RutterClient({
-            baseUrl: appConfig().saltEdge.baseUrl
+            baseUrl: appConfig().rutter.baseUrl
         })
     }
 
     async exchangeToken(token: string){
-        return await this.rutterClient.post('item/public_token/exchange', {
-            client_id: appConfig().rutter.appId,
-            secret: appConfig().rutter.secret,
-            public_token: token
-        })
+        try {
+            return await this.rutterClient.post('item/public_token/exchange', {
+                client_id: "3489bd0f-7c51-403a-9901-fe8207796b0d" || appConfig().rutter.appId,
+                secret: "5341e7d6-2d14-49f7-a6b3-60213ad38255" || appConfig().rutter.secret,
+                public_token: "677ede12-18f1-46d8-bcf0-c61bd6479325" || token
+            })
+        } catch (error) {
+            console.log(error);
+        }
+       
     }
 
     // create customer to begin transactions; 

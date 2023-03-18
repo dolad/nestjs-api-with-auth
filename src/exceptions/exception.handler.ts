@@ -15,7 +15,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: HttpException, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
-
+    let responseBody;
     const ctx = host.switchToHttp();
 
     const httpStatus =
@@ -24,14 +24,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     console.log(exception);
-    const errorResponse = exception.getResponse() as any;
-    const responseBody = {
+    if(exception){
+      const errorResponse = exception.getResponse ? exception.getResponse() as any : { message:"Something went wrong"};
+       responseBody = {
+        statusCode: httpStatus,
+        status: false,
+        data: null,
+        message: errorResponse.message || errorResponse,
+       
+      };
+    }
+    responseBody = {
       statusCode: httpStatus,
       status: false,
       data: null,
-      message: errorResponse.message || errorResponse,
-     
-    };
+      message: "Something went wrong",
+    }
+   
+   
     
     this.logger.error(exception.message, exception.stack, responseBody, );
 
