@@ -22,20 +22,20 @@ async function bootstrap() {
     }),
   );
 
-  const CORS_OPTIONS = {
-    origin: ['*'], // or '*' or whatever is required
-    allowedHeaders: [
-      'Access-Control-Allow-Origin',
-      'Origin',
-      'X-Requested-With',
-      'Accept',
-      'Content-Type',
-      'Authorization',
-    ],
-    exposedHeaders: 'Authorization',
-    credentials: true,
-    methods: ['GET', 'PUT', 'OPTIONS', 'POST', 'DELETE'],
-  };
+  // const CORS_OPTIONS = {
+  //   origin: ['*'], // or '*' or whatever is required
+  //   allowedHeaders: [
+  //     'Access-Control-Allow-Origin',
+  //     'Origin',
+  //     'X-Requested-With',
+  //     'Accept',
+  //     'Content-Type',
+  //     'Authorization',
+  //   ],
+  //   exposedHeaders: 'Authorization',
+  //   credentials: true,
+  //   methods: ['GET', 'PUT', 'OPTIONS', 'POST', 'DELETE'],
+  // };
 
  
   app.use(loggerMiddleware);
@@ -43,7 +43,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1', { exclude: ['/'] });
 
   setupSwagger(app);
-  app.enableCors(CORS_OPTIONS);
+  app.enableCors();
 
   const configService = app.get<ConfigService>(ConfigService);
 
