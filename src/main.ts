@@ -23,8 +23,6 @@ async function bootstrap() {
   );
 
  
-
-
   app.use(loggerMiddleware);
 
   app.setGlobalPrefix('api/v1', { exclude: ['/'] });
