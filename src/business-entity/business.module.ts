@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { User } from "../storage/postgres/user.schema";
 import { BusinessEntity } from "../storage/postgres/business-entity.schema";
@@ -11,7 +11,7 @@ import { BusinessInformationModule } from "src/business-information/business.mod
 @Module({
     imports: [
         SequelizeModule.forFeature([BusinessEntity, User]),
-        UserModule,
+        forwardRef(() => UserModule),
         BusinessInformationModule,
     ],
     controllers: [BusinessEntityController],

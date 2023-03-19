@@ -3,11 +3,12 @@ import { AuthService } from "../../auth/services/auth.services";
 import { UpdateBusinessInformationDTO } from "../../business-information/dto/business-info.dto";
 import { BusinessInformationServices } from "../../business-information/services/business-info.services";
 import { User, UserType } from "../../storage/postgres/user.schema";
-import { USER_REPOSITORY } from "../../utils/constants";
+import { BUSINESS_ENTITY_REPOSITORY, USER_REPOSITORY } from "../../utils/constants";
 import { AddUserToBusinessEntity } from "../dto/add-user.dto";
 import { ChangePasswordPayload, UpdateCreatorDetails } from "../dto/update-user-password.dto";
 import { IAuthUser} from "../types/user.types";
 import { UserSession } from "src/storage/postgres/user-session.schema";
+import { BusinessEntity } from "src/storage/postgres/business-entity.schema";
 
 
 @Injectable()
@@ -15,6 +16,8 @@ export class UserServices {
     constructor(
         @Inject(USER_REPOSITORY) private userRepos: typeof User,
         private readonly businessInfoService: BusinessInformationServices,
+        @Inject(BUSINESS_ENTITY_REPOSITORY)
+        private readonly businessEntityRepo: typeof BusinessEntity,
         private readonly authServices: AuthService,
     ){
         
@@ -99,19 +102,20 @@ export class UserServices {
 
     async getEntityUser (user:IAuthUser): Promise<User[]>{
         
-        const creator = await this.userRepos.findOne({
+        const businessEntity = await this.businessEntityRepo.findOne({
             where: {
-                id: user.userId,
+                creator: user.userId
             }
-        });
+        })
+   
 
-        if(!creator.businessEntityId){
+        if(!businessEntity){
             throw new BadRequestException("this user does not have any business attached to it")
         }
 
         const getAllUserEntities = await this.userRepos.findAll({
             where:{
-                businessEntityId: creator.businessEntityId
+                businessEntityId: businessEntity.id
             }
         })
 
