@@ -23,26 +23,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    console.log(exception);
-    if(exception){
+    if(exception != null){
       const errorResponse = exception.getResponse ? exception.getResponse() as any : { message:"Something went wrong"};
        responseBody = {
         statusCode: httpStatus,
         status: false,
         data: null,
         message: errorResponse.message || errorResponse,
-       
       };
+    }else {
+      responseBody = {
+        statusCode: httpStatus,
+        status: false,
+        data: null,
+        message: "Something went wrong",
+      }
     }
-    responseBody = {
-      statusCode: httpStatus,
-      status: false,
-      data: null,
-      message: "Something went wrong",
-    }
-   
-   
     
+   
+   
     this.logger.error(exception.message, exception.stack, responseBody, );
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);

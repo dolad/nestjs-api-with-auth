@@ -27,7 +27,6 @@ export class BusinessInfoController {
   @HttpCode(HttpStatus.CREATED)
   async addBusinessInfo(
   ): Promise<IResponseMessage> {
-   
     return wrapResponseMessage('business Information Successfully', "not implemented");
   }
 

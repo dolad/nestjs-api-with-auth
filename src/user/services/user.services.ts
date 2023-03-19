@@ -1,4 +1,4 @@
-import { ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { AuthService } from "../../auth/services/auth.services";
 import { UpdateBusinessInformationDTO } from "../../business-information/dto/business-info.dto";
 import { BusinessInformationServices } from "../../business-information/services/business-info.services";
@@ -105,9 +105,13 @@ export class UserServices {
             }
         });
 
+        if(!creator.businessEntityId){
+            throw new BadRequestException("this user does not have any business attached to it")
+        }
+
         const getAllUserEntities = await this.userRepos.findAll({
             where:{
-                businessEntity: creator.businessEntityId
+                businessEntityId: creator.businessEntityId
             }
         })
 
