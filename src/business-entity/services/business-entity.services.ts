@@ -1,4 +1,10 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   BUSINESS_ENTITY_REPOSITORY,
   USER_REPOSITORY,
@@ -32,7 +38,7 @@ export class BusinessEntityServices {
   ): Promise<any> {
     // has business been created before
     let businessEntity;
-  
+
     businessEntity = await this.businessEntityRepo.findOne({
       where: {
         creator: user.userId,
@@ -53,7 +59,7 @@ export class BusinessEntityServices {
         },
         { transaction: tx },
       );
-    
+
       await this.businessInformation.create(
         {
           ...payload,
@@ -64,7 +70,7 @@ export class BusinessEntityServices {
 
       tx.commit();
       this.logger.log('Business entity created');
-      return "Kyc Submitted Successfully"
+      return 'Kyc Submitted Successfully';
     } catch (error) {
       tx.rollback();
       console.log(error);
@@ -76,16 +82,32 @@ export class BusinessEntityServices {
     payload: AddBusinessOwnerDto[],
     user: IAuthUser,
   ): Promise<any> {
-    const tx = await this.sequelize.transaction();
     const buisinessEntity = await this.businessEntityRepo.findOne({
       where: {
         creator: user.userId,
-        kycStep: 1
+        kycStep: 1,
       },
     });
 
-    if(!buisinessEntity){
-      throw new NotFoundException("User has not completed the first kyc");
+    if (!buisinessEntity) {
+      throw new NotFoundException('User has not completed the first kyc');
+    }
+
+    const ownerResponse = await this.createNewOwner(payload, user);
+    return ownerResponse
+  }
+
+  async createNewOwner(payload: AddBusinessOwnerDto[], user: IAuthUser) : Promise<string> {
+    const tx = await this.sequelize.transaction();
+
+    const buisinessEntity = await this.businessEntityRepo.findOne({
+      where: {
+        creator: user.userId,
+      },
+    });
+
+    if (!buisinessEntity) {
+      throw new NotFoundException('User has not completed the first kyc');
     }
 
     try {
@@ -139,9 +161,9 @@ export class BusinessEntityServices {
         });
         await this.userRepos.bulkCreate(otherShareholders, { transaction: tx });
       }
-      
+
       // update the businessEntityRepo
-     await this.businessEntityRepo.update(
+      await this.businessEntityRepo.update(
         {
           businessOwner: owner.id,
           kycStep: 2,
@@ -150,13 +172,13 @@ export class BusinessEntityServices {
           where: {
             id: buisinessEntity.id,
           },
-          transaction: tx
+          transaction: tx,
         },
       );
 
       tx.commit();
       this.logger.log('Business entity created');
-      return "Updated successfully"
+      return 'Updated successfully';
     } catch (error) {
       tx.rollback();
       console.log(error);

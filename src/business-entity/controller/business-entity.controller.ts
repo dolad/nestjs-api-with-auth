@@ -42,9 +42,25 @@ export class BusinessEntityController {
     );
   }
 
-  @Post('/kyc/stage-2')
+  @Post('/add-business-owner')
   @UseGuards(JwtAuthGuard)
   async addBusinessOwner(
+    @Request() req,
+    @Body() createBodyPayload: CreateBusinessEntity,
+  ): Promise<IResponseMessage> {
+    const response = await this.businessEntityService.createBusinessEntity(
+      createBodyPayload,
+      req.user,
+    );
+    return wrapResponseMessage(
+      'Business entity',
+      response,
+    );
+  }
+
+  @Post('/kyc/stage-2')
+  @UseGuards(JwtAuthGuard)
+  async addBusinessOwnerToKycStage(
     @Request() req,
     @Body(new ParseArrayPipe({ items: AddBusinessOwnerDto }))
     createBodyPayload: AddBusinessOwnerDto[],

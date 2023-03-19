@@ -14,6 +14,7 @@ import {
   wrapResponseMessage,
   IResponseMessage,
 } from '../../utils/response.map';
+import { UpdateBusinessInformationDTO } from '../dto/business-info.dto';
 import { BusinessInformationServices } from '../services/business-info.services';
 
 @Controller('business-information')
@@ -29,4 +30,14 @@ export class BusinessInfoController {
    
     return wrapResponseMessage('business Information Successfully', "not implemented");
   }
+
+  @Post('/update')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async updateBusinessInformation(@Body() payload: UpdateBusinessInformationDTO
+  ): Promise<IResponseMessage> {
+    const response = await this.businessInfo.update(payload)
+    return wrapResponseMessage('business Information Successfully', "updated");
+  }
+
 }
