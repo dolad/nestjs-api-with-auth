@@ -52,6 +52,7 @@ export type UserAttributes = {
     residentialAddress?: string;
     residentialPostcode?: string;
     twoFaToken: string;
+    profileImage: string;
 
 }
 
@@ -221,6 +222,13 @@ export class User extends Model<UserAttributes, UserCreateAttributes> {
         defaultValue: null
     })
     residentialPostcode?: string;
+
+    @Column({
+        allowNull: true,
+        type: DataType.STRING,
+        defaultValue: null
+    })
+    profileImage?: string;
 
     @ForeignKey(() => BusinessEntity)
     @Column({ type: DataType.UUID,
