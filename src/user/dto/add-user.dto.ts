@@ -22,6 +22,12 @@ export class AddUserToBusinessEntity {
     @ApiProperty()
     @IsOptional()
     @IsString()
+    phone: string;
+
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
     email: string;
 
 
