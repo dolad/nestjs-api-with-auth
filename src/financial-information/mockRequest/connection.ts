@@ -27,7 +27,6 @@ export const supportedCountryPayload = [
 
 export const connectSessionGenerator  = (customerId: string) => {
     return {
-        data: {
             customer_id: customerId,
             return_connection_id: true,
             country_code: ["GB", "AE"],
@@ -40,9 +39,7 @@ export const connectSessionGenerator  = (customerId: string) => {
             attempt: {
               from_date: '2023-03-01',
               fetch_scopes: ['accounts', 'transactions'],
-            }
-        }
-       
+          }
     }
   
 };

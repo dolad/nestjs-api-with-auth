@@ -11,6 +11,8 @@ export type FinancialConnectDetailsAttributes = {
     saltEdgeIdentifier: string;
     saltCustomerSecret: string;
     businessId: string;
+    createdAt: Date;
+    updatedAt: Date
 }
 
 export type CreateFinancialConnectDetailsAttributes = Optional<FinancialConnectDetailsAttributes, 'id'>
@@ -55,11 +57,25 @@ export class FinancialConnectDetails extends Model<FinancialConnectDetailsAttrib
         allowNull: false,
     })
     saltCustomerSecret: string;
-
+    
     @Column({
-      type: DataType.STRING,
-      allowNull: false,
-    })
-    businessId: string;
+        type: DataType.STRING,
+        allowNull: false,
+      })
+      businessId: string;
+  
+      @Column({
+          allowNull: true,
+          type: DataType.DATE,
+          defaultValue: new Date()
+      })
+      updatedAt: Date;
+  
+      @Column({
+          allowNull: true,
+          type: DataType.DATE,
+          defaultValue: new Date()
+      })
+      createdAt: Date;
 
 }

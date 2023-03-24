@@ -19,6 +19,7 @@ export class SaltEdge {
             appId: appConfig().saltEdge.appId,
             secret: appConfig().saltEdge.secret,
         })
+        
     }
 
     // create customer to begin transactions; 
@@ -39,10 +40,10 @@ export class SaltEdge {
     //  save this for account retrieval
     async createConnectionSession( customerId: string){
         const payload = connectSessionGenerator(customerId);
-        return await this.saltClient.post('connect_sessions/create?include_fake_providers=true', {
-                ...payload
-            
-        })
+        const response = await this.saltClient.post('connect_sessions/create', {
+            data: payload
+        });
+        return response.data.data;
      }
 
     //  fetch Account
