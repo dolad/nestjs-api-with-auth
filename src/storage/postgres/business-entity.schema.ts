@@ -1,6 +1,7 @@
 import {  Optional } from "sequelize";
 import { Column, DataType, Table, Model, HasMany, HasOne} from "sequelize-typescript";
 import { BusinessInformation } from "./business-information.schema";
+import { FinancialConnectDetails } from "./financial-account";
 import { User } from "./user.schema";
 
 
@@ -11,7 +12,7 @@ export type BusinessEntityAttribute = {
     kycStep?: number;
     businessOwner?: string;
     businessInformation?: BusinessInformation;
-    // financeAccounts?: BusinessFinanceInformation;
+    // financeAccounts?: FinancialConnectDetails[];
     // salesSoftwares?: SalesSoftwares;
 
 }

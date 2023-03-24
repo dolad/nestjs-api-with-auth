@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -63,14 +63,9 @@ export class FinancialInformationServices {
     return await this.supportedCountriesRepo.findAll();
   }
 
-  async connectBank(user: IAuthUser): Promise<any> {
-    // create customer and customerTable;
-    // create connection;
-    // fetch Account and Transaction;
-    const fetchConnectDetails = await this.createSaltEdgeCustomer(user);
-    const response = await this.saltEdgeServices.createConnectionSession(
-      fetchConnectDetails.saltEdgeCustomerId,
-    );
+  async connectBankKyc(user: IAuthUser): Promise<any> {
+  
+    const response = await this.connectBank(user);  
     await this.businessEntityRepo.update({
       kycStep: 3
     }, {
@@ -78,6 +73,14 @@ export class FinancialInformationServices {
         creator: user.userId
       }
     });
+    return response;
+  }
+
+  async connectBank(user: IAuthUser): Promise<any> {
+    const fetchConnectDetails = await this.createSaltEdgeCustomer(user);
+    const response = await this.saltEdgeServices.createConnectionSession(
+      fetchConnectDetails.saltEdgeCustomerId,
+    );
     return response.data.data;
   }
 
@@ -120,19 +123,35 @@ export class FinancialInformationServices {
         customerId: user.userId,
       },
     });
+
     if (financialConnectExist) {
       return financialConnectExist;
     }
+    const businessId = await this.businessEntityRepo.findOne({
+      where: {
+        creator: user.userId
+      }
+    });
+
+    if(!businessId){
+      throw new BadRequestException("This user have register a business with us");
+    }
+
+   
     const createSaltEdgeCustomer = await this.saltEdgeServices.createCustomer(
-      user.email,
+      user.userId,
     );
+
+    
     const payload = createSaltEdgeCustomer.data.data;
+
     return await this.financialSupportRepo.create({
       saltEdgeCustomerId: payload.id,
       saltCustomerSecret: payload.secret,
       saltEdgeIdentifier: payload.identifier,
       customerEmail: user.email,
       customerId: user.userId,
+      businessId: businessId.id
     });
   }
 }

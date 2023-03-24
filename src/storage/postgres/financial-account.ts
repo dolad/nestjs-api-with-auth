@@ -1,5 +1,6 @@
 import {  Optional } from "sequelize";
-import { Column, DataType, Table, Model} from "sequelize-typescript";
+import { Column, DataType, Table, Model, BelongsTo, ForeignKey} from "sequelize-typescript";
+import { BusinessEntity } from "./business-entity.schema";
 
 
 export type FinancialConnectDetailsAttributes = {
@@ -9,6 +10,7 @@ export type FinancialConnectDetailsAttributes = {
     saltEdgeCustomerId: string;
     saltEdgeIdentifier: string;
     saltCustomerSecret: string;
+    businessId: string;
 }
 
 export type CreateFinancialConnectDetailsAttributes = Optional<FinancialConnectDetailsAttributes, 'id'>
@@ -53,5 +55,11 @@ export class FinancialConnectDetails extends Model<FinancialConnectDetailsAttrib
         allowNull: false,
     })
     saltCustomerSecret: string;
+
+    @Column({
+      type: DataType.STRING,
+      allowNull: false,
+    })
+    businessId: string;
 
 }
