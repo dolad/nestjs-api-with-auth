@@ -25,11 +25,11 @@ export const supportedCountryPayload = [
   },
 ];
 
-export const connectSessionGenerator  = (customerId: string) => {
+export const leadPayloadGenerator  = (customerId: string) => {
     return {
             customer_id: customerId,
             return_connection_id: true,
-            country_code: ["GB", "AE"],
+            country_code: ["GB"],
             
             consent: {
               from_date: '2023-01-01',
