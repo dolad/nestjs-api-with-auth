@@ -1,9 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { HttpClient } from "../../utils/fetcher";
 import appConfig from "src/config/app.config";
-import { AxiosInstance } from "axios";
-import { connectSessionGenerator, createConnectionPayload } from "../mockRequest/connection";
-
+import {AxiosInstance} from "axios";
+import { leadPayloadGenerator, createConnectionPayload } from "../mockRequest/connection";
 
 @Injectable()
 export class SaltEdge {
@@ -19,16 +18,15 @@ export class SaltEdge {
             appId: appConfig().saltEdge.appId,
             secret: appConfig().saltEdge.secret,
         })
-        
     }
 
     // create customer to begin transactions; 
     // store customer information to retrieve connections
 
-    async createCustomer(identifier: string){
-       return await this.saltClient.post('customers', {
+    async createLeads(identifier: string){
+       return await this.saltClient.post('leads', {
             data: {
-                identifier
+                email: identifier
             }
         })
     }
@@ -38,13 +36,16 @@ export class SaltEdge {
      }
 
     //  save this for account retrieval
-    async createConnectionSession( customerId: string){
-        const payload = connectSessionGenerator(customerId);
-        const response = await this.saltClient.post('connect_sessions/create', {
+    async createLeadSession( customerId: string){
+        const payload = leadPayloadGenerator(customerId);
+        const response = await this.saltClient.post('lead_sessions/create', {
             data: payload
         });
+    
         return response.data.data;
      }
+
+     
 
     //  fetch Account
     async fetchAccount(){

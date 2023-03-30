@@ -25,15 +25,12 @@ export const supportedCountryPayload = [
   },
 ];
 
-export const connectSessionGenerator  = (customerId: string) => {
+export const leadPayloadGenerator  = (customerId: string) => {
     return {
             customer_id: customerId,
-            return_connection_id: true,
-            country_code: ["GB", "AE"],
-            
             consent: {
               from_date: '2023-01-01',
-              period_days: 365,
+              period_days: 90,
               scopes: ['account_details', 'transactions_details'],
             },
             attempt: {

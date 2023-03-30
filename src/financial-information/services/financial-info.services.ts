@@ -77,8 +77,9 @@ export class FinancialInformationServices {
   }
 
   async connectBank(user: IAuthUser): Promise<any> {
-    const fetchConnectDetails = await this.createSaltEdgeCustomer(user);
-    const response = await this.saltEdgeServices.createConnectionSession(
+    const fetchConnectDetails = await this.createLeadsForCustomer(user);
+  
+    const response = await this.saltEdgeServices.createLeadSession(
       fetchConnectDetails.saltEdgeCustomerId,
     );
     return response.data.data;
@@ -86,7 +87,7 @@ export class FinancialInformationServices {
 
   async fetchCustomerConnection(user: IAuthUser) {
     // fetch connections
-    const getCustomer = await this.createSaltEdgeCustomer(user);
+    const getCustomer = await this.createLeadsForCustomer(user);
     const response = await this.saltEdgeServices.fetchConnection(
       getCustomer.saltEdgeCustomerId,
     );
@@ -114,9 +115,9 @@ export class FinancialInformationServices {
     // fetchaccount from connections
   }
 
-  private async createSaltEdgeCustomer(
+  private async createLeadsForCustomer(
     user: IAuthUser,
-  ): Promise<FinancialConnectDetails> {
+  ): Promise<any> {
     const financialConnectExist = await this.financialSupportRepo.findOne({
       where: {
         customerEmail: user.email,
@@ -137,18 +138,17 @@ export class FinancialInformationServices {
       throw new BadRequestException("This user have register a business with us");
     }
 
-   
-    const createSaltEdgeCustomer = await this.saltEdgeServices.createCustomer(
-      user.userId,
+    const createSaltEdgeCustomer = await this.saltEdgeServices.createLeads(
+      user.email,
     );
-
     
+   
     const payload = createSaltEdgeCustomer.data.data;
 
     return await this.financialSupportRepo.create({
-      saltEdgeCustomerId: payload.id,
-      saltCustomerSecret: payload.secret,
-      saltEdgeIdentifier: payload.identifier,
+      saltEdgeCustomerId: payload.customer_id,
+      saltCustomerSecret: payload.customer_id,
+      saltEdgeIdentifier: payload.email,
       customerEmail: user.email,
       customerId: user.userId,
       businessId: businessId.id

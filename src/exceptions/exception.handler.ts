@@ -22,21 +22,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-
     if(exception != null){
-      const errorResponse = exception.getResponse ? exception.getResponse() as any : { message:"Something went wrong"};
        responseBody = {
         statusCode: httpStatus,
         status: false,
         data: null,
-        message: errorResponse.message || errorResponse,
+        message: exception.message,
       };
     }else {
       responseBody = {
         statusCode: httpStatus,
         status: false,
         data: null,
-        message: "Something went wrong",
+        message: exception.stack,
       }
     }
     
