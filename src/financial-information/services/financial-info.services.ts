@@ -78,11 +78,10 @@ export class FinancialInformationServices {
 
   async connectBank(user: IAuthUser): Promise<any> {
     const fetchConnectDetails = await this.createLeadsForCustomer(user);
-  
     const response = await this.saltEdgeServices.createLeadSession(
       fetchConnectDetails.saltEdgeCustomerId,
     );
-    return response.data.data;
+    return response;
   }
 
   async fetchCustomerConnection(user: IAuthUser) {
@@ -138,8 +137,9 @@ export class FinancialInformationServices {
       throw new BadRequestException("This user have register a business with us");
     }
 
+   
     const createSaltEdgeCustomer = await this.saltEdgeServices.createLeads(
-      user.email,
+      user.userId,
     );
     
    

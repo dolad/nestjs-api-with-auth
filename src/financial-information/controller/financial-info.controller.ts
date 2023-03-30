@@ -45,7 +45,7 @@ export class FinancialInfoController {
   @HttpCode(HttpStatus.OK)
   async connectBankProvider(@Request() req
   ): Promise<IResponseMessage> {
-    const response = await this.financeServices.connectBank(req.user);
+    const response = await this.financeServices.connectBankKyc(req.user);
     return wrapResponseMessage('business Information Successfully', response);
   }
 }

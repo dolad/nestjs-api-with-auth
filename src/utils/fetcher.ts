@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import appConfig from "src/config/app.config";
 
 export interface IHttpClientParams {
     baseUrl: string;
@@ -8,17 +9,15 @@ export interface IHttpClientParams {
 
 
 
-export function HttpClient(params:IHttpClientParams): AxiosInstance {
- return axios.create({
-  baseURL: params.baseUrl,
+export const httpClient: AxiosInstance = axios.create({
+  baseURL: 'https://www.saltedge.com/api/partners/v1/',
   headers:  {
     Accept: 'application/json',
-    "App-id": params.appId,
-    "Secret": params.secret
-  }
-})
+    'Content-type': 'application/json',
+    "App-id": appConfig().saltEdge.appId,
+    "Secret": appConfig().saltEdge.secret
+  }})
 
-}
 
 export function RutterClient(params:IHttpClientParams): AxiosInstance {
     return axios.create({
