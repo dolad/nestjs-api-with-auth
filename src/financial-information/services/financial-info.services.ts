@@ -78,6 +78,7 @@ export class FinancialInformationServices {
 
   async connectBank(user: IAuthUser): Promise<any> {
     const fetchConnectDetails = await this.createLeadsForCustomer(user);
+  
     const response = await this.saltEdgeServices.createLeadSession(
       fetchConnectDetails.saltEdgeCustomerId,
     );
@@ -116,7 +117,7 @@ export class FinancialInformationServices {
 
   private async createLeadsForCustomer(
     user: IAuthUser,
-  ): Promise<FinancialConnectDetails> {
+  ): Promise<any> {
     const financialConnectExist = await this.financialSupportRepo.findOne({
       where: {
         customerEmail: user.email,
@@ -138,10 +139,10 @@ export class FinancialInformationServices {
     }
 
     const createSaltEdgeCustomer = await this.saltEdgeServices.createLeads(
-      user.userId,
+      user.email,
     );
-
     
+   
     const payload = createSaltEdgeCustomer.data.data;
 
     return await this.financialSupportRepo.create({

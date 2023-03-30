@@ -41,6 +41,7 @@ export class SaltEdge {
         const response = await this.saltClient.post('lead_sessions/create', {
             data: payload
         });
+    
         return response.data.data;
      }
 
