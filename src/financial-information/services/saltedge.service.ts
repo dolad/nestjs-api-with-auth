@@ -1,7 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { httpClient } from "../../utils/fetcher";
-import appConfig from "src/config/app.config";
-import axios, {AxiosInstance} from "axios";
 
 import { leadPayloadGenerator, createConnectionPayload } from "../mockRequest/connection";
 
@@ -9,20 +7,14 @@ import { leadPayloadGenerator, createConnectionPayload } from "../mockRequest/co
 export class SaltEdge {
 
    
-
-    // instantiate saltEdgeClient
-  
-
-    // create customer to begin transactions; 
-    // store customer information to retrieve connections
-
     async createLeads(identifier: string){
-
+    
        const response = await httpClient.post('leads', {
             data: {
                 email: identifier
             }, 
        })
+        
         return response;
 
     }

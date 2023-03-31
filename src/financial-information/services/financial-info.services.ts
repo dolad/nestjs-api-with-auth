@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -64,15 +64,18 @@ export class FinancialInformationServices {
   }
 
   async connectBankKyc(user: IAuthUser): Promise<any> {
-  
-    const response = await this.connectBank(user);  
-    await this.businessEntityRepo.update({
-      kycStep: 3
-    }, {
+    const businessEntity = await this.businessEntityRepo.findOne({
       where: {
         creator: user.userId
       }
     });
+
+    if(!businessEntity) throw new NotFoundException("User not associated with any business");
+    if(businessEntity.kycStep < 2) throw new BadRequestException("Please confirm the previos step");
+    const response = await this.connectBank(user);  
+    businessEntity.kycStep = 2;
+    businessEntity.save();
+    
     return response;
   }
 
@@ -137,9 +140,8 @@ export class FinancialInformationServices {
       throw new BadRequestException("This user have register a business with us");
     }
 
-   
     const createSaltEdgeCustomer = await this.saltEdgeServices.createLeads(
-      user.userId,
+      user.email,
     );
     
    
