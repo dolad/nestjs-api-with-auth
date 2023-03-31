@@ -84,7 +84,9 @@ export class FinancialInformationServices {
     const response = await this.saltEdgeServices.createLeadSession(
       fetchConnectDetails.saltEdgeCustomerId,
     );
-    return response;
+    return {
+      connect_url: response.redirect_url
+    };
   }
 
   async fetchCustomerConnection(user: IAuthUser) {
