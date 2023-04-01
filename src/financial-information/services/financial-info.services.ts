@@ -73,7 +73,7 @@ export class FinancialInformationServices {
     if(!businessEntity) throw new NotFoundException("User not associated with any business");
     if(businessEntity.kycStep < 2) throw new BadRequestException("Please confirm the previos step");
     const response = await this.connectBank(user);  
-    businessEntity.kycStep = 2;
+    businessEntity.kycStep = 3;
     businessEntity.save();
     
     return response;
