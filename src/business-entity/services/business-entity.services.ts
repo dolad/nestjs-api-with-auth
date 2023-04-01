@@ -67,7 +67,7 @@ export class BusinessEntityServices {
           email: user.email
         },
         transaction: tx
-      }, )
+      },)
 
       await this.businessInformation.create(
         {
@@ -138,6 +138,7 @@ export class BusinessEntityServices {
           {
             businessEntityId: buisinessEntity.id,
             userType: UserType.BUSINESS_OWNER,
+            ...ownerPayload
           },
           {
             where: {
