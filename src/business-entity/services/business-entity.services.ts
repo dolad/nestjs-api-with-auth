@@ -36,7 +36,7 @@ export class BusinessEntityServices {
     payload: CreateBusinessEntity,
     user: IAuthUser,
   ): Promise<any> {
-    // has business been created before
+    
     let businessEntity;
 
     businessEntity = await this.businessEntityRepo.findOne({
@@ -60,12 +60,21 @@ export class BusinessEntityServices {
         { transaction: tx },
       );
 
+      await this.userRepos.update({
+        businessEntityId: businessEntity.id
+      },{
+        where: {
+          email: user.email
+        },
+        transaction: tx
+      }, )
+
       await this.businessInformation.create(
         {
           ...payload,
           businessId: businessEntity.id,
         },
-        tx,
+        {transaction: tx},
       );
 
       tx.commit();

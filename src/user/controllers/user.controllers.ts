@@ -17,27 +17,6 @@ export class UserController {
   constructor(private readonly userService: UserServices) {}
 
   
-  // @UseGuards(SessionGuard)
-  // @Post('session/check')
-  // @UseGuards(JwtAuthGuard)
-  // async createBusinessInformation(@Request() req, @GetSession() session: UserSession ): Promise<any> {
-  //   const response = await this.userService.getUserSession(req.user); 
-  //   return wrapResponseMessage("business information added", response);
-  // }
-
-  // @UseGuards(SessionGuard)
-  // @Post('session/destroy')
-  // @UseGuards(JwtAuthGuard)
-  // async destroySession(@Request() req, @GetSession() session: UserSession ): Promise<IResponseMessage> {
-  //   const response = new Promise((resolve, reject) => {
-  //     session.destroy((err) => {
-  //     if (err) reject(err);
-  //     resolve(undefined);
-  //     })
-  //   });
-  //   return wrapResponseMessage("business information added", response);
-  // }
-
   @Post('enable-two-fa')
   @UseGuards(JwtAuthGuard)
   async enableTwoFa(@Request() req, @Body() payload:EnabledTwoFaAuthPayload): Promise<IResponseMessage> {
@@ -75,7 +54,6 @@ export class UserController {
   }
 
   
-
   @Get('sessions')
   @UseGuards(JwtAuthGuard)
   async getUserSession(@Request() req): Promise<IResponseMessage> {
