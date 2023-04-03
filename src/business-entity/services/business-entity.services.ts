@@ -132,6 +132,18 @@ export class BusinessEntityServices {
         },
       });
 
+
+      if (!owner) {
+        owner = await this.userRepos.create(
+          {
+            ...ownerPayload,
+            userType: UserType.BUSINESS_OWNER,
+            businessEntityId: buisinessEntity.id,
+          },
+          { transaction: tx },
+        );
+      }
+
       // update owner
       if (owner) {
         await this.userRepos.update(
@@ -149,16 +161,6 @@ export class BusinessEntityServices {
         );
       }
 
-      if (!owner) {
-        owner = await this.userRepos.create(
-          {
-            ...ownerPayload,
-            userType: UserType.BUSINESS_OWNER,
-            businessEntityId: buisinessEntity.id,
-          },
-          { transaction: tx },
-        );
-      }
 
       // create other share holders
       if (payload.length) {

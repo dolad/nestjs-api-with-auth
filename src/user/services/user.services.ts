@@ -90,6 +90,12 @@ export class UserServices {
         if(!creator.businessEntityId){
             throw new ForbiddenException("user has not add a business")
         }
+        const userExist = await this.userRepos.findOne({
+            where:{
+                email:payload.email
+            }
+        });
+        if(userExist) throw new ForbiddenException("User already exist");
         const createNewUser = await this.userRepos.create({
             ...payload,
             businessEntityId: creator.businessEntityId,
