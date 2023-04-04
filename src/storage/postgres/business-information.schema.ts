@@ -12,7 +12,7 @@ export type BusinessInformationAttributes = {
     businessCountry?: string;
     businessCity?: string;
     businessId: string;
-    businessEntity: BusinessEntity
+    businessEntity?: BusinessEntity
 
 }
 
@@ -73,7 +73,7 @@ export class BusinessInformation extends Model<BusinessInformationAttributes, Bu
     businessCity?: string;
 
     @BelongsTo(() => BusinessEntity)
-    businessEntity: BusinessEntity
+    businessEntity?: BusinessEntity
 
     @ForeignKey(() => BusinessEntity)
     @Column({

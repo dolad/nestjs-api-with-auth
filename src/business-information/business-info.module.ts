@@ -7,7 +7,7 @@ import { BusinessInformationServices } from "./services/business-info.services";
     imports: [],
     controllers: [BusinessInfoController],
     providers: [BusinessInformationServices, businessInformationProviders],
-    exports: [BusinessInformationServices],
+    exports: [BusinessInformationServices, businessInformationProviders],
 })
 
 export class BusinessInformationModule {}

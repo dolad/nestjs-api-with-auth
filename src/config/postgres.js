@@ -16,6 +16,12 @@ module.exports = {
     define: {
       underscored: false,
     },
+    pool: {
+      max: 15,
+      min: 0,
+      idle: 10000,
+      acquire: 10000
+    },
     autoLoadModels: true,
     seederStorage: 'sequelize',
     seederStorageTableName: 'sequelize_seeder',
@@ -35,10 +41,10 @@ module.exports = {
     },
     autoLoadModels: true,
     pool: {
-      max: 5,
+      max: 15,
       min: 0,
-      acquire: 60000,
       idle: 10000,
+      acquire: 10000
     },
     seederStorage: 'sequelize',
     seederStorageTableName: 'sequelize_seeder',
@@ -68,10 +74,10 @@ module.exports = {
       },
     },
     pool: {
-      max: 5,
+      max: 15,
       min: 0,
-      acquire: 60000,
       idle: 10000,
-    },
+      acquire: 10000
+    }
   },
 };

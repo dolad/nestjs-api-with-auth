@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import {
   BUSINESS_ENTITY_REPOSITORY,
+  BUSINESS_INFORMATION_REPOSITORY,
   USER_REPOSITORY,
 } from '../../utils/constants';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -19,7 +20,6 @@ import { Sequelize } from 'sequelize-typescript';
 import { User, UserType } from '../../storage/postgres/user.schema';
 import { IAuthUser } from '../../user/types/user.types';
 import { BusinessInformation } from '../../storage/postgres/business-information.schema';
-import { BusinessInformationServices } from 'src/business-information/services/business-info.services';
 
 @Injectable()
 export class BusinessEntityServices {
@@ -27,7 +27,8 @@ export class BusinessEntityServices {
   constructor(
     @Inject(BUSINESS_ENTITY_REPOSITORY)
     private readonly businessEntityRepo: typeof BusinessEntity,
-    private readonly businessInformation: BusinessInformationServices,
+    @Inject(BUSINESS_INFORMATION_REPOSITORY)
+    private readonly businessInformationRepo: typeof BusinessInformation,
     @Inject(USER_REPOSITORY) private userRepos: typeof User,
     private sequelize: Sequelize,
   ) {}
@@ -37,53 +38,56 @@ export class BusinessEntityServices {
     user: IAuthUser,
   ): Promise<any> {
     
-    let businessEntity;
-
-    businessEntity = await this.businessEntityRepo.findOne({
+    
+   const  businessEntityExist = await this.businessEntityRepo.findOne({
       where: {
         creator: user.userId,
         kycStep: 1,
       },
     });
 
-    if (businessEntity) {
+    if (businessEntityExist) {
       throw new ConflictException('User has already completed this stage');
     }
-    const tx = await this.sequelize.transaction();
     try {
       // create business entity
-      businessEntity = await this.businessEntityRepo.create(
-        {
-          creator: user.userId,
-          kycStep: 1,
-        },
-        { transaction: tx },
-      );
+       await this.sequelize.transaction(async (t) => {
+       
+        const businessEntity = await this.businessEntityRepo.create(
+          {
+            creator: user.userId,
+            kycStep: 1,
+          },
+          { transaction: t },
+        );
 
-      await this.userRepos.update({
-        businessEntityId: businessEntity.id
-      },{
-        where: {
-          email: user.email
-        },
-        transaction: tx
-      },)
+        await this.userRepos.update({
+          businessEntityId: businessEntity.id
+        },{
+          where: {
+            email: user.email
+          },
+          transaction: t
+        })
 
-      await this.businessInformation.create(
-        {
-          ...payload,
-          businessId: businessEntity.id,
-        },
-        {transaction: tx},
-      );
+        
 
-      tx.commit();
+        await this.businessInformationRepo.create(
+          {
+            ...payload,
+            businessId: businessEntity.id,
+          },
+          {transaction: t},
+        );
+
+      })
+      
       this.logger.log('Business entity created');
       return 'Kyc Submitted Successfully';
     } catch (error) {
-      tx.rollback();
-      console.log(error);
       this.logger.error('business entity can not be created');
+      throw new Error("Failed to create buisiness entity");
+      
     }
   }
 

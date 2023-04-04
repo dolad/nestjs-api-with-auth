@@ -30,6 +30,12 @@ console.log(process.env.NODE_ENV)
                 force: false,
                 alter: false,
               },
+              pool: {
+                max: 15,
+                min: 0,
+                idle: 10000,
+                acquire: 10000
+              }
             }),
           }),
         

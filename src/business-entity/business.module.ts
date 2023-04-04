@@ -6,11 +6,12 @@ import { BusinessEntityController } from "./controller/business-entity.controlle
 import { businessEntityProviders } from "./providers/provider";
 import { BusinessEntityServices } from "./services/business-entity.services";
 import { UserModule } from "../user/user.module";
-import { BusinessInformationModule } from "src/business-information/business.module";
+import { BusinessInformationModule } from "../business-information/business-info.module";
+import { BusinessInformation } from "../storage/postgres/business-information.schema";
 
 @Module({
     imports: [
-        SequelizeModule.forFeature([BusinessEntity, User]),
+        SequelizeModule.forFeature([BusinessEntity, User, BusinessInformation]),
         forwardRef(() => UserModule),
         BusinessInformationModule,
     ],

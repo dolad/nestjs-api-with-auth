@@ -14,7 +14,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import emailConfiig from './config/email.confiig';
 import { BusinessTypeModule } from './business-type/business.module';
 import { BusinessEntityModule } from './business-entity/business.module';
-import { BusinessInformationModule } from './business-information/business.module';
+import { BusinessInformationModule } from './business-information/business-info.module';
 import { FinancialInformationModule } from './financial-information/financial-info.module';
 import { SoftwareInformationModule } from './software-information/software-info.module';
 // import IoRedis from 'ioredis'
