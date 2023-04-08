@@ -15,6 +15,8 @@ import {
   IResponseMessage,
 } from '../../utils/response.map';
 import { CreateFinancialInformationDTO } from '../dto/financial-info.dto';
+import { AddFundingRequirement } from '../dto/funding-requirement.dto';
+import { RemoveConnectedBankDTO } from '../dto/remove-connected-bank.dto';
 import { FinancialInformationServices } from '../services/financial-info.services';
 
 @Controller('financial-information')
@@ -46,6 +48,31 @@ export class FinancialInfoController {
   async connectBankProvider(@Request() req
   ): Promise<IResponseMessage> {
     const response = await this.financeServices.connectBankKyc(req.user);
+    return wrapResponseMessage('business Information Successfully', response);
+  }
+
+  @Post('/funding-requirement')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async addFundingRequirement(@Request() req, @Body() fundingRequirementPayload: AddFundingRequirement
+  ): Promise<IResponseMessage> {
+    const response = await this.financeServices.createFundingRequirement(req.user, fundingRequirementPayload);
+    return wrapResponseMessage('business Information Successfully', response);
+  }
+
+  @Get('/get-connected-bank')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getConnectedBank(@Request() req): Promise<IResponseMessage> {
+    const response = await this.financeServices.fetchConnectedBanks(req.user);
+    return wrapResponseMessage('business Information Successfully', response);
+  }
+
+  @Post('/remove-connected-bank')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async disconnectConnectedBank(@Request() req, @Body() removedConnectedBankPayload: RemoveConnectedBankDTO ): Promise<IResponseMessage> {
+    const response = await this.financeServices.disableBankConnection(req.user, removedConnectedBankPayload.bankName);
     return wrapResponseMessage('business Information Successfully', response);
   }
 }

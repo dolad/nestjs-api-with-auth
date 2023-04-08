@@ -1,4 +1,5 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConsoleLogger, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { FundingRequirement } from 'src/storage/postgres/financial-requirement';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -7,9 +8,11 @@ import { IAuthUser } from '../../user/types/user.types';
 import {
   BUSINESS_ENTITY_REPOSITORY,
   FINANCIAL_CONNECT_PROVIDER,
+  FINANCIAL_REQUIREMENT,
   SUPORTED_BANK_PROVIDER,
   SUPORTED_BANK_PROVIDER_COUNTRIES,
 } from '../../utils/constants';
+import { AddFundingRequirement } from '../dto/funding-requirement.dto';
 import { supportedCountryPayload } from '../mockRequest/connection';
 import { SaltEdge } from './saltedge.service';
 
@@ -24,7 +27,10 @@ export class FinancialInformationServices {
     private readonly financialSupportRepo: typeof FinancialConnectDetails,
     private readonly saltEdgeServices: SaltEdge,
     @Inject(BUSINESS_ENTITY_REPOSITORY)
-    private readonly businessEntityRepo: typeof BusinessEntity)
+    private readonly businessEntityRepo: typeof BusinessEntity,
+    @Inject(FINANCIAL_REQUIREMENT)
+    private readonly financialRequirement: typeof FundingRequirement
+    )
   {}
 
   /**
@@ -46,7 +52,7 @@ export class FinancialInformationServices {
    * @returns addSupport to database this should not be used unless use want to add more provider
    */
   async addToSupportedBank(): Promise<any> {
-    const response = await this.saltEdgeServices.fetchProvider('AE');
+    const response = await this.saltEdgeServices.fetchProvider();
     const responsePayload = response.data.data.map((res) => {
       return {
         code: res.code,
@@ -95,9 +101,47 @@ export class FinancialInformationServices {
     const response = await this.saltEdgeServices.fetchConnection(
       getCustomer.saltEdgeCustomerId,
     );
-    return response.data.data;
+    return response
     // fetchaccount from connections
   }
+
+
+  async fetchConnectedBanks(user: IAuthUser) {
+    const financialConnect = await this.financialSupportRepo.findOne({
+      where: {
+        customerEmail: user.email
+      }
+    });
+
+    const connection = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
+    const provider = connection.filter(item => item.status === 'inactive').map(item => ({providerName: item.provider_name, status:item.status, cId:item.id}));
+    const result = await Promise.all(provider.map(prov => {
+     return this.supportedBank.findOne({
+        where: {
+          name:prov.providerName
+        }
+      })
+    }))
+    return result;
+  }
+
+  async disableBankConnection(user:IAuthUser, bankName:string){
+    const financialConnect = await this.financialSupportRepo.findOne({
+      where: {
+        customerEmail: user.email
+      }
+    });
+    const connections = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
+    const providerConnectionDetails = connections.filter(item => item.status === 'inactive' && item.provider_name === bankName)
+    const consents = await this.saltEdgeServices.getConsentWithConnectionId(providerConnectionDetails[0].id);
+    const revokeConsent = await this.saltEdgeServices.revokeConsent(consents[0].id, consents[0].connection_id);
+    return revokeConsent;
+
+
+  }
+
+
+
 
   async fetchAccount(user: IAuthUser) {
     // fetch connections
@@ -117,6 +161,35 @@ export class FinancialInformationServices {
     );
     return response;
     // fetchaccount from connections
+  }
+
+  async createFundingRequirement(user: IAuthUser, fundingRequirement: AddFundingRequirement): Promise<any> {
+    const businessId = await this.businessEntityRepo.findOne({
+      where: {
+        creator: user.userId
+      }
+    });
+    if(!businessId){
+      throw new NotFoundException("Business not Found")
+    }
+
+    const requirementAlready = await this.financialRequirement.findOne({
+      where: {
+        businessId: businessId.id
+      }
+    });
+
+    if(requirementAlready){
+      throw new BadRequestException("Funding Requirement already added");
+    }
+
+    const requirement = await this.financialRequirement.create({
+      ...fundingRequirement,
+      businessId:businessId.id
+    });
+    
+    return requirement;
+
   }
 
   private async createLeadsForCustomer(
@@ -158,4 +231,5 @@ export class FinancialInformationServices {
       businessId: businessId.id
     });
   }
+
 }

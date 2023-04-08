@@ -34,6 +34,18 @@ export class SaltEdge {
         return response.data.data;
      }
 
+     //  fetch Account
+    async getConsentWithConnectionId(connectionId: string){
+        const response = await httpClient.get(`partner_consents?connection_id=${connectionId}`)
+        return response.data.data
+     }
+
+    async revokeConsent(consentId: string, customerId:string){
+       const url = `partner_consents/${consentId}/revoke?connection_id=${customerId}`;
+        const response = await httpClient.put(url);
+        response.data.data;
+     }
+
      
 
     //  fetch Account
@@ -46,8 +58,8 @@ export class SaltEdge {
      }
 
     //  fetchProviders
-    async fetchProvider(countriesCode: string): Promise<any>{
-        return await httpClient.get(`providers?include_fake_providers=true&country_code=${countriesCode}`)
+    async fetchProvider(): Promise<any>{
+        return await httpClient.get(`providers`)
     }
    /**
      * 
@@ -63,8 +75,10 @@ export class SaltEdge {
      * @returns list of active connections for fetching user accounts
      */
      async fetchConnection(customerId: string){
-        return await httpClient.get(`connections?customer_id=${customerId}`, {
+        const res = await httpClient.get(`connections?customer_id=${customerId}`, {
         })
+
+        return res.data.data;
     }
 
     /**
