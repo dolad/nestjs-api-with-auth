@@ -15,6 +15,7 @@ import { FinancialConnectDetails } from "../postgres/financial-account";
 import { SoftwareConnectDetails } from "../postgres/software-info.schema";
 import { UserSession } from "./user-session.schema";
 import { FundingRequirement } from "./financial-requirement";
+import { BusinessOwners } from "./business-owners.dto";
 
 console.log(process.env.NODE_ENV)
 
@@ -25,7 +26,7 @@ console.log(process.env.NODE_ENV)
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
               ...dbConfig[config.get<IAppConfig>('app').environment],
-              models:[User, Kyc, BusinessEntity, BusinessInformation, BusinessType, BankProviderCountries, BankProvider, FinancialConnectDetails, SoftwareConnectDetails, UserSession, FundingRequirement],
+              models:[User, Kyc, BusinessEntity, BusinessInformation, BusinessType, BankProviderCountries, BankProvider, FinancialConnectDetails, SoftwareConnectDetails, UserSession, FundingRequirement,BusinessOwners],
               autoLoadModels: true,
                sync: {
                 force: false,

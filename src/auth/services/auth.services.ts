@@ -192,7 +192,7 @@ export class AuthService {
       },
     };
 
-    this.eventEmitter.emit('notification.email', emailPayload);
+    this.eventEmitter.emit('verification.email', emailPayload);
     this.logger.log('email notification sent successfull');
   }
 

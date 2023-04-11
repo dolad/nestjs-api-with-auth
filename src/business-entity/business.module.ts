@@ -3,7 +3,7 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { User } from "../storage/postgres/user.schema";
 import { BusinessEntity } from "../storage/postgres/business-entity.schema";
 import { BusinessEntityController } from "./controller/business-entity.controller";
-import { businessEntityProviders } from "./providers/provider";
+import { businessEntityProviders, businessOwnersProviders } from "./providers/provider";
 import { BusinessEntityServices } from "./services/business-entity.services";
 import { UserModule } from "../user/user.module";
 import { BusinessInformationModule } from "../business-information/business-info.module";
@@ -16,7 +16,7 @@ import { BusinessInformation } from "../storage/postgres/business-information.sc
         BusinessInformationModule,
     ],
     controllers: [BusinessEntityController],
-    providers: [BusinessEntityServices, businessEntityProviders],
+    providers: [BusinessEntityServices, businessEntityProviders, businessOwnersProviders],
     exports: [BusinessEntityServices, businessEntityProviders]
 })
 
