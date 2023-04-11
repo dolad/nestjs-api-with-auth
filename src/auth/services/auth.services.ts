@@ -296,12 +296,13 @@ export class AuthService {
         twoFaToken:token
       }
     });
-    user.twoFaToken = null;
-    user.save();
-    
     if(!user){
       throw new NotFoundException("Invalid token")
     }
+    user.twoFaToken = null;
+    user.save();
+    
+    
     return {
       email: user.email,
       id: user.id,
