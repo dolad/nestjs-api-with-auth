@@ -32,7 +32,7 @@ export class BusinessEntityServices {
     @Inject(BUSINESS_INFORMATION_REPOSITORY)
     private readonly businessInformationRepo: typeof BusinessInformation,
     @Inject(USER_REPOSITORY) private userRepos: typeof User,
-    @Inject(BUSINESS_OWNER) private businessRepo: typeof BusinessOwners,
+    @Inject(BUSINESS_OWNER) private businessOwnerRepo: typeof BusinessOwners,
     private sequelize: Sequelize,
   ) {}
 
@@ -74,7 +74,6 @@ export class BusinessEntityServices {
         })
 
         
-
         await this.businessInformationRepo.create(
           {
             ...payload,
@@ -100,10 +99,14 @@ export class BusinessEntityServices {
   ): Promise<any> {
     const buisinessEntity = await this.businessEntityRepo.findOne({
       where: {
-        creator: user.userId,
-        kycStep: 1,
+        creator: user.userId
       },
     });
+    
+    if(buisinessEntity.kycStep === 2){
+      throw new ConflictException("User Already passed this stage")
+    }
+
 
     if (!buisinessEntity) {
       throw new NotFoundException('User has not completed the first kyc');
@@ -174,11 +177,10 @@ export class BusinessEntityServices {
         const otherShareholders = payload.map((user) => {
           return {
             ...user,
-            userType: UserType.SHAREHOLDER,
-            businessEntityId: buisinessEntity.id,
+            businessId: buisinessEntity.id,
           };
         });
-        await this.userRepos.bulkCreate(otherShareholders, { transaction: tx });
+        await this.businessOwnerRepo.bulkCreate(otherShareholders, {transaction: tx})
       }
 
       // update the businessEntityRepo
@@ -200,8 +202,7 @@ export class BusinessEntityServices {
       return 'Updated successfully';
     } catch (error) {
       tx.rollback();
-      console.log(error);
-      this.logger.error('business entity can not be created');
+      this.logger.error(`business entity can not be created ${error}`);
     }
   }
 
