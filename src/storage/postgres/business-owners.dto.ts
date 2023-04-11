@@ -10,8 +10,8 @@ export type BusinessOwnersAttributes = {
     gender: string;
     employmentStatus: string;
     annualIncome: number;
-    dateofBirth: Date;
-    personalCredilimit: number;
+    dateOfBirth: Date;
+    personalCreditLimit: number;
     country: string;
     city: string;
     residentialAddress: string;
@@ -81,7 +81,7 @@ export class BusinessOwners extends Model<BusinessOwnersAttributes, CreateBusine
         allowNull: false,
        
     })
-    personalCredilimit: number;
+    personalCreditLimit: number;
 
     @Column({
         type: DataType.STRING,

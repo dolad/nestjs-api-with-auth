@@ -33,5 +33,10 @@ export class UpdateCreatorDetails {
     @IsString()
     lastName: string;
 
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    phone: string;
+
 }
 
