@@ -27,7 +27,7 @@ export class EmailService {
       },
       template: payload.template,
     };
-
+   
     this.Transporter.use(
       'compile',
       HandleBar({
@@ -41,9 +41,7 @@ export class EmailService {
         extName: '.hbs',
       }),
     );
-
     const response = await this.Transporter.sendMail(options);
-
     return response;
   }
 }

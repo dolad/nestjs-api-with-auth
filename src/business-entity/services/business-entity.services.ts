@@ -8,6 +8,7 @@ import {
 import {
   BUSINESS_ENTITY_REPOSITORY,
   BUSINESS_INFORMATION_REPOSITORY,
+  BUSINESS_OWNER,
   USER_REPOSITORY,
 } from '../../utils/constants';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -20,6 +21,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { User, UserType } from '../../storage/postgres/user.schema';
 import { IAuthUser } from '../../user/types/user.types';
 import { BusinessInformation } from '../../storage/postgres/business-information.schema';
+import { BusinessOwners } from 'src/storage/postgres/business-owners.dto';
 
 @Injectable()
 export class BusinessEntityServices {
@@ -30,6 +32,7 @@ export class BusinessEntityServices {
     @Inject(BUSINESS_INFORMATION_REPOSITORY)
     private readonly businessInformationRepo: typeof BusinessInformation,
     @Inject(USER_REPOSITORY) private userRepos: typeof User,
+    @Inject(BUSINESS_OWNER) private businessRepo: typeof BusinessOwners,
     private sequelize: Sequelize,
   ) {}
 

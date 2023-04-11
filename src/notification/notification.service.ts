@@ -9,31 +9,25 @@ export class NotificationService {
 
   constructor(private readonly emailService: EmailService) { }
 
-  @OnEvent('notification.email')
+  @OnEvent('verification.email')
   async emailNotification(payload: IEmailNotification) {
     try {
       this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-
+      console.log("i am logging")
       let options: ISendEmail;
       const defaultOptions = {
         to: payload.to,
       };
-
-      switch (payload.type) {
-        case 'VERIFICATION_EMAIL':
-          options = {
-            ...payload.verificationEmail,
-            ...defaultOptions,
-            subject: 'Verify Email',
-            template: 'verify',
-          };
-
-          break;
-
-        default:
-          break;
+      console.log(payload.type);
+      if(payload.type === 'VERIFICATION_EMAIL'){
+        options = {
+          ...payload.verificationEmail,
+          ...defaultOptions,
+          subject: 'Verify Email',
+          template: 'verify',
+        };
       }
-
+      
       if (options) {
         await this.emailService.sendEmail(options);
 
@@ -100,7 +94,6 @@ export class NotificationService {
 
       if (options) {
         await this.emailService.sendEmail(options);
-
         this.logger.verbose(
           `${payload.type} sent to ${payload.to} successfully.`,
         );
