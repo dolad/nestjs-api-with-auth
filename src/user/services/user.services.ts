@@ -113,7 +113,8 @@ export class UserServices {
                 creator: user.userId
             }
         })
-   
+        
+        console.log(businessEntity.id);
 
         if(!businessEntity){
             throw new BadRequestException("this user does not have any business attached to it")
@@ -124,6 +125,7 @@ export class UserServices {
                 businessEntityId: businessEntity.id
             }
         })
+        console.log(getAllUserEntities);
 
         return getAllUserEntities
     }
