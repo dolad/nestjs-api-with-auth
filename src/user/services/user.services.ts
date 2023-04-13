@@ -125,8 +125,7 @@ export class UserServices {
                 businessEntityId: businessEntity.id
             }
         })
-        console.log(getAllUserEntities);
-
+        
         return getAllUserEntities
     }
 
