@@ -164,7 +164,7 @@ export class BusinessEntityServices {
           },
           {
             where: {
-              id: owner.id,
+              id: user.userId,
             },
             transaction: tx,
           },

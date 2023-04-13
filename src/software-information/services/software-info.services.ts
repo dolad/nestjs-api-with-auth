@@ -52,5 +52,15 @@ export class SoftwareInformationServices {
       return CONNECT_SOFTWARE_CONNECT;
   
     }
+
+    async connectedSoftwares(user: IAuthUser): Promise<any>{
+      const connectedSoftware = await this.softwareConnect.findAll({
+        attributes: ['softwarePlatform'],
+        where:{
+          customerId:user.userId
+        }
+      })
+      return connectedSoftware
+    }
    
 }
