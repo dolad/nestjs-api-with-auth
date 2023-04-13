@@ -114,7 +114,6 @@ export class UserServices {
             }
         })
         
-        console.log(businessEntity.id);
 
         if(!businessEntity){
             throw new BadRequestException("this user does not have any business attached to it")
