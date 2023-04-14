@@ -6,4 +6,19 @@ export class GoogleSignDto  {
     @IsNotEmpty()
     @IsString()
     code: string
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    city: string
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    country: string
+
+    @ApiProperty()
+     @IsNotEmpty()
+    @IsString()
+    deviceName: string
 }

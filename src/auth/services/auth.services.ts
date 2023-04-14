@@ -72,7 +72,7 @@ export class AuthService {
    * @param payload LoginDTO
    * @return User
    */
-  async login(user: User, loginDto?:LoginDTO): Promise<LoginOutput | string> {
+  async login(user: User, loginDto: LoginDTO): Promise<LoginOutput | string> {
     
       const userSessionPayload: SessionTypeParams = {
         userId: user.id,
@@ -162,17 +162,40 @@ export class AuthService {
     );
   }
 
-  async googleLogin(googleUserPayload:GoogleSignDto): Promise<LoginOutput | string> {
+  async googleLogin(googleUserPayload: GoogleSignDto): Promise<LoginOutput | string> {
     const {code } = googleUserPayload;
     const userData = await googleOathVerify(code);
     
     let user = await this.userService.findByEmail(userData.email);
     if (!user){
        user = await this.createGoogleUser(userData)
-       return await this.login(user);
+       return await this.googleSessionLogin(user, googleUserPayload);
     }
-    return await this.login(user);
+    return await this.googleSessionLogin(user, googleUserPayload);
   }
+
+  async googleSessionLogin(user: User, loginDto: GoogleSignDto): Promise<LoginOutput | string> {
+    
+    const userSessionPayload: SessionTypeParams = {
+      userId: user.id,
+      sessionId: uuidv4(),
+      deviceInfo:loginDto.deviceName,
+      city:loginDto.city,
+      country:loginDto.country
+    }
+    await this.createUserSession(userSessionPayload);
+  
+  if(!user.isConfirmed){
+      await this.sendRegistrationToken(user);
+      throw new BadRequestException('user registration is not complete please check your email and verify')
+  }
+  this.logger.log('user loggedIn successfull');
+  return {
+    email: user.email,
+    id: user.id,
+    token: await this.generateAccessToken(user),
+  };
+}
 
   async sendRegistrationToken(user: User): Promise<void> {
     if (user.isConfirmed) {
