@@ -1,4 +1,5 @@
 import { BadRequestException, ConsoleLogger, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { FundingRequirement } from 'src/storage/postgres/financial-requirement';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
@@ -114,16 +115,17 @@ export class FinancialInformationServices {
     });
 
     const connection = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
-    const provider = connection.map(item => ({providerName: item.provider_name, status:item.status, cId:item.id}));
+    const providerName = connection.filter(item => item.status === 'active').map(item => (item.provider_name));
     
-    const result = await Promise.all(provider.filter(prov => {
-     return this.supportedBank.findOne({
-        where: {
-          name:prov.providerName
+    const provider = await this.supportedBank.findAll({
+      where: {
+        name: {
+          [Op.in]: providerName
         }
-      })
-    }))
-    return result;
+      }
+    })
+
+    return provider;
   }
 
   async disableBankConnection(user:IAuthUser, bankName:string){
