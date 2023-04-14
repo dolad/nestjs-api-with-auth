@@ -59,7 +59,7 @@ export class SaltEdge {
 
     //  fetchProviders
     async fetchProvider(): Promise<any>{
-        return await httpClient.get(`providers`)
+        return await httpClient.get(`providers?from_id=7410&country_code=GB`)
     }
    /**
      * 
