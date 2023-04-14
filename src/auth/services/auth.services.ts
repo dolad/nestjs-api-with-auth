@@ -165,6 +165,7 @@ export class AuthService {
   async googleLogin(googleUserPayload:GoogleSignDto): Promise<LoginOutput | string> {
     const {code } = googleUserPayload;
     const userData = await googleOathVerify(code);
+    
     let user = await this.userService.findByEmail(userData.email);
     if (!user){
        user = await this.createGoogleUser(userData)

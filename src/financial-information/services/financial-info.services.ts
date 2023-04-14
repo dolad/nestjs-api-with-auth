@@ -114,8 +114,9 @@ export class FinancialInformationServices {
     });
 
     const connection = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
-    const provider = connection.filter(item => item.status === 'inactive').map(item => ({providerName: item.provider_name, status:item.status, cId:item.id}));
-    const result = await Promise.all(provider.map(prov => {
+    const provider = connection.map(item => ({providerName: item.provider_name, status:item.status, cId:item.id}));
+    
+    const result = await Promise.all(provider.filter(prov => {
      return this.supportedBank.findOne({
         where: {
           name:prov.providerName
