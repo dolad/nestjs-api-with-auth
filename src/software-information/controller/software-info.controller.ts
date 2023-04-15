@@ -30,4 +30,12 @@ export class SoftwareInfoController {
     const response = await this.softwareServices.connect(req.user, token);
     return wrapResponseMessage('business Information Successfully', response);
   }
+
+  @Post('connected-softwares')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async connectedSoftware(@Request() req): Promise<IResponseMessage> {
+    const response = await this.softwareServices.connectedSoftwares(req.user);
+    return wrapResponseMessage('Connected Softwares Fetched Succesfully', response);
+  }
 }

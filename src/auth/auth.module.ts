@@ -10,12 +10,14 @@ import { JWTStrategy } from "./strategy/jwt.strategy";
 import { LocalStrategy } from "./strategy/local.strategy";
 // import { SessionSerializer } from "./serializer/session.serializer";
 import { userSessionProvider } from "./providers/user-session.provider";
+import { NotificationModule } from "src/notification/notification.module";
 
 @Module({
     imports: [
         SequelizeModule.forFeature([User]),
         forwardRef(() => UserModule),
         PassportModule,
+        NotificationModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET,
             signOptions:{

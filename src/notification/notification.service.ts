@@ -10,31 +10,22 @@ export class NotificationService {
   constructor(private readonly emailService: EmailService) { }
 
   @OnEvent('verification.email')
-  async emailNotification(payload: IEmailNotification) {
+  async registrationVerification(payload: IEmailNotification) {
     try {
+
       this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-      console.log("i am logging")
-      let options: ISendEmail;
       const defaultOptions = {
         to: payload.to,
+        ...payload.verificationEmail,
+        subject: 'Verify Email',
+        template: 'verify',
       };
-      console.log(payload.type);
-      if(payload.type === 'VERIFICATION_EMAIL'){
-        options = {
-          ...payload.verificationEmail,
-          ...defaultOptions,
-          subject: 'Verify Email',
-          template: 'verify',
-        };
-      }
-      
-      if (options) {
-        await this.emailService.sendEmail(options);
-
-        this.logger.verbose(
+    
+      await this.emailService.sendEmail(defaultOptions);
+      this.logger.verbose(
           `${payload.type} sent to ${payload.to} successfully.`,
         );
-      }
+      
     } catch (error) {
       this.logger.error(
         `An error occured while sending ${payload.type} to ${payload.to}.`,
@@ -49,8 +40,7 @@ export class NotificationService {
       this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
       let options: ISendEmail;
       const defaultOptions = {
-        to: payload.to,
-        type: 'twoFA'
+        to: payload.to
       };
 
       options = {
@@ -82,7 +72,7 @@ export class NotificationService {
       let options: ISendEmail;
       const defaultOptions = {
         to: payload.to,
-        type: 'Password Reset'
+        
       };
 
       options = {
@@ -92,12 +82,11 @@ export class NotificationService {
         template: 'reset-password',
       }
 
-      if (options) {
-        await this.emailService.sendEmail(options);
-        this.logger.verbose(
+      await this.emailService.sendEmail(options);
+      this.logger.verbose(
           `${payload.type} sent to ${payload.to} successfully.`,
         );
-      }
+      
     } catch (error) {
       this.logger.error(
         `An error occured while sending ${payload.type} to ${payload.to}.`,

@@ -28,6 +28,7 @@ import { UserSession } from '../../storage/postgres/user-session.schema';
 import { SessionTypeParams } from '../types/session.types';
 import { IAuthUser, UserSession as SessionParams } from 'src/user/types/user.types';
 import { v4 as uuidv4 } from "uuid";
+import { NotificationService } from 'src/notification/notification.service';
  
 @Injectable()
 export class AuthService {
@@ -40,6 +41,7 @@ export class AuthService {
     private readonly config: ConfigService,
     @Inject(forwardRef(() => UserServices))
     private readonly userService: UserServices,
+    private readonly notificationService: NotificationService
   ) {}
 
   async register(payload: RegistrationDTO): Promise<string> {
@@ -175,21 +177,27 @@ export class AuthService {
   }
 
   async googleSessionLogin(user: User, loginDto: GoogleSignDto): Promise<LoginOutput | string> {
-    
-    const userSessionPayload: SessionTypeParams = {
-      userId: user.id,
-      sessionId: uuidv4(),
-      deviceInfo:loginDto.deviceName,
-      city:loginDto.city,
-      country:loginDto.country
+    try {
+      const userSessionPayload: SessionTypeParams = {
+        userId: user.id,
+        sessionId: uuidv4(),
+        deviceInfo:loginDto.deviceName,
+        city:loginDto.city,
+        country:loginDto.country
+      }
+      await this.createUserSession(userSessionPayload);
+      if(!user.isConfirmed){
+        await this.sendRegistrationToken(user);
+        throw new BadRequestException('user registration is not complete please check your email and verify')
     }
-    await this.createUserSession(userSessionPayload);
+     this.logger.log('user loggedIn successfull');
+      
+    } catch (error) {
+      this.logger.error(error);
+    }
+   
   
-  if(!user.isConfirmed){
-      await this.sendRegistrationToken(user);
-      throw new BadRequestException('user registration is not complete please check your email and verify')
-  }
-  this.logger.log('user loggedIn successfull');
+  
   return {
     email: user.email,
     id: user.id,
@@ -216,7 +224,7 @@ export class AuthService {
       },
     };
 
-    this.eventEmitter.emit('verification.email', emailPayload);
+    await this.notificationService.registrationVerification(emailPayload)
     this.logger.log('email notification sent successfull');
   }
 
@@ -272,8 +280,7 @@ export class AuthService {
           },
         },
       }; 
-
-      this.eventEmitter.emit('password-reset-notification.email', passwordResetPayload);
+      await this.notificationService.resetPasswordEmailNotification(passwordResetPayload);
       this.logger.log('password reset email sent successfull');
       return 'password reset link has been sent to your email or phone number';     
   }
@@ -287,7 +294,7 @@ export class AuthService {
   }
 
 
-  private dispatchTwoFaTokenEmail(user: User): string {
+  private async dispatchTwoFaTokenEmail(user: User): Promise<string> {
     const twoFaToken = Math.random().toString().substring(2, 8);
     user.twoFaToken = twoFaToken;
     user.save();
@@ -301,8 +308,7 @@ export class AuthService {
       },
     };
 
-    this.eventEmitter.emit('two-fa-auth.email', emailPayload);
-
+    await this.notificationService.sendTwoFaEmail(emailPayload);
     this.logger.log('email notification sent successfull');
     return 'authentication login code has been sent to your email or phone number';
   }
@@ -314,7 +320,7 @@ export class AuthService {
     return user;
   }
 
-   async verify2fa(token: string): Promise<LoginOutput | string> {
+  async verify2fa(token: string): Promise<LoginOutput | string> {
     const user = await this.userRepos.findOne({
       where: {
         twoFaToken:token
