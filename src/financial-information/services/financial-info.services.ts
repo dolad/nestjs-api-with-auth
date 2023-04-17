@@ -103,7 +103,7 @@ export class FinancialInformationServices {
       getCustomer.saltEdgeCustomerId,
     );
     return response
-    // fetchaccount from connections
+   
   }
 
 
@@ -114,6 +114,7 @@ export class FinancialInformationServices {
       }
     });
 
+    if(!financialConnect) return [];
     const connection = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
     const providerName = connection.filter(item => item.status === 'active').map(item => (item.provider_name));
     
@@ -134,12 +135,19 @@ export class FinancialInformationServices {
         customerEmail: user.email
       }
     });
+   if(!financialConnect){
+    throw new NotFoundException("User does not have any connected Banks");
+   }
     const connections = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
-    const providerConnectionDetails = connections.filter(item => item.status === 'inactive' && item.provider_name === bankName)
+    const providerConnectionDetails = connections.filter(item => item.status === 'active' && item.provider_name === bankName)
     const consents = await this.saltEdgeServices.getConsentWithConnectionId(providerConnectionDetails[0].id);
-    const revokeConsent = await this.saltEdgeServices.revokeConsent(consents[0].id, consents[0].connection_id);
-    return revokeConsent;
-
+    await this.saltEdgeServices.revokeConsent(consents[0].id, consents[0].connection_id);
+    await this.financialSupportRepo.destroy({
+      where: {
+        customerEmail: user.email
+      }
+    });
+    return "Successfully disconnect bank";
 
   }
 
