@@ -11,6 +11,7 @@ import { LocalStrategy } from "./strategy/local.strategy";
 // import { SessionSerializer } from "./serializer/session.serializer";
 import { userSessionProvider } from "./providers/user-session.provider";
 import { NotificationModule } from "src/notification/notification.module";
+import { AdminRouteGuard } from "./guards/admin.guard";
 
 @Module({
     imports: [
@@ -26,8 +27,7 @@ import { NotificationModule } from "src/notification/notification.module";
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JWTStrategy, LocalStrategy,
-        //  SessionSerializer, 
+    providers: [AuthService, JWTStrategy, LocalStrategy, AdminRouteGuard,
          userSessionProvider],
     exports: [AuthService]
 })
