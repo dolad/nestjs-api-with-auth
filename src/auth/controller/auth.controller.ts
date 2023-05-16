@@ -5,6 +5,7 @@ import { GoogleSignDto } from "../dtos/google-signin-dto";
 import { LoginDTO } from "../dtos/login.dto";
 import { RegistrationDTO } from "../dtos/registration.dto";
 import { ResendRegistationDTO,  UpdatePasswordDTO, Verify2FaToken } from "../dtos/resendRegistration.dto";
+import { AdminRouteGuard } from "../guards/admin.guard";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.services";
@@ -34,8 +35,21 @@ export class AuthController {
    @UseGuards(LocalAuthGuard)
    @Post('login')
    async login(@Request() req, @Body() loginDto: LoginDTO): Promise<IResponseMessage>{
-      const response = await this.authServices.login(req.user,loginDto,);
+      const response = await this.authServices.login(req.user,loginDto);
       return wrapResponseMessage("User login successful", response);
+   }
+
+   @ApiResponse({
+      status: 200,
+      description: 'Admin login',
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(LocalAuthGuard, AdminRouteGuard)
+  @Post('admin/login')
+   async adminLogin(@Request() req, @Body() loginDto: LoginDTO): Promise<IResponseMessage>{
+      const response = await this.authServices.login(req.user,loginDto);
+      return wrapResponseMessage("Admin loggedIn successful", response);
    }
 
    @ApiResponse({
@@ -72,6 +86,7 @@ export class AuthController {
 
    }
 
+  
   @Get('auth-user')
   @UseGuards(JwtAuthGuard)
   async createBusinessOwnerInformation(@Request() req): Promise<IResponseMessage> {

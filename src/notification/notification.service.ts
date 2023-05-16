@@ -94,4 +94,29 @@ export class NotificationService {
       );
     }
   }
+
+  @OnEvent('create.admin-user.email')
+  async sendCreateAdminUserEmail(payload: IEmailNotification) {
+    try {
+      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
+     
+     const options: ISendEmail = {
+        to: payload.to,
+        subject: 'Admin User',
+        template: 'admin-user',
+        ...payload.adminUserEmaiVerification,
+  
+      }
+
+      await this.emailService.sendEmail(options);
+      this.logger.verbose(
+          `${payload.type} sent to ${payload.to} successfully.`,
+        );
+    } catch (error) {
+      this.logger.error(
+        `An error occured while sending ${payload.type} to ${payload.to}.`,
+        error,
+      );
+    }
+  }
 }

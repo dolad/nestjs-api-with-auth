@@ -106,7 +106,6 @@ export class FinancialInformationServices {
    
   }
 
-
   async fetchConnectedBanks(user: IAuthUser) {
     const financialConnect = await this.financialSupportRepo.findOne({
       where: {

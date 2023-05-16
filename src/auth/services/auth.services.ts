@@ -83,9 +83,7 @@ export class AuthService {
         city:loginDto.city,
         country:loginDto.country
       }
-      await this.createUserSession(userSessionPayload);
-    
-   
+    await this.createUserSession(userSessionPayload);
     const { twoFactorAuth } = user;
     if(!user.isConfirmed){
         await this.sendRegistrationToken(user);
