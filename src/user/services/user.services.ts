@@ -143,6 +143,15 @@ export class UserServices {
         return "Business entity Updated succesfully"
     }
 
+    async getAdminUsers(): Promise<User[]>{
+        const admins = await this.userRepos.scope('removeSensitivePayload').findAll({
+            where: {
+                userType: UserType.ADMIN
+            }
+        })
+       return admins
+    }
+
     async addAdminUser(payload: AddUserToBusinessEntity ): Promise<string>{
 
         const {lastName, firstName, email, password }  = payload;

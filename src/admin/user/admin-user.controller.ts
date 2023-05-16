@@ -40,10 +40,16 @@ export class AdminUserController {
   }
 
 
-  @Post('add-user')
+  @Post('add-admins')
   async addAdminUser(@Request() req, @Body() payload:AddUserToBusinessEntity): Promise<IResponseMessage> {
     const response = await this.userService.addAdminUser(payload);
     return wrapResponseMessage("Admin user Created", response);
+  }
+
+  @Get('get-admins')
+  async getAdminUser(@Request() req): Promise<IResponseMessage> {
+    const response = await this.userService.getAdminUsers();
+    return wrapResponseMessage("Admin user successfully fetched", response);
   }
 
 
