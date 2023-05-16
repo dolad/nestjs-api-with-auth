@@ -17,6 +17,7 @@ import { BusinessEntityModule } from './business-entity/business.module';
 import { BusinessInformationModule } from './business-information/business-info.module';
 import { FinancialInformationModule } from './financial-information/financial-info.module';
 import { SoftwareInformationModule } from './software-information/software-info.module';
+import { AdminModules } from './admin/admin.module';
 // import IoRedis from 'ioredis'
 // import { REDIS, RedisModule } from './storage/redis';
 // import session from 'express-session';
@@ -54,7 +55,8 @@ import { SoftwareInformationModule } from './software-information/software-info.
     // RedisModule,
     BusinessInformationModule,
     FinancialInformationModule,
-    SoftwareInformationModule
+    SoftwareInformationModule,
+    AdminModules
 
   ],
 

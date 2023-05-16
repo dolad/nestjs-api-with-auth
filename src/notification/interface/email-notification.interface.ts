@@ -1,10 +1,18 @@
 
 export interface IEmailNotification {
-  type: 'VERIFICATION_EMAIL' | 'TWO_FA_AUTHENTICATION' | 'RESET_PASSWORD_EMAIL';
+  type: 'VERIFICATION_EMAIL' | 'TWO_FA_AUTHENTICATION' | 'RESET_PASSWORD_EMAIL' | 'ADMIN_USER_CREATED';
   verificationEmail?: IVerifyEmail;
   twoFaEmail?: ITwoFaEmail;
-  resetPasswordEmail?:IResetPassword
+  resetPasswordEmail?:IResetPassword;
+  adminUserEmaiVerification?: IAdminUserCreateEmail
   to: string;
+}
+
+export interface IAdminUserCreateEmail{
+  context: {
+    firstName: string,
+    password: string,
+  },
 }
 
 export interface ITwoFaEmail {

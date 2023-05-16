@@ -1,15 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 
 export class AddUserToBusinessEntity {
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     firstName: string;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     lastName: string;
 
@@ -26,7 +26,7 @@ export class AddUserToBusinessEntity {
 
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     email: string;
 
@@ -34,10 +34,7 @@ export class AddUserToBusinessEntity {
     @ApiProperty()
     @IsOptional()
     @IsString()
-    password: string;
-
-
-
+    password?: string;
 
 }
 

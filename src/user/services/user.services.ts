@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { AuthService } from "../../auth/services/auth.services";
 import { UpdateBusinessInformationDTO } from "../../business-information/dto/business-info.dto";
 import { BusinessInformationServices } from "../../business-information/services/business-info.services";
@@ -9,6 +9,8 @@ import { ChangePasswordPayload, UpdateCreatorDetails } from "../dto/update-user-
 import { IAuthUser} from "../types/user.types";
 import { UserSession } from "src/storage/postgres/user-session.schema";
 import { BusinessEntity } from "src/storage/postgres/business-entity.schema";
+import { IEmailNotification } from "src/notification/interface/email-notification.interface";
+import { NotificationService } from "src/notification/notification.service";
 
 
 @Injectable()
@@ -19,6 +21,8 @@ export class UserServices {
         @Inject(BUSINESS_ENTITY_REPOSITORY)
         private readonly businessEntityRepo: typeof BusinessEntity,
         private readonly authServices: AuthService,
+        private readonly notificationService: NotificationService
+
     ){
         
     }
@@ -39,13 +43,18 @@ export class UserServices {
         return user;
     }
     async enableTwoFaAuth(user: IAuthUser, twoFactorAuth: string): Promise<string>{
-        await this.userRepos.update({
-            twoFactorAuth,
-        },{
+        
+        const userTwoFaEnable = await this.userRepos.findOne({
             where: {
-                email: user.email
+                email:user.email
             }
         })
+
+        if(userTwoFaEnable.twoFactorAuth){
+            return "Two Factor Already Enabled for this Stream Already"
+        }
+        userTwoFaEnable.twoFactorAuth = twoFactorAuth;
+        userTwoFaEnable.save();
         return "Two Factor Authentication Enabled Succesfully"
     }
 
@@ -132,6 +141,37 @@ export class UserServices {
     async updateBusinessInfo(payload: UpdateBusinessInformationDTO, user:IAuthUser): Promise<string>{
         await this.businessInfoService.update(payload);
         return "Business entity Updated succesfully"
+    }
+
+    async addAdminUser(payload: AddUserToBusinessEntity ): Promise<string>{
+
+        const {lastName, firstName, email, password }  = payload;
+        const userExist = await this.findByEmail(email);
+        if (userExist) throw new ConflictException("User with this email already exist");
+        const regPassword =  password ? password : (Math.random() + 1).toString(36).substring(6);
+        const user = await this.userRepos.create({
+            lastName: lastName,
+            firstName: firstName,
+            email: email,
+            password: regPassword,
+            isConfirmed: true,
+            userType: UserType.ADMIN
+        })
+
+        const emailPayload: IEmailNotification = {
+            type: 'ADMIN_USER_CREATED',
+            to: user.email,
+            adminUserEmaiVerification: {
+              context: {
+                firstName: user.firstName,
+                password: regPassword,
+              },
+            },
+          };
+        
+        await this.notificationService.sendCreateAdminUserEmail(emailPayload);
+        return "Admin account created";
+        
     }
 
 
