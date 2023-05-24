@@ -17,8 +17,8 @@ import { NotificationModule } from "src/notification/notification.module";
         forwardRef(() => BusinessEntityModule),
         NotificationModule
     ],
-    providers: [userProviders, UserServices, ClientRouteGuard],
-    exports: [userProviders, UserServices],
+    providers: [ UserServices, ClientRouteGuard, ...userProviders],
+    exports: [ UserServices, ...userProviders],
     controllers: [UserController]
 })
 

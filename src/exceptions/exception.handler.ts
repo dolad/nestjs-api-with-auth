@@ -15,23 +15,22 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: any, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
-    
+
     const ctx = host.switchToHttp();
-   
+
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-  
-      const responseBody = {
-  
-        statusCode: httpStatus,
-        status: false,
-        data: null,
-        message: exception.message,
-      };
 
-    this.logger.error(exception.message, exception.stack, responseBody, );
+    const responseBody = {
+      statusCode: httpStatus,
+      status: false,
+      data: null,
+      message: exception['response']?.['message'] || exception.message,
+    };
+
+    this.logger.error(exception.message, exception.stack, responseBody);
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }

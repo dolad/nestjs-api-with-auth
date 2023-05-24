@@ -1,54 +1,68 @@
+export type emailType =
+  | 'VERIFICATION_EMAIL'
+  | 'TWO_FA_AUTHENTICATION'
+  | 'RESET_PASSWORD_EMAIL'
+  | 'ADMIN_USER_CREATED'
+  | 'PARTNER_USER_CREATED';
 
+// TODO use discrimination Union
 export interface IEmailNotification {
-  type: 'VERIFICATION_EMAIL' | 'TWO_FA_AUTHENTICATION' | 'RESET_PASSWORD_EMAIL' | 'ADMIN_USER_CREATED';
+  type: emailType;
   verificationEmail?: IVerifyEmail;
   twoFaEmail?: ITwoFaEmail;
-  resetPasswordEmail?:IResetPassword;
-  adminUserEmaiVerification?: IAdminUserCreateEmail
+  resetPasswordEmail?: IResetPassword;
+  adminUserEmaiVerification?: IAdminUserCreateEmail;
+  partnerUserEmailVerification?: IPatnerCreateEmail;
   to: string;
 }
 
-export interface IAdminUserCreateEmail{
+export interface IPatnerCreateEmail {
   context: {
-    firstName: string,
-    password: string,
-  },
+    providerName: string;
+    password: string;
+  };
+}
+
+export interface IAdminUserCreateEmail {
+  context: {
+    firstName: string;
+    password: string;
+  };
 }
 
 export interface ITwoFaEmail {
   context: {
-    twoFaToken: string
+    twoFaToken: string;
   };
 }
 
 export interface IResetPassword {
   context: {
-    verificationLink: string
+    verificationLink: string;
   };
 }
 
 export interface IVerifyEmail {
-    context: {
-      firstName: string;
-      host: string
-    };
-  }
+  context: {
+    firstName: string;
+    host: string;
+  };
+}
 
 export interface ISendEmail {
-    to: string;
-    subject: string;
-    template: string;
-    context: any;
-  }
+  to: string;
+  subject: string;
+  template: string;
+  context: any;
+}
 
 export interface IEmail {
-    service: string;
-    auth: {
-      user: string;
-      pass: string;
-    };
-    host: string;
-    port: number;
-    from: string;
-  }
-  
+  service: string;
+  auth: {
+    user: string;
+    pass: string;
+  };
+  host: string;
+  port: number;
+  from: string;
+}
