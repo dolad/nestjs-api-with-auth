@@ -96,7 +96,7 @@ export class BusinessEntityController {
     @Param("shareHolderId") shareHolderId: string,
     @Body() updateShareHolderDetails: UpdateBusinessOwnerDto
   ): Promise<IResponseMessage> {
-    const response = await this.businessEntityService.updateShareHoldersDetails(
+     await this.businessEntityService.updateShareHoldersDetails(
         shareHolderId,
         updateShareHolderDetails
     );

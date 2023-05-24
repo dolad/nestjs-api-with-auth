@@ -7,9 +7,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  User
-} from 'src/storage/postgres/user.schema';
+import { User } from 'src/storage/postgres/user.schema';
 import { USER_REPOSITORY, USER_SESSION } from '../../utils/constants';
 import { RegistrationDTO } from '../dtos/registration.dto';
 import { LoginDTO } from '../dtos/login.dto';
@@ -26,10 +24,13 @@ import { UpdatePasswordDTO } from '../dtos/resendRegistration.dto';
 import { HashManager } from '../utils/hash';
 import { UserSession } from '../../storage/postgres/user-session.schema';
 import { SessionTypeParams } from '../types/session.types';
-import { IAuthUser, UserSession as SessionParams } from 'src/user/types/user.types';
-import { v4 as uuidv4 } from "uuid";
+import {
+  IAuthUser,
+  UserSession as SessionParams,
+} from 'src/user/types/user.types';
+import { v4 as uuidv4 } from 'uuid';
 import { NotificationService } from 'src/notification/notification.service';
- 
+
 @Injectable()
 export class AuthService {
   private logger: Logger = new Logger(AuthService.name);
@@ -41,7 +42,7 @@ export class AuthService {
     private readonly config: ConfigService,
     @Inject(forwardRef(() => UserServices))
     private readonly userService: UserServices,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {}
 
   async register(payload: RegistrationDTO): Promise<string> {
@@ -62,10 +63,12 @@ export class AuthService {
    * @return User
    */
   async validate(payload: LoginDTO): Promise<User> {
-    let user = await this.userService.findByEmailOrFailed(payload.email);
+    const user = await this.userService.findByEmailOrFailed(payload.email);
     const isPasswordCorrect = await user.isPasswordCorrect(payload.password);
     if (!isPasswordCorrect) throw new ForbiddenException('Invalid credentials');
-    const returnUser = await this.userRepos.scope('removeSensitivePayload').findByPk(user.id) 
+    const returnUser = await this.userRepos
+      .scope('removeSensitivePayload')
+      .findByPk(user.id);
     return returnUser;
   }
 
@@ -75,19 +78,20 @@ export class AuthService {
    * @return User
    */
   async login(user: User, loginDto: LoginDTO): Promise<LoginOutput | string> {
-    
-      const userSessionPayload: SessionTypeParams = {
-        userId: user.id,
-        sessionId: uuidv4(),
-        deviceInfo:loginDto.deviceName,
-        city:loginDto.city,
-        country:loginDto.country
-      }
+    const userSessionPayload: SessionTypeParams = {
+      userId: user.id,
+      sessionId: uuidv4(),
+      deviceInfo: loginDto.deviceName,
+      city: loginDto.city,
+      country: loginDto.country,
+    };
     await this.createUserSession(userSessionPayload);
     const { twoFactorAuth } = user;
-    if(!user.isConfirmed){
-        await this.sendRegistrationToken(user);
-        throw new BadRequestException('user registration is not complete please check your email and verify')
+    if (!user.isConfirmed) {
+      await this.sendRegistrationToken(user);
+      throw new BadRequestException(
+        'user registration is not complete please check your email and verify',
+      );
     }
     if (twoFactorAuth) return await this.send2FAToken(user);
     this.logger.log('user loggedIn successfull');
@@ -98,45 +102,43 @@ export class AuthService {
     };
   }
 
-  async createUserSession(sessionPayload:SessionTypeParams): Promise<void> {
+  async createUserSession(sessionPayload: SessionTypeParams): Promise<void> {
     // does user have any session at all
     const userSession = await this.userSession.findAll({
       where: {
-        userId:sessionPayload.userId
-      }
+        userId: sessionPayload.userId,
+      },
     });
 
-    if(!userSession.length){
-     await this.userSession.create({
-      ...sessionPayload,
-      lastLoggedIn: new Date()
-     })
-    } 
-    let lastSession: UserSession
+    if (!userSession.length) {
+      await this.userSession.create({
+        ...sessionPayload,
+        lastLoggedIn: new Date(),
+      });
+    }
+    let lastSession: UserSession;
 
     // find last session and update with same devices
-     lastSession = await this.userSession.findOne({
-      where:{
-        sessionId:sessionPayload.sessionId,
+    lastSession = await this.userSession.findOne({
+      where: {
+        sessionId: sessionPayload.sessionId,
         userId: sessionPayload.userId,
-        deviceInfo: sessionPayload.deviceInfo
-      }
+        deviceInfo: sessionPayload.deviceInfo,
+      },
     });
 
-    if(!lastSession){
-     lastSession = await this.userSession.create({
+    if (!lastSession) {
+      lastSession = await this.userSession.create({
         ...sessionPayload,
-        lastLoggedIn: new Date()
-       })
+        lastLoggedIn: new Date(),
+      });
     }
 
-    lastSession.city= sessionPayload.city;
-    lastSession.country=sessionPayload.country;
-    lastSession.lastLoggedIn= new Date();
+    lastSession.city = sessionPayload.city;
+    lastSession.country = sessionPayload.country;
+    lastSession.lastLoggedIn = new Date();
     lastSession.save();
-
   }
-
 
   async authUser(user: any): Promise<User> {
     return await this.userRepos
@@ -162,46 +164,50 @@ export class AuthService {
     );
   }
 
-  async googleLogin(googleUserPayload: GoogleSignDto): Promise<LoginOutput | string> {
-    const {code } = googleUserPayload;
+  async googleLogin(
+    googleUserPayload: GoogleSignDto,
+  ): Promise<LoginOutput | string> {
+    const { code } = googleUserPayload;
     const userData = await googleOathVerify(code);
-    
+
     let user = await this.userService.findByEmail(userData.email);
-    if (!user){
-       user = await this.createGoogleUser(userData)
-       return await this.googleSessionLogin(user, googleUserPayload);
+    if (!user) {
+      user = await this.createGoogleUser(userData);
+      return await this.googleSessionLogin(user, googleUserPayload);
     }
     return await this.googleSessionLogin(user, googleUserPayload);
   }
 
-  async googleSessionLogin(user: User, loginDto: GoogleSignDto): Promise<LoginOutput | string> {
+  async googleSessionLogin(
+    user: User,
+    loginDto: GoogleSignDto,
+  ): Promise<LoginOutput | string> {
     try {
       const userSessionPayload: SessionTypeParams = {
         userId: user.id,
         sessionId: uuidv4(),
-        deviceInfo:loginDto.deviceName,
-        city:loginDto.city,
-        country:loginDto.country
-      }
+        deviceInfo: loginDto.deviceName,
+        city: loginDto.city,
+        country: loginDto.country,
+      };
       await this.createUserSession(userSessionPayload);
-      if(!user.isConfirmed){
+      if (!user.isConfirmed) {
         await this.sendRegistrationToken(user);
-        throw new BadRequestException('user registration is not complete please check your email and verify')
-    }
-     this.logger.log('user loggedIn successfull');
-      
+        throw new BadRequestException(
+          'user registration is not complete please check your email and verify',
+        );
+      }
+      this.logger.log('user loggedIn successfull');
     } catch (error) {
       this.logger.error(error);
     }
-   
-  
-  
-  return {
-    email: user.email,
-    id: user.id,
-    token: await this.generateAccessToken(user),
-  };
-}
+
+    return {
+      email: user.email,
+      id: user.id,
+      token: await this.generateAccessToken(user),
+    };
+  }
 
   async sendRegistrationToken(user: User): Promise<void> {
     if (user.isConfirmed) {
@@ -222,7 +228,7 @@ export class AuthService {
       },
     };
 
-    await this.notificationService.registrationVerification(emailPayload)
+    await this.notificationService.registrationVerification(emailPayload);
     this.logger.log('email notification sent successfull');
   }
 
@@ -264,33 +270,35 @@ export class AuthService {
     });
   }
 
-  async resetPassword(email: any): Promise<string>{
-      const user = await this.userService.findByEmailOrFailed(email);
-      const token = await this.generateRegisterationToken(user.email, user.userType);
-      console.log(token);
-      const verificationLink = `${process.env.FRONT_END_URL}/reset-password?token=${token}`
-      const passwordResetPayload:  IEmailNotification = {
-        type: 'RESET_PASSWORD_EMAIL',
-        to: user.email,
-        resetPasswordEmail: {
-          context: {
-            verificationLink,
-          },
+  async resetPassword(email: any): Promise<string> {
+    const user = await this.userService.findByEmailOrFailed(email);
+    const token = await this.generateRegisterationToken(
+      user.email,
+      user.userType,
+    );
+    console.log(token);
+    const verificationLink = `${process.env.FRONT_END_URL}/reset-password?token=${token}`;
+    const passwordResetPayload: IEmailNotification = {
+      type: 'RESET_PASSWORD_EMAIL',
+      to: user.email,
+      resetPasswordEmail: {
+        context: {
+          verificationLink,
         },
-      }; 
-      await this.notificationService.resetPasswordEmailNotification(passwordResetPayload);
-      this.logger.log('password reset email sent successfull');
-      return 'password reset link has been sent to your email or phone number';     
+      },
+    };
+    await this.notificationService.resetPasswordEmailNotification(
+      passwordResetPayload,
+    );
+    this.logger.log('password reset email sent successfull');
+    return 'password reset link has been sent to your email or phone number';
   }
 
   private async send2FAToken(user: User): Promise<string> {
     if (user.twoFactorAuth && user.twoFactorAuth === 'email') {
       return this.dispatchTwoFaTokenEmail(user);
     }
-   
-   
   }
-
 
   private async dispatchTwoFaTokenEmail(user: User): Promise<string> {
     const twoFaToken = Math.random().toString().substring(2, 8);
@@ -321,16 +329,15 @@ export class AuthService {
   async verify2fa(token: string): Promise<LoginOutput | string> {
     const user = await this.userRepos.findOne({
       where: {
-        twoFaToken:token
-      }
+        twoFaToken: token,
+      },
     });
-    if(!user){
-      throw new NotFoundException("Invalid token")
+    if (!user) {
+      throw new NotFoundException('Invalid token');
     }
     user.twoFaToken = null;
     user.save();
-    
-    
+
     return {
       email: user.email,
       id: user.id,
@@ -340,31 +347,30 @@ export class AuthService {
 
   async updatePassword(payload: UpdatePasswordDTO): Promise<string> {
     const verify = await this.verifyResetPasswordEmailLink(payload.token);
-    if(payload.newPassword != payload.confirmNewPassword){
-      throw new BadRequestException("Confirmed password does not merge");
+    if (payload.newPassword != payload.confirmNewPassword) {
+      throw new BadRequestException('Confirmed password does not merge');
     }
     const hashManager = new HashManager();
-    const password = await hashManager.bHash(payload.newPassword)
-     await this.userRepos.update({
-      password,
-    },{
-      where: {
-        email:verify.email
-      }
-    })
+    const password = await hashManager.bHash(payload.newPassword);
+    await this.userRepos.update(
+      {
+        password,
+      },
+      {
+        where: {
+          email: verify.email,
+        },
+      },
+    );
 
-      return "user password Updated"
-    
+    return 'user password Updated';
   }
 
-  async getUserSessions(user:IAuthUser): Promise<UserSession[]> {
+  async getUserSessions(user: IAuthUser): Promise<UserSession[]> {
     return await this.userSession.findAll({
       where: {
-        userId: user.userId
-      }
-    })
-  
+        userId: user.userId,
+      },
+    });
   }
-
-  
 }

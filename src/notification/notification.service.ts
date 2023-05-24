@@ -1,120 +1,83 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EmailService } from './email/email.service';
-import { IEmailNotification, ISendEmail } from './interface/email-notification.interface';
+import {
+  emailType,
+  IEmailNotification,
+  ISendEmail,
+} from './interface/email-notification.interface';
 
 @Injectable()
 export class NotificationService {
   private logger: Logger = new Logger(NotificationService.name);
 
-  constructor(private readonly emailService: EmailService) { }
+  constructor(private readonly emailService: EmailService) {}
 
   @OnEvent('verification.email')
   async registrationVerification(payload: IEmailNotification) {
-    try {
-
-      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-      const defaultOptions = {
-        to: payload.to,
-        ...payload.verificationEmail,
-        subject: 'Verify Email',
-        template: 'verify',
-      };
-    
-      await this.emailService.sendEmail(defaultOptions);
-      this.logger.verbose(
-          `${payload.type} sent to ${payload.to} successfully.`,
-        );
-      
-    } catch (error) {
-      this.logger.error(
-        `An error occured while sending ${payload.type} to ${payload.to}.`,
-        error,
-      );
-    }
+    const options = {
+      to: payload.to,
+      ...payload.verificationEmail,
+      subject: 'Verify Email',
+      template: 'verify',
+    };
+    await this.sendEmailWrapper(options, payload.type);
   }
 
   @OnEvent('two-fa-auth.email')
   async sendTwoFaEmail(payload: IEmailNotification) {
-    try {
-      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-      let options: ISendEmail;
-      const defaultOptions = {
-        to: payload.to
-      };
-
-      options = {
-        ...payload.twoFaEmail,
-        ...defaultOptions,
-        subject: 'Login Verification',
-        template: 'two-fa',
-      }
-
-      if (options) {
-        await this.emailService.sendEmail(options);
-
-        this.logger.verbose(
-          `${payload.type} sent to ${payload.to} successfully.`,
-        );
-      }
-    } catch (error) {
-      this.logger.error(
-        `An error occured while sending ${payload.type} to ${payload.to}.`,
-        error,
-      );
-    }
+    const options = {
+      ...payload.twoFaEmail,
+      to: payload.to,
+      subject: 'Login Verification',
+      template: 'two-fa',
+    };
+    await this.sendEmailWrapper(options, payload.type);
   }
 
   @OnEvent('password-reset-notification.email')
   async resetPasswordEmailNotification(payload: IEmailNotification) {
-    try {
-      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-      let options: ISendEmail;
-      const defaultOptions = {
-        to: payload.to,
-        
-      };
-
-      options = {
-        ...payload.resetPasswordEmail,
-        ...defaultOptions,
-        subject: 'Reset password Verification',
-        template: 'reset-password',
-      }
-
-      await this.emailService.sendEmail(options);
-      this.logger.verbose(
-          `${payload.type} sent to ${payload.to} successfully.`,
-        );
-      
-    } catch (error) {
-      this.logger.error(
-        `An error occured while sending ${payload.type} to ${payload.to}.`,
-        error,
-      );
-    }
+    const options: ISendEmail = {
+      ...payload.resetPasswordEmail,
+      to: payload.to,
+      subject: 'Reset password Verification',
+      template: 'reset-password',
+    };
+    await this.sendEmailWrapper(options, payload.type);
   }
 
   @OnEvent('create.admin-user.email')
   async sendCreateAdminUserEmail(payload: IEmailNotification) {
-    try {
-      this.logger.verbose(`Sending ${payload.type} to ${payload.to}.`);
-     
-     const options: ISendEmail = {
-        to: payload.to,
-        subject: 'Admin User',
-        template: 'admin-user',
-        ...payload.adminUserEmaiVerification,
-  
-      }
+    const options: ISendEmail = {
+      to: payload.to,
+      subject: 'Admin User',
+      template: 'admin-user',
+      ...payload.adminUserEmaiVerification,
+    };
+    await this.sendEmailWrapper(options, payload.type);
+  }
 
+  async sendCreatePartnerUserEmail(payload: IEmailNotification) {
+    const options: ISendEmail = {
+      to: payload.to,
+      subject: 'Patner User',
+      template: 'partner',
+      ...payload.partnerUserEmailVerification,
+    };
+    await this.sendEmailWrapper(options, payload.type);
+  }
+
+  private async sendEmailWrapper(
+    options: ISendEmail,
+    type: emailType,
+  ): Promise<void> {
+    try {
+      this.logger.verbose(`Sending ${type} to ${options.to}.`);
       await this.emailService.sendEmail(options);
-      this.logger.verbose(
-          `${payload.type} sent to ${payload.to} successfully.`,
-        );
+      this.logger.verbose(`${type} sent to ${options.to} successfully.`);
     } catch (error) {
       this.logger.error(
-        `An error occured while sending ${payload.type} to ${payload.to}.`,
+        `An error occured while sending ${type} to ${options.to}.`,
         error,
       );
     }
