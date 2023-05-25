@@ -27,6 +27,9 @@ import { IEmailNotification } from '../../notification/interface/email-notificat
 import { NotificationService } from '../../notification/notification.service';
 import { AddPatnerDTO } from '../../admin/user/dto/add-bank.dto';
 import { Partner } from '../../storage/postgres/partner.schema';
+import { UpdatePatnerInformationDTO } from 'src/admin/user/dto/updateProvider.dto';
+import { throwError } from 'rxjs';
+import { UpdateContactPersonInformation } from 'src/admin/user/dto/updateContactPerson.dto';
 
 @Injectable()
 export class UserServices {
@@ -256,5 +259,31 @@ export class UserServices {
     return {
       id: partner.id,
     };
+  }
+
+  async updatePartnerInformation(
+    payload: UpdatePatnerInformationDTO,
+    partnerId: string,
+  ): Promise<string> {
+    const partnerExist = await this.partnerModel.findByPk(partnerId);
+    if (!partnerExist) throw new NotFoundException('Partner does not exist');
+    if (payload.businessTypes) {
+      payload.businessTypes = partnerExist.businessTypes.concat(
+        payload.businessTypes,
+      );
+    }
+
+    await this.partnerModel.update(
+      {
+        ...payload,
+      },
+      {
+        where: {
+          id: partnerId,
+        },
+      },
+    );
+
+    return 'Partner Information updated successfully';
   }
 }
