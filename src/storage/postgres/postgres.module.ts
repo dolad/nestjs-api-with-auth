@@ -17,6 +17,7 @@ import { UserSession } from './user-session.schema';
 import { FundingRequirement } from './financial-requirement';
 import { BusinessOwners } from './business-owners.dto';
 import { Partner } from './partner.schema';
+import { FundingRequestTransaction } from './fundingTransaction';
 
 console.log(process.env.NODE_ENV);
 
@@ -39,6 +40,7 @@ console.log(process.env.NODE_ENV);
           SoftwareConnectDetails,
           UserSession,
           FundingRequirement,
+          FundingRequestTransaction,
           BusinessOwners,
           Partner,
         ],
