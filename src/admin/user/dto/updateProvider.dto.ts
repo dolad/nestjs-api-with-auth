@@ -117,7 +117,12 @@ export class UpdatePatnerInformationDTO {
   interestRate: number;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   repaymentTime: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  logoUrl: string;
 }

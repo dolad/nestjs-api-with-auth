@@ -22,21 +22,13 @@ import { BusinessInformationServices } from '../services/business-info.services'
 export class BusinessInfoController {
   constructor(private readonly businessInfo: BusinessInformationServices) {}
 
-  @Post('/kyc/stage-2')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async addBusinessInfo(
-  ): Promise<IResponseMessage> {
-    return wrapResponseMessage('business Information Successfully', "not implemented");
-  }
-
   @Post('/update')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async updateBusinessInformation(@Body() payload: UpdateBusinessInformationDTO
+  async updateBusinessInformation(
+    @Body() payload: UpdateBusinessInformationDTO,
   ): Promise<IResponseMessage> {
-    const response = await this.businessInfo.update(payload)
-    return wrapResponseMessage('business Information Successfully', "updated");
+    await this.businessInfo.update(payload);
+    return wrapResponseMessage('business Information Successfully', 'updated');
   }
-
 }

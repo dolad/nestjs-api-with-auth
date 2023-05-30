@@ -23,7 +23,6 @@ import { EnabledTwoFaAuthPayload } from '../../user/dto/enable-2fa.dto';
 import { AddUserToBusinessEntity } from 'src/user/dto/add-user.dto';
 import { AddPatnerDTO } from './dto/add-bank.dto';
 import { UpdatePatnerInformationDTO } from './dto/updateProvider.dto';
-import { UpdateContactPersonInformation } from './dto/updateContactPerson.dto';
 
 @Controller('admin-user')
 @ApiTags('AdminUser')

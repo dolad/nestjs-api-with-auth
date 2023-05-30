@@ -125,3 +125,5 @@ export class AddPatnerDTO {
   @IsString()
   repaymentTime: string;
 }
+
+

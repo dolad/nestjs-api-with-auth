@@ -1,6 +1,18 @@
-import { BadRequestException, ConsoleLogger, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConsoleLogger,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Op } from 'sequelize';
 import { FundingRequirement } from 'src/storage/postgres/financial-requirement';
+import { Partner } from 'src/storage/postgres/partner.schema';
+import {
+  FundingPartnerResponse,
+  GetFundingParterParam,
+} from 'src/user/interface/get-funding-partner';
+import { UserServices } from 'src/user/services/user.services';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -10,6 +22,7 @@ import {
   BUSINESS_ENTITY_REPOSITORY,
   FINANCIAL_CONNECT_PROVIDER,
   FINANCIAL_REQUIREMENT,
+  PATNER_REPOSITORY,
   SUPORTED_BANK_PROVIDER,
   SUPORTED_BANK_PROVIDER_COUNTRIES,
 } from '../../utils/constants';
@@ -29,10 +42,10 @@ export class FinancialInformationServices {
     private readonly saltEdgeServices: SaltEdge,
     @Inject(BUSINESS_ENTITY_REPOSITORY)
     private readonly businessEntityRepo: typeof BusinessEntity,
+    private readonly userServices: UserServices,
     @Inject(FINANCIAL_REQUIREMENT)
-    private readonly financialRequirement: typeof FundingRequirement
-    )
-  {}
+    private readonly financialRequirement: typeof FundingRequirement,
+  ) {}
 
   /**
    *
@@ -73,16 +86,18 @@ export class FinancialInformationServices {
   async connectBankKyc(user: IAuthUser): Promise<any> {
     const businessEntity = await this.businessEntityRepo.findOne({
       where: {
-        creator: user.userId
-      }
+        creator: user.userId,
+      },
     });
 
-    if(!businessEntity) throw new NotFoundException("User not associated with any business");
-    if(businessEntity.kycStep < 2) throw new BadRequestException("Please confirm the previos step");
-    const response = await this.connectBank(user);  
+    if (!businessEntity)
+      throw new NotFoundException('User not associated with any business');
+    if (businessEntity.kycStep < 2)
+      throw new BadRequestException('Please confirm the previos step');
+    const response = await this.connectBank(user);
     businessEntity.kycStep = 3;
     businessEntity.save();
-    
+
     return response;
   }
 
@@ -92,7 +107,7 @@ export class FinancialInformationServices {
       fetchConnectDetails.saltEdgeCustomerId,
     );
     return {
-      connect_url: response.redirect_url
+      connect_url: response.redirect_url,
     };
   }
 
@@ -102,56 +117,64 @@ export class FinancialInformationServices {
     const response = await this.saltEdgeServices.fetchConnection(
       getCustomer.saltEdgeCustomerId,
     );
-    return response
-   
+    return response;
   }
 
   async fetchConnectedBanks(user: IAuthUser) {
     const financialConnect = await this.financialSupportRepo.findOne({
       where: {
-        customerEmail: user.email
-      }
+        customerEmail: user.email,
+      },
     });
 
-    if(!financialConnect) return [];
-    const connection = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
-    const providerName = connection.filter(item => item.status === 'active').map(item => (item.provider_name));
-    
+    if (!financialConnect) return [];
+    const connection = await this.saltEdgeServices.fetchConnection(
+      financialConnect.saltEdgeCustomerId,
+    );
+    const providerName = connection
+      .filter((item) => item.status === 'active')
+      .map((item) => item.provider_name);
+
     const provider = await this.supportedBank.findAll({
       where: {
         name: {
-          [Op.in]: providerName
-        }
-      }
-    })
+          [Op.in]: providerName,
+        },
+      },
+    });
 
     return provider;
   }
 
-  async disableBankConnection(user:IAuthUser, bankName:string){
+  async disableBankConnection(user: IAuthUser, bankName: string) {
     const financialConnect = await this.financialSupportRepo.findOne({
       where: {
-        customerEmail: user.email
-      }
+        customerEmail: user.email,
+      },
     });
-   if(!financialConnect){
-    throw new NotFoundException("User does not have any connected Banks");
-   }
-    const connections = await this.saltEdgeServices.fetchConnection(financialConnect.saltEdgeCustomerId); 
-    const providerConnectionDetails = connections.filter(item => item.status === 'active' && item.provider_name === bankName)
-    const consents = await this.saltEdgeServices.getConsentWithConnectionId(providerConnectionDetails[0].id);
-    await this.saltEdgeServices.revokeConsent(consents[0].id, consents[0].connection_id);
+    if (!financialConnect) {
+      throw new NotFoundException('User does not have any connected Banks');
+    }
+    const connections = await this.saltEdgeServices.fetchConnection(
+      financialConnect.saltEdgeCustomerId,
+    );
+    const providerConnectionDetails = connections.filter(
+      (item) => item.status === 'active' && item.provider_name === bankName,
+    );
+    const consents = await this.saltEdgeServices.getConsentWithConnectionId(
+      providerConnectionDetails[0].id,
+    );
+    await this.saltEdgeServices.revokeConsent(
+      consents[0].id,
+      consents[0].connection_id,
+    );
     await this.financialSupportRepo.destroy({
       where: {
-        customerEmail: user.email
-      }
+        customerEmail: user.email,
+      },
     });
-    return "Successfully disconnect bank";
-
+    return 'Successfully disconnect bank';
   }
-
-
-
 
   async fetchAccount(user: IAuthUser) {
     // fetch connections
@@ -173,38 +196,38 @@ export class FinancialInformationServices {
     // fetchaccount from connections
   }
 
-  async createFundingRequirement(user: IAuthUser, fundingRequirement: AddFundingRequirement): Promise<any> {
+  async createFundingRequirement(
+    user: IAuthUser,
+    fundingRequirement: AddFundingRequirement,
+  ): Promise<any> {
     const businessId = await this.businessEntityRepo.findOne({
       where: {
-        creator: user.userId
-      }
+        creator: user.userId,
+      },
     });
-    if(!businessId){
-      throw new NotFoundException("Business not Found")
+    if (!businessId) {
+      throw new NotFoundException('Business not Found');
     }
 
     const requirementAlready = await this.financialRequirement.findOne({
       where: {
-        businessId: businessId.id
-      }
+        businessId: businessId.id,
+      },
     });
 
-    if(requirementAlready){
-      throw new BadRequestException("Funding Requirement already added");
+    if (requirementAlready) {
+      throw new BadRequestException('Funding Requirement already added');
     }
 
     const requirement = await this.financialRequirement.create({
       ...fundingRequirement,
-      businessId:businessId.id
+      businessId: businessId.id,
     });
-    
-    return requirement;
 
+    return requirement;
   }
 
-  private async createLeadsForCustomer(
-    user: IAuthUser,
-  ): Promise<any> {
+  private async createLeadsForCustomer(user: IAuthUser): Promise<any> {
     const financialConnectExist = await this.financialSupportRepo.findOne({
       where: {
         customerEmail: user.email,
@@ -217,29 +240,35 @@ export class FinancialInformationServices {
     }
     const businessId = await this.businessEntityRepo.findOne({
       where: {
-        creator: user.userId
-      }
+        creator: user.userId,
+      },
     });
 
-    if(!businessId){
-      throw new BadRequestException("This user have register a business with us");
+    if (!businessId) {
+      throw new BadRequestException(
+        'This user have register a business with us',
+      );
     }
 
     const createSaltEdgeCustomer = await this.saltEdgeServices.createLeads(
       user.email,
     );
-    
-   
-    const payload = createSaltEdgeCustomer.data.data;
 
+    const payload = createSaltEdgeCustomer.data.data;
     return await this.financialSupportRepo.create({
       saltEdgeCustomerId: payload.customer_id,
       saltCustomerSecret: payload.customer_id,
       saltEdgeIdentifier: payload.email,
       customerEmail: user.email,
       customerId: user.userId,
-      businessId: businessId.id
+      businessId: businessId.id,
     });
   }
 
+  async fetchFundingPartner(
+    payload: GetFundingParterParam,
+  ): Promise<FundingPartnerResponse> {
+    const fundingPatner = await this.userServices.fetchFundingPartner(payload);
+    return fundingPatner;
+  }
 }

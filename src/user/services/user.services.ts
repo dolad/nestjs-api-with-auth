@@ -28,8 +28,11 @@ import { NotificationService } from '../../notification/notification.service';
 import { AddPatnerDTO } from '../../admin/user/dto/add-bank.dto';
 import { Partner } from '../../storage/postgres/partner.schema';
 import { UpdatePatnerInformationDTO } from 'src/admin/user/dto/updateProvider.dto';
-import { throwError } from 'rxjs';
-import { UpdateContactPersonInformation } from 'src/admin/user/dto/updateContactPerson.dto';
+import {
+  FundingPartnerResponse,
+  GetFundingParterParam,
+} from '../interface/get-funding-partner';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UserServices {
@@ -285,5 +288,53 @@ export class UserServices {
     );
 
     return 'Partner Information updated successfully';
+  }
+
+  async fetchFundingPartner(
+    payload: GetFundingParterParam,
+  ): Promise<FundingPartnerResponse> {
+    const { businessType } = payload;
+    let { rows, page } = payload;
+    let offset = 0;
+    if (!rows) rows = 10;
+    if (!page) page = 1;
+    rows = +rows;
+    page = +page;
+    offset = (page - 1) * rows;
+
+    const whereOption: Record<string, any> = {};
+    if (businessType) {
+      whereOption.businessTypes = {
+        [Op.contains]: [businessType],
+      };
+    }
+    const options = {
+      where: whereOption,
+      offset,
+      limit: rows,
+      attributes: [
+        'interestRate',
+        'repaymentTime',
+        'maximumLoanAmount',
+        'minimumLoanAmount',
+        'minimumAnnualTurnOver',
+        'providerName',
+        'id',
+      ],
+    };
+
+    const fundingPatner: { rows: Partner[]; count: number } =
+      await this.partnerModel
+        .scope('removeSensitivePayload')
+        .findAndCountAll(options);
+
+    const totalPages = Math.ceil(fundingPatner.count / rows) || 0;
+
+    return {
+      page,
+      totalPages,
+      rows: fundingPatner.rows,
+      count: fundingPatner.count,
+    };
   }
 }
