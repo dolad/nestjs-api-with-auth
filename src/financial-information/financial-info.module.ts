@@ -14,6 +14,6 @@ import { SaltEdge } from './services/saltedge.service';
     SaltEdge,
     ...financialInfoProviders,
   ],
-  exports: [FinancialInformationServices],
+  exports: [FinancialInformationServices, ...financialInfoProviders],
 })
 export class FinancialInformationModule {}

@@ -23,12 +23,16 @@ import { EnabledTwoFaAuthPayload } from '../../user/dto/enable-2fa.dto';
 import { AddUserToBusinessEntity } from 'src/user/dto/add-user.dto';
 import { AddPatnerDTO } from './dto/add-bank.dto';
 import { UpdatePatnerInformationDTO } from './dto/updateProvider.dto';
+import { AdminService } from './admin-user.services';
 
 @Controller('admin-user')
 @ApiTags('AdminUser')
 @UseGuards(JwtAuthGuard, AdminRouteGuard)
 export class AdminUserController {
-  constructor(private readonly userService: UserServices) {}
+  constructor(
+    private readonly userService: UserServices,
+    private readonly adminServices: AdminService,
+  ) {}
 
   @Post('change-password')
   async changeUserPassword(
@@ -100,5 +104,11 @@ export class AdminUserController {
       partnerId,
     );
     return wrapResponseMessage('Partner user updated', response);
+  }
+
+  @Get('dashoboard/data')
+  async getDashboards(@Request() req): Promise<IResponseMessage> {
+    const response = await this.adminServices.getDashBoardData();
+    return wrapResponseMessage('Admin user successfully fetched', response);
   }
 }
