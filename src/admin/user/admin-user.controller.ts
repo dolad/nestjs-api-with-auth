@@ -109,6 +109,6 @@ export class AdminUserController {
   @Get('dashoboard/data')
   async getDashboards(@Request() req): Promise<IResponseMessage> {
     const response = await this.adminServices.getDashBoardData();
-    return wrapResponseMessage('Admin user successfully fetched', response);
+    return wrapResponseMessage('Dashboard data fetched', response);
   }
 }

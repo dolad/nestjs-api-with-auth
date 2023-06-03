@@ -83,10 +83,3 @@ export class AdminService {
     };
   }
 }
-
-export function sumArray(arr: number[], index: number) {
-  if (index === arr.length) {
-    return 0;
-  }
-  return arr[index] + sumArray(arr, index + 1);
-}
