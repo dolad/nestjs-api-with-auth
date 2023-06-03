@@ -34,6 +34,7 @@ export interface PartnerAttributes {
   minimumAnnualTurnOver: number;
   interestRate: number;
   repaymentTime: string;
+  logoUrl: string;
 }
 
 export type PartnerCreateAttributes = Optional<PartnerAttributes, 'id'>;
@@ -181,6 +182,12 @@ export class Partner extends Model<PartnerAttributes, PartnerCreateAttributes> {
     allowNull: false,
   })
   repaymentTime?: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  logoUrl?: string;
 
   async isPasswordCorrect(password: string): Promise<boolean> {
     return await new HashManager().bCompare(this.password, password);

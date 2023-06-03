@@ -26,6 +26,19 @@ export enum Environment {
   TEST = 'test',
 }
 
+export enum FundingTransationStatus {
+  PENDING = 'pending',
+  DECLINED = 'declined',
+  APPROVED = 'approved',
+  DISBURSED = 'disbursed',
+}
+
+export enum FundingRepaymentStatus {
+  COMPLETED = 'completed',
+  PARTIAL_PAYMENT = 'partial_payment',
+  NOT_INITIATED = 'non_initiated',
+}
+
 //REDIS
 export interface IRedis {
   port: number;

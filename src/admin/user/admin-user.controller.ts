@@ -5,6 +5,7 @@ import {
   Request,
   Body,
   Get,
+  Param,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminRouteGuard } from '../../auth/guards/admin.guard';
@@ -21,6 +22,7 @@ import {
 import { EnabledTwoFaAuthPayload } from '../../user/dto/enable-2fa.dto';
 import { AddUserToBusinessEntity } from 'src/user/dto/add-user.dto';
 import { AddPatnerDTO } from './dto/add-bank.dto';
+import { UpdatePatnerInformationDTO } from './dto/updateProvider.dto';
 
 @Controller('admin-user')
 @ApiTags('AdminUser')
@@ -86,5 +88,17 @@ export class AdminUserController {
   async addPartner(@Body() payload: AddPatnerDTO): Promise<IResponseMessage> {
     const response = await this.userService.addPatner(payload);
     return wrapResponseMessage('Partner user Created', response);
+  }
+
+  @Post('update-partner-informations/:partnerId')
+  async updatePartnerInformation(
+    @Body() payload: UpdatePatnerInformationDTO,
+    @Param('partnerId') partnerId: string,
+  ): Promise<IResponseMessage> {
+    const response = await this.userService.updatePartnerInformation(
+      payload,
+      partnerId,
+    );
+    return wrapResponseMessage('Partner user updated', response);
   }
 }
