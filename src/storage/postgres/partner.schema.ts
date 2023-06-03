@@ -35,6 +35,7 @@ export interface PartnerAttributes {
   interestRate: number;
   repaymentTime: string;
   logoUrl: string;
+  isActive: boolean;
 }
 
 export type PartnerCreateAttributes = Optional<PartnerAttributes, 'id'>;
@@ -182,6 +183,13 @@ export class Partner extends Model<PartnerAttributes, PartnerCreateAttributes> {
     allowNull: false,
   })
   repaymentTime?: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+    defaultValue: true,
+  })
+  isActive?: boolean;
 
   @Column({
     type: DataType.STRING,
