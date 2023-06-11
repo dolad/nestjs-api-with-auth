@@ -13,6 +13,10 @@ import {
   GetFundingParterParam,
 } from 'src/user/interface/get-funding-partner';
 import { UserServices } from 'src/user/services/user.services';
+import {
+  getPaginationParams,
+  PaginationParamsInput,
+} from 'src/utils/pagination';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';

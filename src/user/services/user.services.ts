@@ -33,6 +33,7 @@ import {
   GetFundingParterParam,
 } from '../interface/get-funding-partner';
 import { Op } from 'sequelize';
+import { getPaginationParams } from 'src/utils/pagination';
 
 @Injectable()
 export class UserServices {
@@ -294,13 +295,10 @@ export class UserServices {
     payload: GetFundingParterParam,
   ): Promise<FundingPartnerResponse> {
     const { businessType } = payload;
-    let { rows, page } = payload;
-    let offset = 0;
-    if (!rows) rows = 10;
-    if (!page) page = 1;
-    rows = +rows;
-    page = +page;
-    offset = (page - 1) * rows;
+    const { rows, offset, page } = getPaginationParams({
+      rows: payload.rows,
+      page: payload.page,
+    });
 
     const whereOption: Record<string, any> = {};
     if (businessType) {

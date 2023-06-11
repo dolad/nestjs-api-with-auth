@@ -18,8 +18,7 @@ import { FundingRequirement } from './financial-requirement';
 import { BusinessOwners } from './business-owners.dto';
 import { Partner } from './partner.schema';
 import { FundingRequestTransaction } from './fundingTransaction';
-
-console.log(process.env.NODE_ENV);
+import { FundingRequest } from './fundingRequest.schema';
 
 @Module({
   imports: [
@@ -40,6 +39,7 @@ console.log(process.env.NODE_ENV);
           SoftwareConnectDetails,
           UserSession,
           FundingRequirement,
+          FundingRequest,
           FundingRequestTransaction,
           BusinessOwners,
           Partner,
