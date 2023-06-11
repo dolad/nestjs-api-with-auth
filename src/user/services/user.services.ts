@@ -335,4 +335,16 @@ export class UserServices {
       count: fundingPatner.count,
     };
   }
+
+  async fetchSupportedFundingProvider(): Promise<Partner[]> {
+    const options = {
+      attributes: ['providerName', 'id'],
+    };
+
+    const fundingPatner: Partner[] = await this.partnerModel
+      .scope('removeSensitivePayload')
+      .findAll(options);
+
+    return fundingPatner;
+  }
 }
