@@ -1,15 +1,9 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { User } from '../../storage/postgres/user.schema';
-import {
-  FUNDING_REQUEST_TRANSACTION,
-  PATNER_REPOSITORY,
-} from '../../utils/constants';
-
+import { FUNDING_REQUEST, PATNER_REPOSITORY } from '../../utils/constants';
 import { Partner } from '../../storage/postgres/partner.schema';
 
-import { Op } from 'sequelize';
-import { FundingRequestTransaction } from 'src/storage/postgres/fundingTransaction';
 import sequelize from 'sequelize';
+import { FundingRequest } from 'src/storage/postgres/fundingRequest.schema';
 
 export type SumQueryResult = {
   fundsIssued: any;
@@ -28,8 +22,8 @@ export class AdminService {
   constructor(
     @Inject(PATNER_REPOSITORY)
     private readonly partnerModel: typeof Partner,
-    @Inject(FUNDING_REQUEST_TRANSACTION)
-    private readonly fundingTransactionModel: typeof FundingRequestTransaction,
+    @Inject(FUNDING_REQUEST)
+    private readonly fundingRequest: typeof FundingRequest,
   ) {}
 
   async getDashBoardData(): Promise<AdminDashBoardDataParams> {
@@ -41,31 +35,31 @@ export class AdminService {
       .filter((partner) => partner.isActive === false)
       .map((item) => item.id);
 
-    const allActiveFundResult = (await this.fundingTransactionModel.findAll({
+    const allActiveFundResult = (await this.fundingRequest.findAll({
       attributes: [
         [sequelize.fn('SUM', sequelize.col('issuedAmount')), 'fundsIssued'],
       ],
       where: {
-        providerId: {
+        bankId: {
           [sequelize.Op.in]: activePartners,
         },
       },
       raw: true,
     })) as unknown as SumQueryResult;
 
-    const inActiveFundResult = (await this.fundingTransactionModel.findAll({
+    const inActiveFundResult = (await this.fundingRequest.findAll({
       attributes: [
         [sequelize.fn('SUM', sequelize.col('issuedAmount')), 'fundsIssued'],
       ],
       where: {
-        providerId: {
+        bankId: {
           [sequelize.Op.in]: inactivePartners,
         },
       },
       raw: true,
     })) as unknown as SumQueryResult;
 
-    const allFundingResult = (await this.fundingTransactionModel.findAll({
+    const allFundingResult = (await this.fundingRequest.findAll({
       attributes: [
         [sequelize.fn('SUM', sequelize.col('issuedAmount')), 'fundsIssued'],
       ],

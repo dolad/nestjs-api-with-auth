@@ -1,23 +1,17 @@
 import {
   BadRequestException,
-  ConsoleLogger,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Op } from 'sequelize';
-import { FundingRequirement } from 'src/storage/postgres/financial-requirement';
 import { FundingRequest } from 'src/storage/postgres/fundingRequest.schema';
-import { Partner } from 'src/storage/postgres/partner.schema';
 import {
   FundingPartnerResponse,
   GetFundingParterParam,
 } from 'src/user/interface/get-funding-partner';
 import { UserServices } from 'src/user/services/user.services';
-import {
-  getPaginationParams,
-  PaginationParamsInput,
-} from 'src/utils/pagination';
+
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -26,8 +20,7 @@ import { IAuthUser } from '../../user/types/user.types';
 import {
   BUSINESS_ENTITY_REPOSITORY,
   FINANCIAL_CONNECT_PROVIDER,
-  FINANCIAL_REQUIREMENT,
-  PATNER_REPOSITORY,
+  FUNDING_REQUEST,
   SUPORTED_BANK_PROVIDER,
   SUPORTED_BANK_PROVIDER_COUNTRIES,
 } from '../../utils/constants';
@@ -48,7 +41,7 @@ export class FinancialInformationServices {
     @Inject(BUSINESS_ENTITY_REPOSITORY)
     private readonly businessEntityRepo: typeof BusinessEntity,
     private readonly userServices: UserServices,
-    @Inject(FINANCIAL_REQUIREMENT)
+    @Inject(FUNDING_REQUEST)
     private readonly fundingRequest: typeof FundingRequest,
   ) {}
 
