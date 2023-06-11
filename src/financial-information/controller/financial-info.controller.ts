@@ -16,7 +16,7 @@ import {
   wrapResponseMessage,
   IResponseMessage,
 } from '../../utils/response.map';
-import { AddFundingRequirement } from '../dto/funding-requirement.dto';
+import { AddFundingRequest } from '../dto/funding-request.dto';
 import { RemoveConnectedBankDTO } from '../dto/remove-connected-bank.dto';
 import { FinancialInformationServices } from '../services/financial-info.services';
 
@@ -54,9 +54,9 @@ export class FinancialInfoController {
   @HttpCode(HttpStatus.OK)
   async addFundingRequirement(
     @Request() req,
-    @Body() fundingRequirementPayload: AddFundingRequirement,
+    @Body() fundingRequirementPayload: AddFundingRequest,
   ): Promise<IResponseMessage> {
-    const response = await this.financeServices.createFundingRequirement(
+    const response = await this.financeServices.createFundingRequest(
       req.user,
       fundingRequirementPayload,
     );
