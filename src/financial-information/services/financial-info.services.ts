@@ -211,7 +211,9 @@ export class FinancialInformationServices {
       },
     });
     if (!businessId) {
-      throw new NotFoundException('Business not Found');
+      throw new NotFoundException(
+        'User is not attached to a buisiness account',
+      );
     }
 
     const request = await this.fundingRequest.create({
