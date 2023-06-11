@@ -14,7 +14,6 @@ import { BankProvider } from '../postgres/bank-provider';
 import { FinancialConnectDetails } from '../postgres/financial-account';
 import { SoftwareConnectDetails } from '../postgres/software-info.schema';
 import { UserSession } from './user-session.schema';
-import { FundingRequirement } from './financial-requirement';
 import { BusinessOwners } from './business-owners.dto';
 import { Partner } from './partner.schema';
 import { FundingRequestTransaction } from './fundingTransaction';
@@ -38,7 +37,6 @@ import { FundingRequest } from './fundingRequest.schema';
           FinancialConnectDetails,
           SoftwareConnectDetails,
           UserSession,
-          FundingRequirement,
           FundingRequest,
           FundingRequestTransaction,
           BusinessOwners,
