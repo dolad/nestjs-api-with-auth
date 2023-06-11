@@ -11,19 +11,23 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GetFundingParterParam } from 'src/user/interface/get-funding-partner';
+import { UserServices } from 'src/user/services/user.services';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import {
   wrapResponseMessage,
   IResponseMessage,
 } from '../../utils/response.map';
-import { AddFundingRequirement } from '../dto/funding-requirement.dto';
+import { AddFundingRequest } from '../dto/funding-request.dto';
 import { RemoveConnectedBankDTO } from '../dto/remove-connected-bank.dto';
 import { FinancialInformationServices } from '../services/financial-info.services';
 
 @Controller('financial-information')
 @ApiTags('Financial')
 export class FinancialInfoController {
-  constructor(private readonly financeServices: FinancialInformationServices) {}
+  constructor(
+    private readonly financeServices: FinancialInformationServices,
+    private readonly userService: UserServices,
+  ) {}
 
   @Get('/fetch-provider-countries')
   @UseGuards(JwtAuthGuard)
@@ -54,9 +58,9 @@ export class FinancialInfoController {
   @HttpCode(HttpStatus.OK)
   async addFundingRequirement(
     @Request() req,
-    @Body() fundingRequirementPayload: AddFundingRequirement,
+    @Body() fundingRequirementPayload: AddFundingRequest,
   ): Promise<IResponseMessage> {
-    const response = await this.financeServices.createFundingRequirement(
+    const response = await this.financeServices.createFundingRequest(
       req.user,
       fundingRequirementPayload,
     );
@@ -77,10 +81,19 @@ export class FinancialInfoController {
   async fetchFundingPartner(
     @Query() getFundingPartnerParam: GetFundingParterParam,
   ): Promise<IResponseMessage> {
-    const response = await this.financeServices.fetchFundingPartner(
+    const response = await this.userService.fetchFundingPartner(
       getFundingPartnerParam,
     );
+
     return wrapResponseMessage('funding partner found succesfull', response);
+  }
+
+  @Get('/supported-funding-provider-name')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async fetchFundingPartnerName(): Promise<IResponseMessage> {
+    const response = await this.userService.fetchSupportedFundingProvider();
+    return wrapResponseMessage('funding partner name', response);
   }
 
   @Post('/remove-connected-bank')

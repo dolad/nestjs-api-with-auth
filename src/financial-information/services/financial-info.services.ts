@@ -7,12 +7,17 @@ import {
 } from '@nestjs/common';
 import { Op } from 'sequelize';
 import { FundingRequirement } from 'src/storage/postgres/financial-requirement';
+import { FundingRequest } from 'src/storage/postgres/fundingRequest.schema';
 import { Partner } from 'src/storage/postgres/partner.schema';
 import {
   FundingPartnerResponse,
   GetFundingParterParam,
 } from 'src/user/interface/get-funding-partner';
 import { UserServices } from 'src/user/services/user.services';
+import {
+  getPaginationParams,
+  PaginationParamsInput,
+} from 'src/utils/pagination';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
@@ -26,7 +31,7 @@ import {
   SUPORTED_BANK_PROVIDER,
   SUPORTED_BANK_PROVIDER_COUNTRIES,
 } from '../../utils/constants';
-import { AddFundingRequirement } from '../dto/funding-requirement.dto';
+import { AddFundingRequest } from '../dto/funding-request.dto';
 import { supportedCountryPayload } from '../mockRequest/connection';
 import { SaltEdge } from './saltedge.service';
 
@@ -44,7 +49,7 @@ export class FinancialInformationServices {
     private readonly businessEntityRepo: typeof BusinessEntity,
     private readonly userServices: UserServices,
     @Inject(FINANCIAL_REQUIREMENT)
-    private readonly financialRequirement: typeof FundingRequirement,
+    private readonly fundingRequest: typeof FundingRequest,
   ) {}
 
   /**
@@ -196,9 +201,9 @@ export class FinancialInformationServices {
     // fetchaccount from connections
   }
 
-  async createFundingRequirement(
+  async createFundingRequest(
     user: IAuthUser,
-    fundingRequirement: AddFundingRequirement,
+    fundingRequirement: AddFundingRequest,
   ): Promise<any> {
     const businessId = await this.businessEntityRepo.findOne({
       where: {
@@ -206,25 +211,17 @@ export class FinancialInformationServices {
       },
     });
     if (!businessId) {
-      throw new NotFoundException('Business not Found');
+      throw new NotFoundException(
+        'User is not attached to a buisiness account',
+      );
     }
 
-    const requirementAlready = await this.financialRequirement.findOne({
-      where: {
-        businessId: businessId.id,
-      },
-    });
-
-    if (requirementAlready) {
-      throw new BadRequestException('Funding Requirement already added');
-    }
-
-    const requirement = await this.financialRequirement.create({
+    const request = await this.fundingRequest.create({
       ...fundingRequirement,
-      businessId: businessId.id,
+      businessEntityId: businessId.id,
     });
 
-    return requirement;
+    return request;
   }
 
   private async createLeadsForCustomer(user: IAuthUser): Promise<any> {
