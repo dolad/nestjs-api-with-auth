@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   Request,
@@ -20,6 +21,7 @@ import {
 import { AddFundingRequest } from '../dto/funding-request.dto';
 import { RemoveConnectedBankDTO } from '../dto/remove-connected-bank.dto';
 import { FinancialInformationServices } from '../services/financial-info.services';
+import { FetchPerformanceStatsDTO } from '../dto/performance-stat-dto';
 
 @Controller('financial-information')
 @ApiTags('Financial')
@@ -85,7 +87,7 @@ export class FinancialInfoController {
       getFundingPartnerParam,
     );
 
-    return wrapResponseMessage('funding partner found succesfull', response);
+    return wrapResponseMessage('funding partner found successfully', response);
   }
 
   @Get('/supported-funding-provider-name')
@@ -108,5 +110,39 @@ export class FinancialInfoController {
       removedConnectedBankPayload.bankName,
     );
     return wrapResponseMessage('business Information Successfully', response);
+  }
+
+  @Get('/funding-request-performance-stats')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequestPerformanceStats(
+    @Query() query: FetchPerformanceStatsDTO,
+  ): Promise<any> {
+    const { bankId, from, to } = query;
+    const response = await this.financeServices.fetchPerformanceStats(
+      bankId,
+      from,
+      to,
+    );
+
+    return wrapResponseMessage(
+      'Funding request performance retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-request-recent-activity/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequestRecentActivity(
+    @Param('bank_id') bankId: string,
+  ): Promise<any> {
+    const response =
+      await this.financeServices.fetchFundingRequestRecentActivities(bankId);
+
+    return wrapResponseMessage(
+      'Recent activities retrieved successfully.',
+      response,
+    );
   }
 }

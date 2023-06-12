@@ -261,4 +261,74 @@ export class FinancialInformationServices {
     const fundingPatner = await this.userServices.fetchFundingPartner(payload);
     return fundingPatner;
   }
+
+  async fetchPerformanceStats(
+    bankId: string,
+    from: Date,
+    to: Date,
+  ): Promise<any> {
+    const response = await this.fundingRequest.findAll({
+      where: {
+        bankId,
+        createdAt: {
+          [Op.between]: [from, to],
+        },
+      },
+      include: [
+        {
+          model: this.businessEntityRepo,
+          as: 'businessEntity',
+        },
+      ],
+    });
+
+    const totalAmountRequested = response.reduce((acc, item) => {
+      const fundingAmount =
+        typeof item.fundingAmount === 'number'
+          ? item.fundingAmount
+          : parseFloat(item.fundingAmount);
+      return acc + fundingAmount;
+    }, 0);
+
+    const totalAmountIssued = response.reduce((acc, item) => {
+      const issuedAmount =
+        typeof item.issuedAmount === 'number'
+          ? item.issuedAmount
+          : parseFloat(item.issuedAmount);
+      return acc + issuedAmount;
+    }, 0);
+
+    const totalAmountDeclined = response.reduce((acc, item) => {
+      //check if the item is declined
+      if (item.fundingTransactionStatus === 'declined') {
+        const fundingAmount =
+          typeof item.fundingAmount === 'number'
+            ? item.fundingAmount
+            : parseFloat(item.fundingAmount);
+        return acc + fundingAmount;
+      }
+    }, 0);
+    return {
+      totalAmountRequested,
+      totalAmountIssued,
+      totalAmountDeclined,
+    };
+  }
+
+  async fetchFundingRequestRecentActivities(bankId: string): Promise<any> {
+    const response = await this.fundingRequest.findAll({
+      where: {
+        bankId,
+      },
+      include: [
+        {
+          model: this.businessEntityRepo,
+          as: 'businessEntity',
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+      limit: 10,
+    });
+    return response;
+  }
 }
