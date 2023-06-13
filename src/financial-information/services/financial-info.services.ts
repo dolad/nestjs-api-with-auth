@@ -266,7 +266,11 @@ export class FinancialInformationServices {
     bankId: string,
     from: Date,
     to: Date,
-  ): Promise<any> {
+  ): Promise<{
+    totalAmountRequested: number;
+    totalAmountIssued: number;
+    totalAmountDeclined: number;
+  }> {
     const response = await this.fundingRequest.findAll({
       where: {
         bankId,
@@ -315,7 +319,9 @@ export class FinancialInformationServices {
     };
   }
 
-  async fetchFundingRequestRecentActivities(bankId: string): Promise<any> {
+  async fetchFundingRequestRecentActivities(
+    bankId: string,
+  ): Promise<FundingRequest[]> {
     const response = await this.fundingRequest.findAll({
       where: {
         bankId,
