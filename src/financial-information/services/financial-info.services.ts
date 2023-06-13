@@ -383,4 +383,36 @@ export class FinancialInformationServices {
       count: response.count,
     };
   }
+
+  async fetchFundingCustomerStats(bankId: string, from: Date, to: Date) {
+    //fetch funding request with distinct business entity
+    const fundingRequest = await this.fundingRequest.findAll({
+      where: {
+        bankId,
+        createdAt: {
+          [Op.between]: [from, to],
+        },
+      },
+      include: [
+        {
+          model: this.businessEntityRepo,
+          as: 'businessEntity',
+        },
+      ],
+      attributes: ['businessEntityId'],
+      group: ['businessEntityId'],
+    });
+
+    const totalPending = fundingRequest.reduce((acc, item) => {
+      if (item.fundingTransactionStatus === 'pending') {
+        return acc + 1;
+      }
+      return acc;
+    }, 0);
+
+    return {
+      totalPendingCustomers: totalPending,
+      totalCustomers: fundingRequest.length,
+    };
+  }
 }
