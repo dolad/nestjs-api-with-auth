@@ -287,28 +287,19 @@ export class FinancialInformationServices {
     });
 
     const totalAmountRequested = response.reduce((acc, item) => {
-      const fundingAmount =
-        typeof item.fundingAmount === 'number'
-          ? item.fundingAmount
-          : parseFloat(item.fundingAmount);
+      const fundingAmount = item.fundingAmount ?? 0;
       return acc + fundingAmount;
     }, 0);
 
     const totalAmountIssued = response.reduce((acc, item) => {
-      const issuedAmount =
-        typeof item.issuedAmount === 'number'
-          ? item.issuedAmount
-          : parseFloat(item.issuedAmount);
+      const issuedAmount = item.issuedAmount ?? 0;
       return acc + issuedAmount;
     }, 0);
 
     const totalAmountDeclined = response.reduce((acc, item) => {
       //check if the item is declined
       if (item.fundingTransactionStatus === 'declined') {
-        const fundingAmount =
-          typeof item.fundingAmount === 'number'
-            ? item.fundingAmount
-            : parseFloat(item.fundingAmount);
+        const fundingAmount = item.fundingAmount ?? 0;
         return acc + fundingAmount;
       }
     }, 0);
