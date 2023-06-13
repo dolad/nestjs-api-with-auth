@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export enum PAYMENTPERIOD {
   THREEMONTH = '3M',
@@ -39,4 +46,36 @@ export class AddFundingRequest {
   @IsNumber()
   @IsNotEmpty()
   amountSpendOnResearch: number;
+}
+
+export class GetFundingRequestsParamDTO {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  bankId: string;
+
+  @ApiProperty()
+  @IsDate()
+  @IsNotEmpty()
+  from: Date;
+
+  @ApiProperty()
+  @IsDate()
+  @IsNotEmpty()
+  to: Date;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  status?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  rows?: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  page?: number;
 }

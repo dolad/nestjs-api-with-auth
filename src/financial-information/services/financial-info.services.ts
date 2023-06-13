@@ -24,9 +24,13 @@ import {
   SUPORTED_BANK_PROVIDER,
   SUPORTED_BANK_PROVIDER_COUNTRIES,
 } from '../../utils/constants';
-import { AddFundingRequest } from '../dto/funding-request.dto';
+import {
+  AddFundingRequest,
+  GetFundingRequestsParamDTO,
+} from '../dto/funding-request.dto';
 import { supportedCountryPayload } from '../mockRequest/connection';
 import { SaltEdge } from './saltedge.service';
+import { getPaginationParams } from '../../utils/pagination';
 
 @Injectable()
 export class FinancialInformationServices {
@@ -262,7 +266,7 @@ export class FinancialInformationServices {
     return fundingPatner;
   }
 
-  async fetchPerformanceStats(
+  async fetchFundRequestPerformanceStats(
     bankId: string,
     from: Date,
     to: Date,
@@ -270,6 +274,7 @@ export class FinancialInformationServices {
     totalAmountRequested: number;
     totalAmountIssued: number;
     totalAmountDeclined: number;
+    totalAmountPending: number;
   }> {
     const response = await this.fundingRequest.findAll({
       where: {
@@ -303,10 +308,20 @@ export class FinancialInformationServices {
         return acc + fundingAmount;
       }
     }, 0);
+
+    const totalAmountPending = response.reduce((acc, item) => {
+      //check if the item is declined
+      if (item.fundingTransactionStatus === 'pending') {
+        const fundingAmount = item.fundingAmount ?? 0;
+        return acc + fundingAmount;
+      }
+    }, 0);
+
     return {
       totalAmountRequested,
       totalAmountIssued,
       totalAmountDeclined,
+      totalAmountPending,
     };
   }
 
@@ -327,5 +342,45 @@ export class FinancialInformationServices {
       limit: 10,
     });
     return response;
+  }
+
+  async fetchFundingRequests(payload: GetFundingRequestsParamDTO): Promise<{
+    page: number;
+    totalPages: number;
+    rows: FundingRequest[];
+    count: number;
+  }> {
+    const { rows, offset, page } = getPaginationParams({
+      rows: payload.rows,
+      page: payload.page,
+    });
+
+    const options = {
+      where: {
+        bankId: payload.bankId,
+        createdAt: {
+          [Op.between]: [payload.from, payload.to],
+        },
+      },
+      include: [
+        {
+          model: this.businessEntityRepo,
+          as: 'businessEntity',
+        },
+      ],
+      offset,
+      limit: rows,
+    };
+
+    const response = await this.fundingRequest.findAndCountAll(options);
+
+    const totalPages = Math.ceil(response.count / rows) || 0;
+
+    return {
+      page,
+      totalPages,
+      rows: response.rows,
+      count: response.count,
+    };
   }
 }
