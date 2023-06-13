@@ -18,7 +18,10 @@ import {
   wrapResponseMessage,
   IResponseMessage,
 } from '../../utils/response.map';
-import { AddFundingRequest } from '../dto/funding-request.dto';
+import {
+  AddFundingRequest,
+  GetFundingRequestsParamDTO,
+} from '../dto/funding-request.dto';
 import { RemoveConnectedBankDTO } from '../dto/remove-connected-bank.dto';
 import { FinancialInformationServices } from '../services/financial-info.services';
 import { FetchPerformanceStatsDTO } from '../dto/performance-stat-dto';
@@ -119,11 +122,12 @@ export class FinancialInfoController {
     @Query() query: FetchPerformanceStatsDTO,
   ): Promise<any> {
     const { bankId, from, to } = query;
-    const response = await this.financeServices.fetchPerformanceStats(
-      bankId,
-      from,
-      to,
-    );
+    const response =
+      await this.financeServices.fetchFundRequestPerformanceStats(
+        bankId,
+        from,
+        to,
+      );
 
     return wrapResponseMessage(
       'Funding request performance retrieved successfully.',
@@ -142,6 +146,17 @@ export class FinancialInfoController {
 
     return wrapResponseMessage(
       'Recent activities retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-requests/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const response = await this.financeServices.fetchFundingRequests(query);
+    return wrapResponseMessage(
+      'Funding requests retrieved successfully.',
       response,
     );
   }
