@@ -415,4 +415,42 @@ export class FinancialInformationServices {
       totalCustomers: fundingRequest.length,
     };
   }
+
+  async fetchCustomerFundingRequest(payload: GetFundingRequestsParamDTO) {
+    const { rows, offset, page } = getPaginationParams({
+      rows: payload.rows,
+      page: payload.page,
+    });
+
+    //get all funding request
+    //count number of funding request of each customer
+    const options = {
+      where: {
+        bankId: payload.bankId,
+        createdAt: {
+          [Op.between]: [payload.from, payload.to],
+        },
+      },
+      include: [
+        {
+          model: this.businessEntityRepo,
+          as: 'businessEntity',
+        },
+      ],
+
+      offset,
+      limit: rows,
+    };
+
+    const response = await this.businessEntityRepo.findAndCountAll(options);
+
+    const totalPages = Math.ceil(response.count / rows) || 0;
+
+    return {
+      page,
+      totalPages,
+      rows: response.rows,
+      count: response.count,
+    };
+  }
 }
