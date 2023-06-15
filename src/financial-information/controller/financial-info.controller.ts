@@ -160,4 +160,35 @@ export class FinancialInfoController {
       response,
     );
   }
+
+  @Get('/funding-customer-stats')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomerStats(@Query() query: FetchPerformanceStatsDTO) {
+    const { bankId, from, to } = query;
+    const response = await this.financeServices.fetchFundingCustomerStats(
+      bankId,
+      from,
+      to,
+    );
+
+    return wrapResponseMessage(
+      'Funding customer stats retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-customer-requests')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomerRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const response = await this.financeServices.fetchCustomerFundingRequest(
+      query,
+    );
+
+    return wrapResponseMessage(
+      'Funding customer requests retrieved successfully.',
+      response,
+    );
+  }
 }
