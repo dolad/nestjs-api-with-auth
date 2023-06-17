@@ -51,17 +51,17 @@ export class AddFundingRequest {
 export class GetFundingRequestsParamDTO {
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   bankId: string;
 
   @ApiProperty()
   @IsDate()
-  @IsNotEmpty()
+  @IsOptional()
   from: Date;
 
   @ApiProperty()
   @IsDate()
-  @IsNotEmpty()
+  @IsOptional()
   to: Date;
 
   @ApiProperty()

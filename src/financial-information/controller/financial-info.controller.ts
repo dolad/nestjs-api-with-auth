@@ -24,7 +24,11 @@ import {
 } from '../dto/funding-request.dto';
 import { RemoveConnectedBankDTO } from '../dto/remove-connected-bank.dto';
 import { FinancialInformationServices } from '../services/financial-info.services';
-import { FetchPerformanceStatsDTO } from '../dto/performance-stat-dto';
+import {
+  FetchPerformanceStatsDTO,
+  GetCustomerFundingRequestsParamDTO,
+} from '../dto/performance-stat-dto';
+import { Op } from 'sequelize';
 
 @Controller('financial-information')
 @ApiTags('Financial')
@@ -164,13 +168,18 @@ export class FinancialInfoController {
   @Get('/funding-customer-stats')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async getFundingCustomerStats(@Query() query: FetchPerformanceStatsDTO) {
+  async getFundingCustomerStats(
+    @Query() query: GetCustomerFundingRequestsParamDTO,
+  ) {
     const { bankId, from, to } = query;
-    const response = await this.financeServices.fetchFundingCustomerStats(
-      bankId,
-      from,
-      to,
-    );
+    const response = await this.financeServices.fetchFundingCustomerStats({
+      where: {
+        bankId,
+        createdAt: {
+          [Op.between]: [from, to],
+        },
+      },
+    });
 
     return wrapResponseMessage(
       'Funding customer stats retrieved successfully.',
@@ -182,8 +191,21 @@ export class FinancialInfoController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getFundingCustomerRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const { bankId, from, to, rows, page, status } = query;
     const response = await this.financeServices.fetchCustomerFundingRequest(
-      query,
+      {
+        where: {
+          bankId,
+          fundingTransactionStatus: status,
+          createdAt: {
+            [Op.between]: [from, to],
+          },
+        },
+      },
+      {
+        rows,
+        page,
+      },
     );
 
     return wrapResponseMessage(

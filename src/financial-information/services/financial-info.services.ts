@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Op } from 'sequelize';
+import { Filterable, Op } from 'sequelize';
 import { FundingRequest } from 'src/storage/postgres/fundingRequest.schema';
 import {
   FundingPartnerResponse,
@@ -384,14 +384,11 @@ export class FinancialInformationServices {
     };
   }
 
-  async fetchFundingCustomerStats(bankId: string, from: Date, to: Date) {
+  async fetchFundingCustomerStats(filter: Filterable<FundingRequest>) {
     //fetch funding request with distinct business entity
     const fundingRequest = await this.fundingRequest.findAll({
       where: {
-        bankId,
-        createdAt: {
-          [Op.between]: [from, to],
-        },
+        ...filter.where,
       },
       include: [
         {
@@ -416,20 +413,20 @@ export class FinancialInformationServices {
     };
   }
 
-  async fetchCustomerFundingRequest(payload: GetFundingRequestsParamDTO) {
+  async fetchCustomerFundingRequest(
+    filter: Filterable<FundingRequest>,
+    pagination: { rows: number; page: number },
+  ) {
     const { rows, offset, page } = getPaginationParams({
-      rows: payload.rows,
-      page: payload.page,
+      rows: pagination.rows,
+      page: pagination.page,
     });
 
     //get all funding request
     //count number of funding request of each customer
     const options = {
       where: {
-        bankId: payload.bankId,
-        createdAt: {
-          [Op.between]: [payload.from, payload.to],
-        },
+        ...filter.where,
       },
       include: [
         {
