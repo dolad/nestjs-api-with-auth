@@ -396,8 +396,6 @@ export class FinancialInformationServices {
           as: 'businessEntity',
         },
       ],
-      attributes: ['businessEntityId'],
-      group: ['businessEntityId'],
     });
 
     const totalPending = fundingRequest.reduce((acc, item) => {

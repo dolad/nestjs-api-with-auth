@@ -165,10 +165,10 @@ export class FinancialInfoController {
     );
   }
 
-  @Get('/funding-customer-stats')
+  @Get('/funding-customers-stats')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async getFundingCustomerStats(
+  async getFundingCustomersStats(
     @Query() query: GetCustomerFundingRequestsParamDTO,
   ) {
     const { bankId, from, to } = query;
@@ -187,10 +187,12 @@ export class FinancialInfoController {
     );
   }
 
-  @Get('/funding-customer-requests')
+  @Get('/funding-customers-requests')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async getFundingCustomerRequests(@Query() query: GetFundingRequestsParamDTO) {
+  async getFundingCustomersRequests(
+    @Query() query: GetFundingRequestsParamDTO,
+  ) {
     const { bankId, from, to, rows, page, status } = query;
     const response = await this.financeServices.fetchCustomerFundingRequest(
       {
@@ -200,6 +202,49 @@ export class FinancialInfoController {
           createdAt: {
             [Op.between]: [from, to],
           },
+        },
+      },
+      {
+        rows,
+        page,
+      },
+    );
+
+    return wrapResponseMessage(
+      'Funding customer requests retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-customer-stats')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomerStatsByBankId(
+    @Query() query: GetCustomerFundingRequestsParamDTO,
+  ) {
+    const { businessId } = query;
+    const response = await this.financeServices.fetchFundingCustomerStats({
+      where: {
+        businessEntityId: businessId,
+      },
+    });
+
+    return wrapResponseMessage(
+      'Funding customer stats retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-customer-requests')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomerRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const { businessId, rows, page, status } = query;
+    const response = await this.financeServices.fetchCustomerFundingRequest(
+      {
+        where: {
+          businessEntityId: businessId,
+          fundingTransactionStatus: status,
         },
       },
       {

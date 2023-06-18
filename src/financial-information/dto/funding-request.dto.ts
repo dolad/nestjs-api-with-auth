@@ -55,6 +55,11 @@ export class GetFundingRequestsParamDTO {
   bankId: string;
 
   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  businessId: string;
+
+  @ApiProperty()
   @IsDate()
   @IsOptional()
   from: Date;
