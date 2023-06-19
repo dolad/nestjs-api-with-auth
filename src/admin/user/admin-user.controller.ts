@@ -6,6 +6,9 @@ import {
   Body,
   Get,
   Param,
+  HttpStatus,
+  HttpCode,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminRouteGuard } from '../../auth/guards/admin.guard';
@@ -25,6 +28,9 @@ import { AddPatnerDTO } from './dto/add-bank.dto';
 import { UpdatePatnerInformationDTO } from './dto/updateProvider.dto';
 import { AdminService } from './admin-user.services';
 import { FinancialInformationServices } from 'src/financial-information/services/financial-info.services';
+import { GetCustomerFundingRequestsParamDTO } from 'src/financial-information/dto/performance-stat-dto';
+import { GetFundingRequestsParamDTO } from 'src/financial-information/dto/funding-request.dto';
+import { Op } from 'sequelize';
 
 @Controller('admin-user')
 @ApiTags('AdminUser')
@@ -126,5 +132,95 @@ export class AdminUserController {
   ): Promise<IResponseMessage> {
     const response = await this.financialServices.fetchTransaction(businessId);
     return wrapResponseMessage('Dashboard data fetched', response);
+  }
+
+  @Get('/funding-customer-requests')
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomerRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const { businessId, rows, page, status } = query;
+    const response = await this.financialServices.fetchCustomerFundingRequest(
+      {
+        where: {
+          businessEntityId: businessId,
+          fundingTransactionStatus: status,
+        },
+      },
+      {
+        rows,
+        page,
+      },
+    );
+
+    return wrapResponseMessage(
+      'Funding customer requests retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-customer-stats')
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomerStatsByBankId(
+    @Query() query: GetCustomerFundingRequestsParamDTO,
+  ) {
+    const { businessId } = query;
+    const response = await this.financialServices.fetchFundingCustomerStats({
+      where: {
+        businessEntityId: businessId,
+      },
+    });
+
+    return wrapResponseMessage(
+      'Funding customer stats retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-customers-requests')
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomersRequests(
+    @Query() query: GetFundingRequestsParamDTO,
+  ) {
+    const { bankId, from, to, rows, page, status } = query;
+    const response = await this.financialServices.fetchCustomerFundingRequest(
+      {
+        where: {
+          bankId,
+          fundingTransactionStatus: status,
+          createdAt: {
+            [Op.between]: [from, to],
+          },
+        },
+      },
+      {
+        rows,
+        page,
+      },
+    );
+
+    return wrapResponseMessage(
+      'Funding customer requests retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-customers-stats')
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomersStats(
+    @Query() query: GetCustomerFundingRequestsParamDTO,
+  ) {
+    const { bankId, from, to } = query;
+    const response = await this.financialServices.fetchFundingCustomerStats({
+      where: {
+        bankId,
+        createdAt: {
+          [Op.between]: [from, to],
+        },
+      },
+    });
+
+    return wrapResponseMessage(
+      'Funding customer stats retrieved successfully.',
+      response,
+    );
   }
 }
