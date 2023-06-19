@@ -24,6 +24,7 @@ import { AddUserToBusinessEntity } from 'src/user/dto/add-user.dto';
 import { AddPatnerDTO } from './dto/add-bank.dto';
 import { UpdatePatnerInformationDTO } from './dto/updateProvider.dto';
 import { AdminService } from './admin-user.services';
+import { FinancialInformationServices } from 'src/financial-information/services/financial-info.services';
 
 @Controller('admin-user')
 @ApiTags('AdminUser')
@@ -32,6 +33,7 @@ export class AdminUserController {
   constructor(
     private readonly userService: UserServices,
     private readonly adminServices: AdminService,
+    private readonly financialServices: FinancialInformationServices,
   ) {}
 
   @Post('change-password')
@@ -109,6 +111,20 @@ export class AdminUserController {
   @Get('dashoboard/data')
   async getDashboards(@Request() req): Promise<IResponseMessage> {
     const response = await this.adminServices.getDashBoardData();
+    return wrapResponseMessage('Dashboard data fetched', response);
+  }
+
+  @Get('dashoboard/fetchFundRequest')
+  async getFundingRequest(@Request() req): Promise<IResponseMessage> {
+    const response = await this.adminServices.getDashBoardData();
+    return wrapResponseMessage('Dashboard data fetched', response);
+  }
+
+  @Get('business/bankStatement/:businessId')
+  async getBusinessBankStatemnt(
+    @Param('businessId') businessId: string,
+  ): Promise<IResponseMessage> {
+    const response = await this.financialServices.fetchTransaction(businessId);
     return wrapResponseMessage('Dashboard data fetched', response);
   }
 }

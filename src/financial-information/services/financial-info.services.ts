@@ -40,7 +40,7 @@ export class FinancialInformationServices {
     @Inject(SUPORTED_BANK_PROVIDER)
     private readonly supportedBank: typeof BankProvider,
     @Inject(FINANCIAL_CONNECT_PROVIDER)
-    private readonly financialSupportRepo: typeof FinancialConnectDetails,
+    private readonly financialConnect: typeof FinancialConnectDetails,
     private readonly saltEdgeServices: SaltEdge,
     @Inject(BUSINESS_ENTITY_REPOSITORY)
     private readonly businessEntityRepo: typeof BusinessEntity,
@@ -114,7 +114,6 @@ export class FinancialInformationServices {
   }
 
   async fetchCustomerConnection(user: IAuthUser) {
-    // fetch connections
     const getCustomer = await this.createLeadsForCustomer(user);
     const response = await this.saltEdgeServices.fetchConnection(
       getCustomer.saltEdgeCustomerId,
@@ -122,8 +121,21 @@ export class FinancialInformationServices {
     return response;
   }
 
+  async findFinancialConnectByBusinessId(
+    businessId: string,
+  ): Promise<FinancialConnectDetails> {
+    const financialConnect = await this.financialConnect.findOne({
+      where: {
+        businessId,
+      },
+    });
+    if (!financialConnect)
+      throw new NotFoundException('Connection yet established');
+    return financialConnect;
+  }
+
   async fetchConnectedBanks(user: IAuthUser) {
-    const financialConnect = await this.financialSupportRepo.findOne({
+    const financialConnect = await this.financialConnect.findOne({
       where: {
         customerEmail: user.email,
       },
@@ -149,7 +161,7 @@ export class FinancialInformationServices {
   }
 
   async disableBankConnection(user: IAuthUser, bankName: string) {
-    const financialConnect = await this.financialSupportRepo.findOne({
+    const financialConnect = await this.financialConnect.findOne({
       where: {
         customerEmail: user.email,
       },
@@ -170,7 +182,7 @@ export class FinancialInformationServices {
       consents[0].id,
       consents[0].connection_id,
     );
-    await this.financialSupportRepo.destroy({
+    await this.financialConnect.destroy({
       where: {
         customerEmail: user.email,
       },
@@ -178,24 +190,14 @@ export class FinancialInformationServices {
     return 'Successfully disconnect bank';
   }
 
-  async fetchAccount(user: IAuthUser) {
-    // fetch connections
-    const connection = await this.fetchCustomerConnection(user);
-    const response = await this.saltEdgeServices.fetchAccounts(connection.id);
-    return response.data.data;
-    // fetchaccount from connections
-  }
-
-  async fetchTransaction(user: IAuthUser) {
-    // fetch connections
-    const connection = await this.fetchCustomerConnection(user);
-    const account = await this.fetchAccount(user);
+  async fetchTransaction(businessId: string) {
+    const financialConnectRecord = await this.findFinancialConnectByBusinessId(
+      businessId,
+    );
     const response = await this.saltEdgeServices.fetchTransaction(
-      connection.id,
-      account.id,
+      financialConnectRecord.saltEdgeCustomerId,
     );
     return response;
-    // fetchaccount from connections
   }
 
   async createFundingRequest(
@@ -222,7 +224,7 @@ export class FinancialInformationServices {
   }
 
   private async createLeadsForCustomer(user: IAuthUser): Promise<any> {
-    const financialConnectExist = await this.financialSupportRepo.findOne({
+    const financialConnectExist = await this.financialConnect.findOne({
       where: {
         customerEmail: user.email,
         customerId: user.userId,
@@ -249,7 +251,7 @@ export class FinancialInformationServices {
     );
 
     const payload = createSaltEdgeCustomer.data.data;
-    return await this.financialSupportRepo.create({
+    return await this.financialConnect.create({
       saltEdgeCustomerId: payload.customer_id,
       saltCustomerSecret: payload.customer_id,
       saltEdgeIdentifier: payload.email,
