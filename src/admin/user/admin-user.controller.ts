@@ -223,4 +223,30 @@ export class AdminUserController {
       response,
     );
   }
+
+  @Get('/funding-request-recent-activity/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequestRecentActivity(
+    @Param('bank_id') bankId: string,
+  ): Promise<any> {
+    const response =
+      await this.financialServices.fetchFundingRequestRecentActivities(bankId);
+
+    return wrapResponseMessage(
+      'Recent activities retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/funding-requests/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const response = await this.financialServices.fetchFundingRequests(query);
+    return wrapResponseMessage(
+      'Funding requests retrieved successfully.',
+      response,
+    );
+  }
 }
