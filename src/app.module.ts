@@ -1,4 +1,10 @@
-import { CacheModule, Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  CacheModule,
+  Inject,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -18,18 +24,17 @@ import { BusinessInformationModule } from './business-information/business-info.
 import { FinancialInformationModule } from './financial-information/financial-info.module';
 import { SoftwareInformationModule } from './software-information/software-info.module';
 import { AdminModules } from './admin/admin.module';
+import { PartnerModule } from './partner/partner.module';
 // import IoRedis from 'ioredis'
 // import { REDIS, RedisModule } from './storage/redis';
 // import session from 'express-session';
 // import RedisStore from 'connect-redis';
 
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig,emailConfiig],
+      load: [appConfig, emailConfiig],
     }),
 
     EventEmitterModule.forRoot({
@@ -37,7 +42,7 @@ import { AdminModules } from './admin/admin.module';
       removeListener: true,
       verboseMemoryLeak: true,
     }),
-    
+
     CacheModule.register({
       isGlobal: true,
     }),
@@ -56,8 +61,8 @@ import { AdminModules } from './admin/admin.module';
     BusinessInformationModule,
     FinancialInformationModule,
     SoftwareInformationModule,
-    AdminModules
-
+    AdminModules,
+    PartnerModule,
   ],
 
   controllers: [AppController],
@@ -69,10 +74,7 @@ import { AdminModules } from './admin/admin.module';
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
   ],
 })
-
-
-export class AppModule{}
-
+export class AppModule {}
 
 // export class AppModule implements NestModule {
 //   constructor(@Inject(REDIS) private readonly redis: IoRedis){}
