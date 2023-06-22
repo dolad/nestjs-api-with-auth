@@ -18,7 +18,6 @@ export class PartnerServices {
   constructor(
     @Inject(PATNER_REPOSITORY)
     private readonly partnerRepository: typeof Partner,
-    private readonly userServices: UserServices,
     private readonly authService: AuthService,
     private readonly financialServices: FinancialInformationServices,
   ) {}
