@@ -134,38 +134,123 @@ export class AdminUserController {
     return wrapResponseMessage('Dashboard data fetched', response);
   }
 
-  @Get('/funding-customer-requests')
+  @Get('/dashboard/general-funding-stats')
   @HttpCode(HttpStatus.OK)
-  async getFundingCustomerRequests(@Query() query: GetFundingRequestsParamDTO) {
-    const { businessId, rows, page, status } = query;
-    const response = await this.financialServices.fetchCustomerFundingRequest(
-      {
+  async getGeneralFundingStatsStats(
+    @Query() query: GetFundingRequestsParamDTO,
+  ) {
+    const { from, to } = query;
+    const response =
+      await this.financialServices.fetchFundRequestPerformanceStats({
         where: {
-          businessEntityId: businessId,
-          fundingTransactionStatus: status,
+          createdAt: {
+            [Op.between]: [from, to],
+          },
         },
-      },
-      {
-        rows,
-        page,
-      },
-    );
-
+      });
     return wrapResponseMessage(
-      'Funding customer requests retrieved successfully.',
+      'Performance stats retrieved successfully.',
       response,
     );
   }
 
-  @Get('/funding-customer-stats')
+  @Get('/dashboard/general-funding-request-recent-activity')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getGeneralFundingRequestRecentActivity(): Promise<any> {
+    const response =
+      await this.financialServices.fetchFundingRequestRecentActivities({
+        where: {},
+      });
+
+    return wrapResponseMessage(
+      'Recent activities retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/banks/performance-stats')
+  @HttpCode(HttpStatus.OK)
+  async getPerformanceStats(@Query() query: GetFundingRequestsParamDTO) {
+    const { bankId, from, to } = query;
+    const response =
+      await this.financialServices.fetchFundRequestPerformanceStats({
+        where: {
+          bankId,
+          createdAt: {
+            [Op.between]: [from, to],
+          },
+        },
+      });
+    return wrapResponseMessage(
+      'Performance stats retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/banks/funding-request/stats')
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequestStats(@Query() query: GetFundingRequestsParamDTO) {
+    const { bankId, from, to } = query;
+    const response =
+      await this.financialServices.fetchFundRequestPerformanceStats({
+        where: {
+          bankId,
+          createdAt: {
+            [Op.between]: [from, to],
+          },
+        },
+      });
+    return wrapResponseMessage('Stats retrieved successfully.', response);
+  }
+
+  @Get('/dashboard/banks/funding-requests/')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const response = await this.financialServices.fetchFundingRequests(query, {
+      where: {
+        bankId: query.bankId,
+        fundingTransactionStatus: query.status,
+        createdAt: {
+          [Op.between]: [query.from, query.to],
+        },
+      },
+    });
+    return wrapResponseMessage(
+      'Funding requests retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/banks/funding-request-recent-activity/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getFundingRequestRecentActivity(
+    @Param('bank_id') bankId: string,
+  ): Promise<any> {
+    const response =
+      await this.financialServices.fetchFundingRequestRecentActivities({
+        where: {
+          bankId,
+        },
+      });
+
+    return wrapResponseMessage(
+      'Recent activities retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/banks/customers/funding-requests-by-bank/stats')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomerStatsByBankId(
     @Query() query: GetCustomerFundingRequestsParamDTO,
   ) {
-    const { businessId } = query;
+    const { bankId } = query;
     const response = await this.financialServices.fetchFundingCustomerStats({
       where: {
-        businessEntityId: businessId,
+        bankId,
       },
     });
 
@@ -175,7 +260,7 @@ export class AdminUserController {
     );
   }
 
-  @Get('/funding-customers-requests')
+  @Get('/dashboard/banks/customers/funding-requests-by-bank')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomersRequests(
     @Query() query: GetFundingRequestsParamDTO,
@@ -203,7 +288,34 @@ export class AdminUserController {
     );
   }
 
-  @Get('/funding-customers-stats')
+  @Get('/dashboard/customers/funding-customers-requests')
+  @HttpCode(HttpStatus.OK)
+  async getFundingCustomersRequestsForCustomerDashboard(
+    @Query() query: GetFundingRequestsParamDTO,
+  ) {
+    const { from, to, rows, page, status } = query;
+    const response = await this.financialServices.fetchCustomerFundingRequest(
+      {
+        where: {
+          fundingTransactionStatus: status,
+          createdAt: {
+            [Op.between]: [from, to],
+          },
+        },
+      },
+      {
+        rows,
+        page,
+      },
+    );
+
+    return wrapResponseMessage(
+      'Funding customer requests retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/customers/funding-customers-stats')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomersStats(
     @Query() query: GetCustomerFundingRequestsParamDTO,
@@ -211,7 +323,6 @@ export class AdminUserController {
     const { bankId, from, to } = query;
     const response = await this.financialServices.fetchFundingCustomerStats({
       where: {
-        bankId,
         createdAt: {
           [Op.between]: [from, to],
         },
@@ -224,30 +335,21 @@ export class AdminUserController {
     );
   }
 
-  @Get('/funding-request-recent-activity/:bank_id')
+  @Get('/dashboard/customers/funding-requests-by-business-id')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async getFundingRequestRecentActivity(
-    @Param('bank_id') bankId: string,
-  ): Promise<any> {
-    const response =
-      await this.financialServices.fetchFundingRequestRecentActivities({
-        where: {
-          bankId,
+  async getFundingRequestsByBusiness(
+    @Query() query: GetFundingRequestsParamDTO,
+  ) {
+    const response = await this.financialServices.fetchFundingRequests(query, {
+      where: {
+        businessEntityId: query.businessId,
+        fundingTransactionStatus: query.status,
+        createdAt: {
+          [Op.between]: [query.from, query.to],
         },
-      });
-
-    return wrapResponseMessage(
-      'Recent activities retrieved successfully.',
-      response,
-    );
-  }
-
-  @Get('/funding-requests/:bank_id')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  async getFundingRequests(@Query() query: GetFundingRequestsParamDTO) {
-    const response = await this.financialServices.fetchFundingRequests(query);
+      },
+    });
     return wrapResponseMessage(
       'Funding requests retrieved successfully.',
       response,

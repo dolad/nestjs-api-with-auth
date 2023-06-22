@@ -337,7 +337,10 @@ export class FinancialInformationServices {
     return response;
   }
 
-  async fetchFundingRequests(payload: GetFundingRequestsParamDTO): Promise<{
+  async fetchFundingRequests(
+    payload: GetFundingRequestsParamDTO,
+    filter: Filterable<FundingRequest>,
+  ): Promise<{
     page: number;
     totalPages: number;
     rows: FundingRequest[];
@@ -349,12 +352,7 @@ export class FinancialInformationServices {
     });
 
     const options = {
-      where: {
-        bankId: payload.bankId,
-        createdAt: {
-          [Op.between]: [payload.from, payload.to],
-        },
-      },
+      where: filter.where,
       include: [
         {
           model: this.businessEntityRepo,
