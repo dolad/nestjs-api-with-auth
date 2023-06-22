@@ -98,7 +98,11 @@ export class AuthService {
     return {
       email: user.email,
       id: user.id,
-      token: await this.generateAccessToken(user),
+      token: await this.generateAccessToken({
+        email: user.email,
+        userId: user.id,
+        login_route: 'general',
+      }),
     };
   }
 
@@ -205,7 +209,11 @@ export class AuthService {
     return {
       email: user.email,
       id: user.id,
-      token: await this.generateAccessToken(user),
+      token: await this.generateAccessToken({
+        email: user.email,
+        userId: user.id,
+        login_route: 'general',
+      }),
     };
   }
 
@@ -243,8 +251,8 @@ export class AuthService {
     return newUser;
   }
 
-  private async generateAccessToken(user: any): Promise<string> {
-    const jwtPayload = { email: user.email, userId: user.id };
+  async generateAccessToken(payload: any): Promise<string> {
+    const jwtPayload = payload;
     return this.jwtService.sign(jwtPayload, {
       secret: this.config.get('jwt').jwtSecret,
     });
@@ -341,7 +349,11 @@ export class AuthService {
     return {
       email: user.email,
       id: user.id,
-      token: await this.generateAccessToken(user),
+      token: await this.generateAccessToken({
+        email: user.email,
+        userId: user.id,
+        login_route: 'general',
+      }),
     };
   }
 

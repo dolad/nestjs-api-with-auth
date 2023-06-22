@@ -231,7 +231,11 @@ export class AdminUserController {
     @Param('bank_id') bankId: string,
   ): Promise<any> {
     const response =
-      await this.financialServices.fetchFundingRequestRecentActivities(bankId);
+      await this.financialServices.fetchFundingRequestRecentActivities({
+        where: {
+          bankId,
+        },
+      });
 
     return wrapResponseMessage(
       'Recent activities retrieved successfully.',

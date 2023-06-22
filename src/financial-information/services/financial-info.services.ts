@@ -269,9 +269,7 @@ export class FinancialInformationServices {
   }
 
   async fetchFundRequestPerformanceStats(
-    bankId: string,
-    from: Date,
-    to: Date,
+    filter: Filterable<FundingRequest>,
   ): Promise<{
     totalAmountRequested: number;
     totalAmountIssued: number;
@@ -279,12 +277,7 @@ export class FinancialInformationServices {
     totalAmountPending: number;
   }> {
     const response = await this.fundingRequest.findAll({
-      where: {
-        bankId,
-        createdAt: {
-          [Op.between]: [from, to],
-        },
-      },
+      where: filter.where,
       include: [
         {
           model: this.businessEntityRepo,
@@ -328,12 +321,10 @@ export class FinancialInformationServices {
   }
 
   async fetchFundingRequestRecentActivities(
-    bankId: string,
+    filter: Filterable<FundingRequest>,
   ): Promise<FundingRequest[]> {
     const response = await this.fundingRequest.findAll({
-      where: {
-        bankId,
-      },
+      where: filter.where,
       include: [
         {
           model: this.businessEntityRepo,
