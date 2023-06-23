@@ -90,3 +90,17 @@ export class GetFundingRequestsParamDTO extends GetPerformanceStatParam {
   @IsOptional()
   page?: number;
 }
+
+export class GetFundingRequestsByBusinessIdDTO extends GetFundingRequestsParamDTO {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  businessId: string;
+}
+
+export class GetFundingRequestsByBankIdDTO extends GetFundingRequestsParamDTO {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  bankId: string;
+}

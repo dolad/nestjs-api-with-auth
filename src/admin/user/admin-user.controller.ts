@@ -30,6 +30,8 @@ import { AdminService } from './admin-user.services';
 import { FinancialInformationServices } from 'src/financial-information/services/financial-info.services';
 import { GetCustomerFundingRequestsParamDTO } from 'src/financial-information/dto/performance-stat-dto';
 import {
+  GetFundingRequestsByBankIdDTO,
+  GetFundingRequestsByBusinessIdDTO,
   GetFundingRequestsParamDTO,
   GetPerformanceStatParam,
 } from 'src/financial-information/dto/funding-request.dto';
@@ -189,14 +191,24 @@ export class AdminUserController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getFundingRequests(@Query() query: GetFundingRequestsParamDTO) {
+    const whereOption = {};
+
+    if (query.from && query.to) {
+      whereOption['createdAt'] = {
+        [Op.between]: [query.from, query.to],
+      };
+    }
+
+    if (query.status) {
+      whereOption['fundingTransactionStatus'] = query.status;
+    }
+
+    if (query.bankId) {
+      whereOption['bankId'] = query.bankId;
+    }
+
     const response = await this.financialServices.fetchFundingRequests(query, {
-      where: {
-        bankId: query.bankId,
-        fundingTransactionStatus: query.status,
-        createdAt: {
-          [Op.between]: [query.from, query.to],
-        },
-      },
+      where: whereOption,
     });
     return wrapResponseMessage(
       'Funding requests retrieved successfully.',
@@ -226,7 +238,7 @@ export class AdminUserController {
   @Get('/dashboard/banks/customers/funding-requests-by-bank/stats')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomerStatsByBankId(
-    @Query() query: GetCustomerFundingRequestsParamDTO,
+    @Query() query: GetFundingRequestsByBankIdDTO,
   ) {
     const { bankId } = query;
     const response = await this.financialServices.fetchFundingCustomerStats({
@@ -244,18 +256,27 @@ export class AdminUserController {
   @Get('/dashboard/banks/customers/funding-requests-by-bank')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomersRequests(
-    @Query() query: GetFundingRequestsParamDTO,
+    @Query() query: GetFundingRequestsByBankIdDTO,
   ) {
     const { bankId, from, to, rows, page, status } = query;
+
+    const whereOption = {
+      bankId,
+    };
+
+    if (query.from && query.to) {
+      whereOption['createdAt'] = {
+        [Op.between]: [query.from, query.to],
+      };
+    }
+
+    if (query.status) {
+      whereOption['fundingTransactionStatus'] = query.status;
+    }
+
     const response = await this.financialServices.fetchCustomerFundingRequest(
       {
-        where: {
-          bankId,
-          fundingTransactionStatus: status,
-          createdAt: {
-            [Op.between]: [from, to],
-          },
-        },
+        where: whereOption,
       },
       {
         rows,
@@ -275,14 +296,22 @@ export class AdminUserController {
     @Query() query: GetFundingRequestsParamDTO,
   ) {
     const { from, to, rows, page, status } = query;
+
+    const whereOption = {};
+
+    if (from && to) {
+      whereOption['createdAt'] = {
+        [Op.between]: [from, to],
+      };
+    }
+
+    if (status) {
+      whereOption['fundingTransactionStatus'] = status;
+    }
+
     const response = await this.financialServices.fetchCustomerFundingRequest(
       {
-        where: {
-          fundingTransactionStatus: status,
-          createdAt: {
-            [Op.between]: [from, to],
-          },
-        },
+        where: whereOption,
       },
       {
         rows,
@@ -301,12 +330,17 @@ export class AdminUserController {
   async getFundingCustomersStats(
     @Query() query: GetCustomerFundingRequestsParamDTO,
   ) {
-    const { bankId, from, to } = query;
+    const { from, to } = query;
+    const date_filter = {};
+
+    if (from && to) {
+      date_filter['createdAt'] = {
+        [Op.between]: [from, to],
+      };
+    }
     const response = await this.financialServices.fetchFundingCustomerStats({
       where: {
-        createdAt: {
-          [Op.between]: [from, to],
-        },
+        ...date_filter,
       },
     });
 
@@ -320,15 +354,25 @@ export class AdminUserController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getFundingRequestsByBusiness(
-    @Query() query: GetFundingRequestsParamDTO,
+    @Query() query: GetFundingRequestsByBusinessIdDTO,
   ) {
+    const filter = {};
+
+    if (query.from && query.to) {
+      filter['createdAt'] = {
+        [Op.between]: [query.from, query.to],
+      };
+    }
+
+    if (query.status) {
+      filter['fundingTransactionStatus'] = query.status;
+    }
+
     const response = await this.financialServices.fetchFundingRequests(query, {
       where: {
         businessEntityId: query.businessId,
         fundingTransactionStatus: query.status,
-        createdAt: {
-          [Op.between]: [query.from, query.to],
-        },
+        ...filter,
       },
     });
     return wrapResponseMessage(
