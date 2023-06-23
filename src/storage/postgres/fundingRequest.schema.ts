@@ -71,12 +71,6 @@ export class FundingRequest extends Model<
   paymentPeriod: string;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  fundingBank: string;
-
-  @Column({
     type: DataType.FLOAT,
     allowNull: false,
   })
@@ -90,7 +84,7 @@ export class FundingRequest extends Model<
 
   @Column({
     type: DataType.FLOAT,
-    allowNull: false,
+    allowNull: true,
   })
   issuedAmount?: number;
 
@@ -103,9 +97,9 @@ export class FundingRequest extends Model<
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
-  approvedBy: string;
+  approvedBy?: string;
 
   @Column({
     type: DataType.STRING,
