@@ -268,16 +268,26 @@ export class FinancialInformationServices {
     return fundingPatner;
   }
 
-  async fetchFundRequestPerformanceStats(
-    filter: Filterable<FundingRequest>,
-  ): Promise<{
+  async fetchFundRequestPerformanceStats(query: any): Promise<{
     totalAmountRequested: number;
     totalAmountIssued: number;
     totalAmountDeclined: number;
     totalAmountPending: number;
   }> {
+    const { bankId, from, to, status } = query;
+    const whereOption: any = {};
+    if (bankId) {
+      whereOption.bankId = bankId;
+    }
+
+    if (from && to) {
+      whereOption.createdAt = {
+        [Op.between]: [from, to],
+      };
+    }
+
     const response = await this.fundingRequest.findAll({
-      where: filter.where,
+      where: whereOption,
       include: [
         {
           model: this.businessEntityRepo,
@@ -297,7 +307,6 @@ export class FinancialInformationServices {
     }, 0);
 
     const totalAmountDeclined = response.reduce((acc, item) => {
-      //check if the item is declined
       if (item.fundingTransactionStatus === 'declined') {
         const fundingAmount = item.fundingAmount ?? 0;
         return acc + fundingAmount;
@@ -305,7 +314,6 @@ export class FinancialInformationServices {
     }, 0);
 
     const totalAmountPending = response.reduce((acc, item) => {
-      //check if the item is declined
       if (item.fundingTransactionStatus === 'pending') {
         const fundingAmount = item.fundingAmount ?? 0;
         return acc + fundingAmount;

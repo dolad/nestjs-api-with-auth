@@ -142,15 +142,8 @@ export class AdminUserController {
   async getGeneralFundingStatsStats(
     @Query() query: GetFundingRequestsParamDTO,
   ) {
-    const { from, to } = query;
     const response =
-      await this.financialServices.fetchFundRequestPerformanceStats({
-        where: {
-          createdAt: {
-            [Op.between]: [from, to],
-          },
-        },
-      });
+      await this.financialServices.fetchFundRequestPerformanceStats(query);
     return wrapResponseMessage(
       'Performance stats retrieved successfully.',
       response,
@@ -175,16 +168,8 @@ export class AdminUserController {
   @Get('/dashboard/banks/performance-stats')
   @HttpCode(HttpStatus.OK)
   async getPerformanceStats(@Query() query: GetPerformanceStatParam) {
-    const { bankId, from, to } = query;
     const response =
-      await this.financialServices.fetchFundRequestPerformanceStats({
-        where: {
-          bankId,
-          createdAt: {
-            [Op.between]: [from, to],
-          },
-        },
-      });
+      await this.financialServices.fetchFundRequestPerformanceStats(query);
     return wrapResponseMessage(
       'Performance stats retrieved successfully.',
       response,
@@ -194,16 +179,9 @@ export class AdminUserController {
   @Get('/dashboard/banks/funding-request/stats')
   @HttpCode(HttpStatus.OK)
   async getFundingRequestStats(@Query() query: GetFundingRequestsParamDTO) {
-    const { bankId, from, to } = query;
     const response =
-      await this.financialServices.fetchFundRequestPerformanceStats({
-        where: {
-          bankId,
-          createdAt: {
-            [Op.between]: [from, to],
-          },
-        },
-      });
+      await this.financialServices.fetchFundRequestPerformanceStats(query);
+
     return wrapResponseMessage('Stats retrieved successfully.', response);
   }
 
