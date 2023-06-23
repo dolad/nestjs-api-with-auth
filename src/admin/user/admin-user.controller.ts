@@ -29,7 +29,10 @@ import { UpdatePatnerInformationDTO } from './dto/updateProvider.dto';
 import { AdminService } from './admin-user.services';
 import { FinancialInformationServices } from 'src/financial-information/services/financial-info.services';
 import { GetCustomerFundingRequestsParamDTO } from 'src/financial-information/dto/performance-stat-dto';
-import { GetFundingRequestsParamDTO } from 'src/financial-information/dto/funding-request.dto';
+import {
+  GetFundingRequestsParamDTO,
+  GetPerformanceStatParam,
+} from 'src/financial-information/dto/funding-request.dto';
 import { Op } from 'sequelize';
 
 @Controller('admin-user')
@@ -114,7 +117,7 @@ export class AdminUserController {
     return wrapResponseMessage('Partner user updated', response);
   }
 
-  @Get('dashoboard/data')
+  @Get('dashboard/data')
   async getDashboards(@Request() req): Promise<IResponseMessage> {
     const response = await this.adminServices.getDashBoardData();
     return wrapResponseMessage('Dashboard data fetched', response);
@@ -171,7 +174,7 @@ export class AdminUserController {
 
   @Get('/dashboard/banks/performance-stats')
   @HttpCode(HttpStatus.OK)
-  async getPerformanceStats(@Query() query: GetFundingRequestsParamDTO) {
+  async getPerformanceStats(@Query() query: GetPerformanceStatParam) {
     const { bankId, from, to } = query;
     const response =
       await this.financialServices.fetchFundRequestPerformanceStats({

@@ -48,16 +48,10 @@ export class AddFundingRequest {
   amountSpendOnResearch: number;
 }
 
-export class GetFundingRequestsParamDTO {
+export class GetPerformanceStatParam {
   @ApiProperty()
   @IsString()
-  @IsOptional()
   bankId: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  businessId: string;
 
   @ApiProperty()
   @IsDate()
@@ -68,6 +62,18 @@ export class GetFundingRequestsParamDTO {
   @IsDate()
   @IsOptional()
   to: Date;
+}
+
+export class GetFundingRequestsParamDTO extends GetPerformanceStatParam {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  bankId: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  businessId: string;
 
   @ApiProperty()
   @IsString()
