@@ -1,6 +1,6 @@
 export interface PaginationParamsInput {
-  rows: number;
-  page: number;
+  rows?: number;
+  page?: number;
 }
 
 export interface PaginationParamsOutput extends PaginationParamsInput {

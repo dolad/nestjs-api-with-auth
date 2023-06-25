@@ -230,7 +230,6 @@ export class UserServices {
   async addPatner(payload: AddPatnerDTO): Promise<{ id: string }> {
     const partnerExist = await this.partnerModel.findOne({
       where: {
-        providerName: payload.providerName.toLowerCase(),
         email: payload.email.toLowerCase(),
       },
     });

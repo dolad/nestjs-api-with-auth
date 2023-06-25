@@ -11,6 +11,10 @@ import { AuthService } from '../../auth/services/auth.services';
 import { HashManager } from '../../auth/utils/hash';
 import { FinancialInformationServices } from '../../financial-information/services/financial-info.services';
 import { Op } from 'sequelize';
+import {
+  FundingRepaymentStatus,
+  FundingTransationStatus,
+} from 'src/config/interface';
 
 @Injectable()
 export class PartnerServices {
@@ -41,10 +45,6 @@ export class PartnerServices {
 
     this.logger.log('partner login successful');
 
-    // return await this.partnerRepository
-    //   .scope('removeSensitivePayload')
-    //   .findByPk(partner.id);
-
     return {
       email,
       partner_id: partner.id,
@@ -61,7 +61,7 @@ export class PartnerServices {
     const hashed_password = await hashManager.bHash(password);
     await this.partnerRepository.update(
       {
-        password,
+        password: hashed_password,
       },
       {
         where: {
@@ -87,17 +87,31 @@ export class PartnerServices {
     return partner;
   }
 
-  async performanceStats(partnerId: string, from: string, to: string) {
+  async performanceStats(partnerId: string) {
     const response =
       await this.financialServices.fetchFundRequestPerformanceStats({
         where: {
           bankId: partnerId,
-          createdAt: {
-            [Op.between]: [from, to],
-          },
         },
       });
-    return response;
+
+    const fundingRequestByStatus =
+      await this.financialServices.fetchFundingRequestsByPartnerId(partnerId);
+    const pendingRequest = fundingRequestByStatus.filter(
+      (request) =>
+        request.fundingTransactionStatus === FundingTransationStatus.PENDING,
+    ).length;
+    const upcomingRequest = fundingRequestByStatus.filter(
+      (request) =>
+        request.repaymentStatus === FundingRepaymentStatus.PARTIAL_PAYMENT,
+    ).length;
+
+    return {
+      ...response,
+      allFundRequest: fundingRequestByStatus.length,
+      pendingRequest: pendingRequest,
+      upcomingRequest: upcomingRequest,
+    };
   }
 
   async fundingRecentActivities(partnerId: string) {

@@ -31,6 +31,9 @@ import {
 import { supportedCountryPayload } from '../mockRequest/connection';
 import { SaltEdge } from './saltedge.service';
 import { getPaginationParams } from '../../utils/pagination';
+import { BusinessInformation } from 'src/storage/postgres/business-information.schema';
+import { ApproveFundRequestPartnerDTO } from '../dto/approveFundingRequest.dto';
+import { FundingTransationStatus } from 'src/config/interface';
 
 @Injectable()
 export class FinancialInformationServices {
@@ -190,7 +193,7 @@ export class FinancialInformationServices {
     return 'Successfully disconnect bank';
   }
 
-  async fetchTransaction(businessId: string) {
+  async getBusinessBankStatement(businessId: string) {
     const financialConnectRecord = await this.findFinancialConnectByBusinessId(
       businessId,
     );
@@ -274,7 +277,7 @@ export class FinancialInformationServices {
     totalAmountDeclined: number;
     totalAmountPending: number;
   }> {
-    const { bankId, from, to, status } = query;
+    const { bankId, from, to } = query;
     const whereOption: any = {};
     if (bankId) {
       whereOption.bankId = bankId;
@@ -307,14 +310,14 @@ export class FinancialInformationServices {
     }, 0);
 
     const totalAmountDeclined = response.reduce((acc, item) => {
-      if (item.fundingTransactionStatus === 'declined') {
+      if (item.fundingTransactionStatus === FundingTransationStatus.DECLINED) {
         const fundingAmount = item.fundingAmount ?? 0;
         return acc + fundingAmount;
       }
     }, 0);
 
     const totalAmountPending = response.reduce((acc, item) => {
-      if (item.fundingTransactionStatus === 'pending') {
+      if (item.fundingTransactionStatus === FundingTransationStatus.PENDING) {
         const fundingAmount = item.fundingAmount ?? 0;
         return acc + fundingAmount;
       }
@@ -384,7 +387,6 @@ export class FinancialInformationServices {
   }
 
   async fetchFundingCustomerStats(filter: Filterable<FundingRequest>) {
-    //fetch funding request with distinct business entity
     const fundingRequest = await this.fundingRequest.findAll({
       where: {
         ...filter.where,
@@ -419,8 +421,6 @@ export class FinancialInformationServices {
       page: pagination.page,
     });
 
-    //get all funding request
-    //count number of funding request of each customer
     const options = {
       where: {
         ...filter.where,
@@ -446,5 +446,48 @@ export class FinancialInformationServices {
       rows: response.rows,
       count: response.count,
     };
+  }
+
+  async fetchFundingRequestsByPartnerId(partnerId: string) {
+    const fundingRequest = await this.fundingRequest.findAll({
+      where: {
+        bankId: partnerId,
+      },
+    });
+
+    return fundingRequest;
+  }
+
+  async fetchFundingRequestById(fundingRequestId: string) {
+    const fundingRequest = await this.fundingRequest.findOne({
+      where: {
+        id: fundingRequestId,
+      },
+      include: [
+        {
+          model: this.businessEntityRepo,
+          as: 'businessEntity',
+          include: [BusinessInformation, FundingRequest],
+        },
+      ],
+    });
+
+    return fundingRequest;
+  }
+
+  async approveRequest(param: ApproveFundRequestPartnerDTO, userId: string) {
+    const response = await this.fundingRequest.update(
+      {
+        approvedBy: userId,
+        comments: param.comments,
+        fundingTransactionStatus: param.status,
+      },
+      {
+        where: {
+          id: param.fundingId,
+        },
+      },
+    );
+    return response;
   }
 }

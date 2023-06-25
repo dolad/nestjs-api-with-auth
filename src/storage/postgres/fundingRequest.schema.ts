@@ -29,6 +29,7 @@ export type FundingRequestAttributes = {
   fundingTransactionStatus?: FundingTransationStatus;
   approvedBy?: string;
   repaymentStatus?: FundingRepaymentStatus;
+  comments?: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -121,6 +122,13 @@ export class FundingRequest extends Model<
 
   @BelongsTo(() => Partner)
   bankEntity?: Partner;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    defaultValue: null,
+  })
+  comments?: string;
 
   @Column({
     type: DataType.DATE,

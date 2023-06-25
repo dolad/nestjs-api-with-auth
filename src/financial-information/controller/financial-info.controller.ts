@@ -24,6 +24,7 @@ import {
 } from '../dto/funding-request.dto';
 import { RemoveConnectedBankDTO } from '../dto/remove-connected-bank.dto';
 import { FinancialInformationServices } from '../services/financial-info.services';
+import { Op } from 'sequelize';
 
 @Controller('financial-information')
 @ApiTags('Financial')
@@ -57,7 +58,7 @@ export class FinancialInfoController {
     return wrapResponseMessage('business Information Successfully', response);
   }
 
-  @Post('/funding-requirement')
+  @Post('/funding-request')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async addFundingRequirement(

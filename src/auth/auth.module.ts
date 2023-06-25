@@ -14,6 +14,7 @@ import { NotificationModule } from 'src/notification/notification.module';
 import { AdminRouteGuard } from './guards/admin.guard';
 import { ClientRouteGuard } from './guards/business.guard';
 import { PartnerModule } from 'src/partner/partner.module';
+import { PartnerRouteGuard } from './guards/partner.guard';
 
 @Module({
   imports: [

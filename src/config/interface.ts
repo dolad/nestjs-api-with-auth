@@ -28,7 +28,7 @@ export enum Environment {
 
 export enum FundingTransationStatus {
   PENDING = 'pending',
-  DECLINED = 'declined',
+  DECLINED = 'rejected',
   APPROVED = 'approved',
   DISBURSED = 'disbursed',
 }

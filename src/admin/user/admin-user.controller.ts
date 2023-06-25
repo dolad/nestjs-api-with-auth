@@ -131,11 +131,13 @@ export class AdminUserController {
     return wrapResponseMessage('Dashboard data fetched', response);
   }
 
-  @Get('business/bankStatement/:businessId')
+  @Get('business/documents/:businessId')
   async getBusinessBankStatemnt(
     @Param('businessId') businessId: string,
   ): Promise<IResponseMessage> {
-    const response = await this.financialServices.fetchTransaction(businessId);
+    const response = await this.financialServices.getBusinessBankStatement(
+      businessId,
+    );
     return wrapResponseMessage('Dashboard data fetched', response);
   }
 
@@ -188,7 +190,6 @@ export class AdminUserController {
   }
 
   @Get('/dashboard/banks/funding-requests/')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getFundingRequests(@Query() query: GetFundingRequestsParamDTO) {
     const whereOption = {};
