@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class FetchPerformanceStatsDTO {
   @ApiProperty()
@@ -8,12 +14,12 @@ export class FetchPerformanceStatsDTO {
   bankId: string;
 
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   @IsNotEmpty()
   from: Date;
 
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   @IsNotEmpty()
   to: Date;
 }
@@ -30,12 +36,12 @@ export class GetCustomerFundingRequestsParamDTO {
   businessId: string;
 
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   from: Date;
 
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   to: Date;
 }

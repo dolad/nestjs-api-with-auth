@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDate,
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -54,12 +54,12 @@ export class GetPerformanceStatParam {
   bankId: string;
 
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   from: Date;
 
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   to: Date;
 }
