@@ -24,6 +24,7 @@ import { GetFundingRequestsParamDTO } from 'src/financial-information/dto/fundin
 import { FinancialInformationServices } from 'src/financial-information/services/financial-info.services';
 import { ApproveFundRequestPartnerDTO } from 'src/financial-information/dto/approveFundingRequest.dto';
 import { PartnerRouteGuard } from 'src/auth/guards/partner.guard';
+import { GetFundingRequestsPartnerParamDTO } from '../dto/getFundingRequest.dto';
 
 @Controller('partner')
 @ApiTags('Partner')
@@ -68,7 +69,6 @@ export class PartnerController {
   @Get('/funding-request/recent-activities')
   @UseGuards(JwtAuthGuard, PartnerRouteGuard)
   async getRecentFundingRequests(@Request() req) {
-    console.log(req.user.partnerId);
     const response = await this.partnerService.fundingRecentActivities(
       req.user.partnerId,
     );
@@ -83,7 +83,7 @@ export class PartnerController {
   @UseGuards(JwtAuthGuard, PartnerRouteGuard)
   async getFundingRequests(
     @Request() req,
-    @Query() query: GetFundingRequestsParamDTO,
+    @Query() query: GetFundingRequestsPartnerParamDTO,
   ) {
     const whereOption = {
       bankId: req.user.partnerId,

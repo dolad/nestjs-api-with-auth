@@ -1,13 +1,7 @@
-import { Module } from "@nestjs/common";
-import { PostgresModule } from "./postgres/postgres.module";
-
-console.log(process.env.NODE_ENV)
+import { Module } from '@nestjs/common';
+import { PostgresModule } from './postgres/postgres.module';
 
 @Module({
-    imports: [
-         PostgresModule,
-    ],
-   
+  imports: [PostgresModule],
 })
-
 export class StorageModule {}

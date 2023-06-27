@@ -56,12 +56,12 @@ export class GetPerformanceStatParam {
   @ApiProperty()
   @IsDateString()
   @IsOptional()
-  from: Date;
+  from?: Date;
 
   @ApiProperty()
   @IsDateString()
   @IsOptional()
-  to: Date;
+  to?: Date;
 }
 
 export class GetFundingRequestsParamDTO extends GetPerformanceStatParam {
@@ -73,7 +73,7 @@ export class GetFundingRequestsParamDTO extends GetPerformanceStatParam {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  businessId: string;
+  businessId?: string;
 
   @ApiProperty()
   @IsString()

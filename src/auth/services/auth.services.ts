@@ -6,9 +6,14 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { User } from 'src/storage/postgres/user.schema';
-import { USER_REPOSITORY, USER_SESSION } from '../../utils/constants';
+import {
+  PATNER_REPOSITORY,
+  USER_REPOSITORY,
+  USER_SESSION,
+} from '../../utils/constants';
 import { RegistrationDTO } from '../dtos/registration.dto';
 import { LoginDTO } from '../dtos/login.dto';
 import { LoginOutput } from '../types/loginOut.type';
@@ -30,6 +35,7 @@ import {
 } from 'src/user/types/user.types';
 import { v4 as uuidv4 } from 'uuid';
 import { NotificationService } from 'src/notification/notification.service';
+import { Partner } from 'src/storage/postgres/partner.schema';
 
 @Injectable()
 export class AuthService {
@@ -38,11 +44,12 @@ export class AuthService {
     @Inject(USER_REPOSITORY) private userRepos: typeof User,
     @Inject(USER_SESSION) private userSession: typeof UserSession,
     private readonly jwtService: JwtService,
-    private eventEmitter: EventEmitter2,
     private readonly config: ConfigService,
     @Inject(forwardRef(() => UserServices))
     private readonly userService: UserServices,
     private readonly notificationService: NotificationService,
+    @Inject(PATNER_REPOSITORY)
+    private readonly partnerModel: typeof Partner,
   ) {}
 
   async register(payload: RegistrationDTO): Promise<string> {
@@ -144,10 +151,27 @@ export class AuthService {
     lastSession.save();
   }
 
-  async authUser(user: any): Promise<User> {
-    return await this.userRepos
+  async authUser(user: any): Promise<User | Partner> {
+    const authUser = await this.userRepos
       .scope('removeSensitivePayload')
-      .findByPk(user.userId);
+      .findOne({
+        where: {
+          email: user.email,
+        },
+      });
+
+    const partnerAuthUser = await this.partnerModel
+      .scope('removeSensitivePayload')
+      .findOne({
+        where: {
+          email: user.email,
+        },
+      });
+
+    if (!authUser && !partnerAuthUser)
+      throw new UnauthorizedException('Not found');
+
+    return authUser || partnerAuthUser;
   }
 
   async resendRegistrationToken(email: string) {

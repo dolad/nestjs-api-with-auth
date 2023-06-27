@@ -6,11 +6,9 @@ import {
 } from '@nestjs/common';
 import { PATNER_REPOSITORY } from '../../utils/constants';
 import { Partner } from '../../storage/postgres/partner.schema';
-import { UserServices } from '../../user/services/user.services';
 import { AuthService } from '../../auth/services/auth.services';
 import { HashManager } from '../../auth/utils/hash';
 import { FinancialInformationServices } from '../../financial-information/services/financial-info.services';
-import { Op } from 'sequelize';
 import {
   FundingRepaymentStatus,
   FundingTransationStatus,
