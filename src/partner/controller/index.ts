@@ -25,6 +25,7 @@ import { FinancialInformationServices } from 'src/financial-information/services
 import { ApproveFundRequestPartnerDTO } from 'src/financial-information/dto/approveFundingRequest.dto';
 import { PartnerRouteGuard } from 'src/auth/guards/partner.guard';
 import { GetFundingRequestsPartnerParamDTO } from '../dto/getFundingRequest.dto';
+import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 
 @Controller('partner')
 @ApiTags('Partner')
@@ -35,8 +36,9 @@ export class PartnerController {
   ) {}
 
   @Post('/login')
-  async login(@Body() body: PartnerLoginDTO) {
-    const response = await this.partnerService.login(body.email, body.password);
+  @UseGuards(LocalAuthGuard)
+  async login(@Request() req, @Body() body: PartnerLoginDTO) {
+    const response = await this.partnerService.login(req.user, body);
 
     return wrapResponseMessage('Partner login successful', response);
   }

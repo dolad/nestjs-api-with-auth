@@ -148,7 +148,7 @@ export class AuthController {
 
   @ApiResponse({
     status: 200,
-    description: 'Password Reset',
+    description: 'Verify TwoFa',
   })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post('verify-2fa')

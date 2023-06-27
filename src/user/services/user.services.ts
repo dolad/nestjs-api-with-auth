@@ -73,12 +73,26 @@ export class UserServices {
       },
     });
 
-    if (userTwoFaEnable.twoFactorAuth) {
+    const parterTwoFaEnabled = await this.partnerModel.findOne({
+      where: {
+        email: user.email,
+      },
+    });
+
+    if (userTwoFaEnable.twoFactorAuth || parterTwoFaEnabled.twoFactorAuth) {
       return 'Two Factor Already Enabled for this Stream Already';
     }
-    userTwoFaEnable.twoFactorAuth = twoFactorAuth;
-    userTwoFaEnable.save();
-    return 'Two Factor Authentication Enabled Succesfully';
+    if (userTwoFaEnable) {
+      userTwoFaEnable.twoFactorAuth = twoFactorAuth;
+      userTwoFaEnable.save();
+      return 'Two Factor Authentication Enabled Succesfully';
+    }
+    if (parterTwoFaEnabled) {
+      parterTwoFaEnabled.twoFactorAuth = twoFactorAuth;
+      parterTwoFaEnabled.save();
+      return 'Two Factor Authentication Enabled Succesfully';
+    }
+    throw new ConflictException('Not found exception');
   }
 
   async findById(id: string): Promise<User> {
@@ -110,18 +124,42 @@ export class UserServices {
     payload: UpdateCreatorDetails,
     user: IAuthUser,
   ): Promise<string> {
-    await this.userRepos.update(
-      {
-        ...payload,
+    const isUser = this.findByEmail(user.email);
+    const isPartner = await this.partnerModel.findOne({
+      where: {
+        email: user.email,
       },
-      {
-        where: {
-          id: user.userId,
+    });
+    if (isUser) {
+      await this.userRepos.update(
+        {
+          ...payload,
         },
-      },
-    );
+        {
+          where: {
+            id: user.userId,
+          },
+        },
+      );
 
-    return 'Creator Updated Successfully';
+      return 'User Updated Successfully';
+    }
+
+    if (isPartner) {
+      await this.partnerModel.update(
+        {
+          ...payload,
+          logoUrl: payload.profileImage,
+        },
+        {
+          where: {
+            id: user.userId,
+          },
+        },
+      );
+
+      return 'Partner Updated Successfully';
+    }
   }
 
   async addBusinessEntityUser(

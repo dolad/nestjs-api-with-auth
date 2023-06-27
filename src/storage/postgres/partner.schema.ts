@@ -36,6 +36,8 @@ export interface PartnerAttributes {
   repaymentTime: string;
   logoUrl: string;
   isActive: boolean;
+  twoFactorAuth?: string;
+  twoFaToken?: string;
 }
 
 export type PartnerCreateAttributes = Optional<PartnerAttributes, 'id'>;
@@ -183,6 +185,20 @@ export class Partner extends Model<PartnerAttributes, PartnerCreateAttributes> {
     allowNull: false,
   })
   repaymentTime?: string;
+
+  @Column({
+    allowNull: true,
+    type: DataType.STRING,
+    defaultValue: null,
+  })
+  twoFaToken?: string;
+
+  @Column({
+    allowNull: true,
+    type: DataType.STRING,
+    defaultValue: null,
+  })
+  twoFactorAuth?: string;
 
   @Column({
     type: DataType.BOOLEAN,

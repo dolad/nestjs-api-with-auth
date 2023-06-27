@@ -15,10 +15,9 @@ import {
   USER_SESSION,
 } from '../../utils/constants';
 import { RegistrationDTO } from '../dtos/registration.dto';
-import { LoginDTO } from '../dtos/login.dto';
+import { CreateSessionDto, LoginDTO } from '../dtos/login.dto';
 import { LoginOutput } from '../types/loginOut.type';
 import { JwtService } from '@nestjs/jwt';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { IEmailNotification } from '../../notification/interface/email-notification.interface';
 import { ConfigService } from '@nestjs/config';
 import { GoogleUserSignInPayload } from '../types/google.type';
@@ -69,13 +68,28 @@ export class AuthService {
    * @param payload LoginDTO
    * @return User
    */
-  async validate(payload: LoginDTO): Promise<User> {
-    const user = await this.userService.findByEmailOrFailed(payload.email);
-    const isPasswordCorrect = await user.isPasswordCorrect(payload.password);
+  async validate(payload: LoginDTO): Promise<User | Partner> {
+    const user = await this.userRepos.findOne({
+      where: {
+        email: payload.email,
+      },
+    });
+
+    const partner = await this.partnerModel.findOne({
+      where: {
+        email: payload.email,
+      },
+    });
+
+    if (!user && !partner) throw new NotFoundException('User not found');
+    const userToCheck = user || partner;
+    const isPasswordCorrect = await userToCheck.isPasswordCorrect(
+      payload.password,
+    );
+
     if (!isPasswordCorrect) throw new ForbiddenException('Invalid credentials');
-    const returnUser = await this.userRepos
-      .scope('removeSensitivePayload')
-      .findByPk(user.id);
+    const returnUser = userToCheck;
+    delete returnUser.password;
     return returnUser;
   }
 
@@ -85,14 +99,12 @@ export class AuthService {
    * @return User
    */
   async login(user: User, loginDto: LoginDTO): Promise<LoginOutput | string> {
-    const userSessionPayload: SessionTypeParams = {
+    await this.createUserSession({
       userId: user.id,
-      sessionId: uuidv4(),
-      deviceInfo: loginDto.deviceName,
+      deviceName: loginDto.deviceName,
       city: loginDto.city,
       country: loginDto.country,
-    };
-    await this.createUserSession(userSessionPayload);
+    });
     const { twoFactorAuth } = user;
     if (!user.isConfirmed) {
       await this.sendRegistrationToken(user);
@@ -113,8 +125,15 @@ export class AuthService {
     };
   }
 
-  async createUserSession(sessionPayload: SessionTypeParams): Promise<void> {
+  async createUserSession(sessionDto: CreateSessionDto): Promise<void> {
     // does user have any session at all
+    const sessionPayload: SessionTypeParams = {
+      userId: sessionDto.userId,
+      sessionId: uuidv4(),
+      deviceInfo: sessionDto.deviceName,
+      city: sessionDto.city,
+      country: sessionDto.country,
+    };
     const userSession = await this.userSession.findAll({
       where: {
         userId: sessionPayload.userId,
@@ -211,14 +230,12 @@ export class AuthService {
     loginDto: GoogleSignDto,
   ): Promise<LoginOutput | string> {
     try {
-      const userSessionPayload: SessionTypeParams = {
+      await this.createUserSession({
         userId: user.id,
-        sessionId: uuidv4(),
-        deviceInfo: loginDto.deviceName,
         city: loginDto.city,
         country: loginDto.country,
-      };
-      await this.createUserSession(userSessionPayload);
+        deviceName: loginDto.deviceName,
+      });
       if (!user.isConfirmed) {
         await this.sendRegistrationToken(user);
         throw new BadRequestException(
@@ -308,7 +325,6 @@ export class AuthService {
       user.email,
       user.userType,
     );
-    console.log(token);
     const verificationLink = `${process.env.FRONT_END_URL}/reset-password?token=${token}`;
     const passwordResetPayload: IEmailNotification = {
       type: 'RESET_PASSWORD_EMAIL',
@@ -326,7 +342,7 @@ export class AuthService {
     return 'password reset link has been sent to your email or phone number';
   }
 
-  private async send2FAToken(user: User): Promise<string> {
+  async send2FAToken(user: User): Promise<string> {
     if (user.twoFactorAuth && user.twoFactorAuth === 'email') {
       return this.dispatchTwoFaTokenEmail(user);
     }
@@ -364,21 +380,40 @@ export class AuthService {
         twoFaToken: token,
       },
     });
-    if (!user) {
-      throw new NotFoundException('Invalid token');
-    }
-    user.twoFaToken = null;
-    user.save();
-
-    return {
-      email: user.email,
-      id: user.id,
-      token: await this.generateAccessToken({
+    const partner = await this.userRepos.findOne({
+      where: {
+        twoFaToken: token,
+      },
+    });
+    if (user) {
+      user.twoFaToken = null;
+      user.save();
+      return {
         email: user.email,
-        userId: user.id,
-        login_route: 'general',
-      }),
-    };
+        id: user.id,
+        token: await this.generateAccessToken({
+          email: user.email,
+          userId: user.id,
+          login_route: 'general',
+        }),
+      };
+    }
+
+    if (partner) {
+      partner.twoFaToken = null;
+      partner.save();
+      return {
+        email: partner.email,
+        id: partner.id,
+        token: await this.generateAccessToken({
+          email: partner.email,
+          userId: partner.id,
+          login_route: 'partner',
+        }),
+      };
+    }
+
+    throw new NotFoundException('Invalid token');
   }
 
   async updatePassword(payload: UpdatePasswordDTO): Promise<string> {

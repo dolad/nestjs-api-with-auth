@@ -13,6 +13,8 @@ import {
   FundingRepaymentStatus,
   FundingTransationStatus,
 } from 'src/config/interface';
+import { User } from 'src/storage/postgres/user.schema';
+import { LoginDTO } from 'src/auth/dtos/login.dto';
 
 @Injectable()
 export class PartnerServices {
@@ -24,31 +26,22 @@ export class PartnerServices {
     private readonly financialServices: FinancialInformationServices,
   ) {}
 
-  async login(email: string, password: string) {
-    const partner = await this.partnerRepository.findOne({
-      where: {
-        email,
-      },
+  async login(user: User, loginDto: LoginDTO) {
+    const { deviceName, city, country } = loginDto;
+    await this.authService.createUserSession({
+      userId: user.id,
+      deviceName,
+      city,
+      country,
     });
 
-    if (!partner) {
-      throw new UnauthorizedException('invalid email or password');
-    }
-
-    const isPasswordCorrect = await partner.isPasswordCorrect(password);
-
-    if (!isPasswordCorrect) {
-      throw new UnauthorizedException('invalid email or password');
-    }
-
     this.logger.log('partner login successful');
-
     return {
-      email,
-      partner_id: partner.id,
+      email: user.email,
+      partner_id: user.id,
       token: await this.authService.generateAccessToken({
-        email,
-        partner_id: partner.id,
+        email: user.email,
+        partner_id: user.id,
         login_route: 'partner',
       }),
     };
