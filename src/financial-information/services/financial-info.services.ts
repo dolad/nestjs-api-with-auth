@@ -34,6 +34,7 @@ import { getPaginationParams } from '../../utils/pagination';
 import { BusinessInformation } from 'src/storage/postgres/business-information.schema';
 import { ApproveFundRequestPartnerDTO } from '../dto/approveFundingRequest.dto';
 import { FundingTransationStatus } from 'src/config/interface';
+import { Partner } from 'src/storage/postgres/partner.schema';
 
 @Injectable()
 export class FinancialInformationServices {
@@ -369,6 +370,9 @@ export class FinancialInformationServices {
           model: this.businessEntityRepo,
           as: 'businessEntity',
         },
+        {
+          model: Partner,
+        },
       ],
       offset,
       limit: rows,
@@ -467,7 +471,7 @@ export class FinancialInformationServices {
         {
           model: this.businessEntityRepo,
           as: 'businessEntity',
-          include: [BusinessInformation, FundingRequest],
+          include: [BusinessInformation, Partner],
         },
       ],
     });
