@@ -225,6 +225,18 @@ export class AdminUserController {
     );
   }
 
+  @Get('/dashboard/banks/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getBankInformation(@Param('bank_id') bankId: string): Promise<any> {
+    const response = await this.adminServices.fetchPartnerInformation(bankId);
+
+    return wrapResponseMessage(
+      'Bank information retrieved successfully.',
+      response,
+    );
+  }
+
   @Get('/dashboard/banks/customers/funding-requests-by-bank/stats')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomerStatsByBankId(

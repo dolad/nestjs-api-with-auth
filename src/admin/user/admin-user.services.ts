@@ -76,4 +76,10 @@ export class AdminService {
       inactivePartners: inactivePartners.length,
     };
   }
+
+  async fetchPartnerInformation(partnerId: string) {
+    return await this.partnerModel
+      .scope('removeSensitivePayload')
+      .findByPk(partnerId);
+  }
 }
