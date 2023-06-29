@@ -26,6 +26,7 @@ import {
 } from '../../utils/constants';
 import {
   AddFundingRequest,
+  FundingPerformanceStat,
   GetFundingRequestsParamDTO,
 } from '../dto/funding-request.dto';
 import { supportedCountryPayload } from '../mockRequest/connection';
@@ -272,12 +273,9 @@ export class FinancialInformationServices {
     return fundingPatner;
   }
 
-  async fetchFundRequestPerformanceStats(query: any): Promise<{
-    totalAmountRequested: number;
-    totalAmountIssued: number;
-    totalAmountDeclined: number;
-    totalAmountPending: number;
-  }> {
+  async fetchFundRequestPerformanceStats(
+    query: any,
+  ): Promise<FundingPerformanceStat> {
     const { bankId, from, to } = query;
     const whereOption: any = {};
     if (bankId) {
@@ -310,25 +308,42 @@ export class FinancialInformationServices {
       return acc + issuedAmount;
     }, 0);
 
-    const totalAmountDeclined = response.reduce((acc, item) => {
-      if (item.fundingTransactionStatus === FundingTransationStatus.DECLINED) {
+    const totalAmountDeclined = response
+      .filter(
+        (item) =>
+          item.fundingTransactionStatus === FundingTransationStatus.DECLINED,
+      )
+      .reduce((acc, item) => {
         const fundingAmount = item.fundingAmount ?? 0;
         return acc + fundingAmount;
-      }
-    }, 0);
+      }, 0);
 
-    const totalAmountPending = response.reduce((acc, item) => {
-      if (item.fundingTransactionStatus === FundingTransationStatus.PENDING) {
+    const totalAmountPending = response
+      .filter(
+        (item) =>
+          item.fundingTransactionStatus === FundingTransationStatus.PENDING,
+      )
+      .reduce((acc, item) => {
         const fundingAmount = item.fundingAmount ?? 0;
         return acc + fundingAmount;
-      }
-    }, 0);
+      }, 0);
 
+    const approvedRequest = response.filter(
+      (item) =>
+        item.fundingTransactionStatus === FundingTransationStatus.APPROVED,
+    ).length;
+    const declinedRequest = response.filter(
+      (item) =>
+        item.fundingTransactionStatus === FundingTransationStatus.DECLINED,
+    ).length;
     return {
       totalAmountRequested,
       totalAmountIssued,
-      totalAmountDeclined,
+      totalAmountDeclined: totalAmountDeclined,
       totalAmountPending,
+      totalRequest: response.length,
+      approvedRequest: approvedRequest,
+      declinedRequest: declinedRequest,
     };
   }
 
@@ -340,7 +355,7 @@ export class FinancialInformationServices {
       include: [
         {
           model: this.businessEntityRepo,
-          as: 'businessEntity',
+          include: [BusinessInformation],
         },
       ],
       order: [['createdAt', 'DESC']],

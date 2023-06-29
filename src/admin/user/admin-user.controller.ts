@@ -125,7 +125,7 @@ export class AdminUserController {
     return wrapResponseMessage('Dashboard data fetched', response);
   }
 
-  @Get('dashoboard/fetchFundRequest')
+  @Get('dashboard/fetchFundRequest')
   async getFundingRequest(@Request() req): Promise<IResponseMessage> {
     const response = await this.adminServices.getDashBoardData();
     return wrapResponseMessage('Dashboard data fetched', response);
@@ -165,17 +165,6 @@ export class AdminUserController {
 
     return wrapResponseMessage(
       'Recent activities retrieved successfully.',
-      response,
-    );
-  }
-
-  @Get('/dashboard/banks/performance-stats')
-  @HttpCode(HttpStatus.OK)
-  async getPerformanceStats(@Query() query: GetPerformanceStatParam) {
-    const response =
-      await this.financialServices.fetchFundRequestPerformanceStats(query);
-    return wrapResponseMessage(
-      'Performance stats retrieved successfully.',
       response,
     );
   }
