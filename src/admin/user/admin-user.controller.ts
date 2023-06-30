@@ -370,10 +370,16 @@ export class AdminUserController {
       filter['fundingTransactionStatus'] = query.status;
     }
 
+    if (query.bankId) {
+      filter['bankId'] = query.bankId;
+    }
+
+    if (query.businessId) {
+      filter['businessId'] = query.businessId;
+    }
+
     const response = await this.financialServices.fetchFundingRequests(query, {
       where: {
-        businessEntityId: query.businessId,
-        fundingTransactionStatus: query.status,
         ...filter,
       },
     });

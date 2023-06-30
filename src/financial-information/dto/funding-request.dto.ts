@@ -113,4 +113,5 @@ export interface FundingPerformanceStat {
   totalRequest?: number;
   approvedRequest?: number;
   declinedRequest?: number;
+  pendingRequest?: number;
 }

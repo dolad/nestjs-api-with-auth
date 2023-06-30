@@ -418,16 +418,25 @@ export class FinancialInformationServices {
       ],
     });
 
-    const totalPending = fundingRequest.reduce((acc, item) => {
-      if (item.fundingTransactionStatus === 'pending') {
-        return acc + 1;
-      }
-      return acc;
+    const pendingCustomers = fundingRequest.filter(
+      (item) =>
+        item.fundingTransactionStatus === FundingTransationStatus.PENDING,
+    );
+    const customerFundingRequest = fundingRequest.reduce((acc, item) => {
+      return acc + item.fundingAmount;
     }, 0);
+    const totalPendingCustomersFundingAmount = pendingCustomers.reduce(
+      (acc, item) => {
+        return acc + item.fundingAmount;
+      },
+      0,
+    );
 
     return {
-      totalPendingCustomers: totalPending,
+      totalPendingCustomers: pendingCustomers.length,
+      totalPendingCustomersFundingAmount,
       totalCustomers: fundingRequest.length,
+      totalCustomerFundingAmount: customerFundingRequest,
     };
   }
 
