@@ -38,6 +38,7 @@ import { ApproveFundRequestPartnerDTO } from '../dto/approveFundingRequest.dto';
 import { FundingTransationStatus } from 'src/config/interface';
 import { Partner } from 'src/storage/postgres/partner.schema';
 import sequelize from 'sequelize';
+import { FetchRequestByCustomerGroupDTO } from '../dto/financial-info.dto';
 
 @Injectable()
 export class FinancialInformationServices {
@@ -387,13 +388,29 @@ export class FinancialInformationServices {
 
     const options = {
       where: filter.where,
+      attributes: [
+        'id',
+        'fundingDescription',
+        'fundingAmount',
+        'fundingTransactionStatus',
+        'paymentPeriod',
+        'createdAt',
+      ],
       include: [
         {
           model: this.businessEntityRepo,
+          attributes: ['id'],
+          include: [
+            {
+              model: BusinessInformation,
+              attributes: ['businessName'],
+            },
+          ],
           as: 'businessEntity',
         },
         {
           model: Partner,
+          attributes: ['providerName'],
         },
       ],
       offset,
@@ -484,7 +501,7 @@ export class FinancialInformationServices {
   }
 
   async fetchFundingRequestGroupedByCustomer(
-    query: GetFundingRequestsByBankIdDTO,
+    query: FetchRequestByCustomerGroupDTO,
   ) {
     const { rows, offset, page } = getPaginationParams({
       rows: query.rows,
@@ -493,9 +510,10 @@ export class FinancialInformationServices {
 
     const queryStatus = query.status || FundingTransationStatus.PENDING;
 
-    const whereOption = {
-      bankId: query.bankId,
-    };
+    const whereOption = {};
+    if (query.bankId) {
+      whereOption['bankId'] = query.bankId;
+    }
 
     if (query.status) {
       whereOption['fundingTransactionStatus'] = queryStatus;
@@ -565,6 +583,7 @@ export class FinancialInformationServices {
   }
 
   async fetchFundingRequestById(fundingRequestId: string) {
+    console.log('here');
     const fundingRequest = await this.fundingRequest.findOne({
       where: {
         id: fundingRequestId,
@@ -572,11 +591,16 @@ export class FinancialInformationServices {
       include: [
         {
           model: this.businessEntityRepo,
+          include: [
+            {
+              model: BusinessInformation,
+            },
+          ],
           as: 'businessEntity',
-          include: [BusinessInformation],
         },
         {
           model: Partner,
+          attributes: ['providerName'],
         },
       ],
     });

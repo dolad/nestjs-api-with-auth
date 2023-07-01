@@ -267,34 +267,13 @@ export class AdminUserController {
     );
   }
 
-  @Get('/dashboard/customers/funding-customers-requests')
+  @Get('/dashboard/customers/overview/funding-request')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomersRequestsForCustomerDashboard(
     @Query() query: GetFundingRequestsParamDTO,
   ) {
-    const { from, to, rows, page, status } = query;
-
-    const whereOption = {};
-
-    if (from && to) {
-      whereOption['createdAt'] = {
-        [Op.between]: [from, to],
-      };
-    }
-
-    if (status) {
-      whereOption['fundingTransactionStatus'] = status;
-    }
-
-    const response = await this.financialServices.fetchCustomerFundingRequest(
-      {
-        where: whereOption,
-      },
-      {
-        rows,
-        page,
-      },
-    );
+    const response =
+      await this.financialServices.fetchFundingRequestGroupedByCustomer(query);
 
     return wrapResponseMessage(
       'Funding customer requests retrieved successfully.',
