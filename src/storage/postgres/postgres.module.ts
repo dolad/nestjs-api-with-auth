@@ -16,7 +16,6 @@ import { SoftwareConnectDetails } from '../postgres/software-info.schema';
 import { UserSession } from './user-session.schema';
 import { BusinessOwners } from './business-owners.dto';
 import { Partner } from './partner.schema';
-import { FundingRequestTransaction } from './fundingTransaction';
 import { FundingRequest } from './fundingRequest.schema';
 
 @Module({
@@ -38,7 +37,6 @@ import { FundingRequest } from './fundingRequest.schema';
           SoftwareConnectDetails,
           UserSession,
           FundingRequest,
-          FundingRequestTransaction,
           BusinessOwners,
           Partner,
         ],

@@ -40,9 +40,7 @@ export class BusinessEntityServices {
     payload: CreateBusinessEntity,
     user: IAuthUser,
   ): Promise<any> {
-    
-    
-   const  businessEntityExist = await this.businessEntityRepo.findOne({
+    const businessEntityExist = await this.businessEntityRepo.findOne({
       where: {
         creator: user.userId,
         kycStep: 1,
@@ -54,8 +52,7 @@ export class BusinessEntityServices {
     }
     try {
       // create business entity
-       await this.sequelize.transaction(async (t) => {
-       
+      await this.sequelize.transaction(async (t) => {
         const businessEntity = await this.businessEntityRepo.create(
           {
             creator: user.userId,
@@ -64,32 +61,32 @@ export class BusinessEntityServices {
           { transaction: t },
         );
 
-        await this.userRepos.update({
-          businessEntityId: businessEntity.id
-        },{
-          where: {
-            email: user.email
+        await this.userRepos.update(
+          {
+            businessEntityId: businessEntity.id,
           },
-          transaction: t
-        })
+          {
+            where: {
+              email: user.email,
+            },
+            transaction: t,
+          },
+        );
 
-        
         await this.businessInformationRepo.create(
           {
             ...payload,
             businessId: businessEntity.id,
           },
-          {transaction: t},
+          { transaction: t },
         );
+      });
 
-      })
-      
       this.logger.log('Business entity created');
       return 'Kyc Submitted Successfully';
     } catch (error) {
       this.logger.error('business entity can not be created');
-      throw new Error("Failed to create buisiness entity");
-      
+      throw new Error('Failed to create buisiness entity');
     }
   }
 
@@ -99,24 +96,26 @@ export class BusinessEntityServices {
   ): Promise<any> {
     const buisinessEntity = await this.businessEntityRepo.findOne({
       where: {
-        creator: user.userId
+        creator: user.userId,
       },
     });
-    
-    if(buisinessEntity.kycStep === 2){
-      throw new ConflictException("User Already passed this stage")
-    }
 
+    if (buisinessEntity.kycStep === 2) {
+      throw new ConflictException('User Already passed this stage');
+    }
 
     if (!buisinessEntity) {
       throw new NotFoundException('User has not completed the first kyc');
     }
 
     const ownerResponse = await this.createNewOwner(payload, user);
-    return ownerResponse
+    return ownerResponse;
   }
 
-  async createNewOwner(payload: AddBusinessOwnerDto[], user: IAuthUser) : Promise<string> {
+  async createNewOwner(
+    payload: AddBusinessOwnerDto[],
+    user: IAuthUser,
+  ): Promise<string> {
     const tx = await this.sequelize.transaction();
 
     const buisinessEntity = await this.businessEntityRepo.findOne({
@@ -142,7 +141,6 @@ export class BusinessEntityServices {
         },
       });
 
-
       if (!owner) {
         owner = await this.userRepos.create(
           {
@@ -160,7 +158,7 @@ export class BusinessEntityServices {
           {
             businessEntityId: buisinessEntity.id,
             userType: UserType.BUSINESS_OWNER,
-            ...ownerPayload
+            ...ownerPayload,
           },
           {
             where: {
@@ -171,8 +169,6 @@ export class BusinessEntityServices {
         );
       }
 
-
-      // create other share holders
       if (payload.length) {
         const otherShareholders = payload.map((user) => {
           return {
@@ -180,7 +176,9 @@ export class BusinessEntityServices {
             businessId: buisinessEntity.id,
           };
         });
-        await this.businessOwnerRepo.bulkCreate(otherShareholders, {transaction: tx})
+        await this.businessOwnerRepo.bulkCreate(otherShareholders, {
+          transaction: tx,
+        });
       }
 
       // update the businessEntityRepo

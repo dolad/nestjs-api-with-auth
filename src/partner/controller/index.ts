@@ -20,7 +20,6 @@ import {
 } from '../../utils/response.map';
 import { UpdatePartnerPasswordDTO } from '../dto/update-password';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { GetFundingRequestsParamDTO } from 'src/financial-information/dto/funding-request.dto';
 import { FinancialInformationServices } from 'src/financial-information/services/financial-info.services';
 import { ApproveFundRequestPartnerDTO } from 'src/financial-information/dto/approveFundingRequest.dto';
 import { PartnerRouteGuard } from 'src/auth/guards/partner.guard';
@@ -108,15 +107,12 @@ export class PartnerController {
   @Get('/funding-request/:fundingId')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, PartnerRouteGuard)
-  async getFundingRequestsById(
-    @Request() req,
-    @Param('fundingId') fundingId: string,
-  ) {
+  async getFundingRequestsById(@Param('fundingId') fundingId: string) {
     const response = await await this.financialServices.fetchFundingRequestById(
       fundingId,
     );
     return wrapResponseMessage(
-      'Funding requests retrieved successfully.',
+      'Funding Documents retrieved successfully.',
       response,
     );
   }

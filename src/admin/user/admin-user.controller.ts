@@ -138,7 +138,7 @@ export class AdminUserController {
     const response = await this.financialServices.getBusinessBankStatement(
       businessId,
     );
-    return wrapResponseMessage('Dashboard data fetched', response);
+    return wrapResponseMessage('Bank Statement data fetched', response);
   }
 
   @Get('/dashboard/general-funding-stats')

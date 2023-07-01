@@ -12,6 +12,3 @@ export function setupSwagger(app: INestApplication) {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api/v1/docs', app, document);
 }
-
-
-// flinkePassword
