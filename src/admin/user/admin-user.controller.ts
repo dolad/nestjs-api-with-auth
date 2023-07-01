@@ -260,7 +260,7 @@ export class AdminUserController {
   async getFundingCustomersRequests(
     @Query() query: GetFundingRequestsByBankIdDTO,
   ) {
-    const { bankId, from, to, rows, page, status } = query;
+    const { bankId, rows, page } = query;
 
     const whereOption = {
       bankId,

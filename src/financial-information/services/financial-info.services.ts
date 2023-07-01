@@ -336,6 +336,10 @@ export class FinancialInformationServices {
       (item) =>
         item.fundingTransactionStatus === FundingTransationStatus.DECLINED,
     ).length;
+    const pendingRequest = response.filter(
+      (item) =>
+        item.fundingTransactionStatus === FundingTransationStatus.PENDING,
+    ).length;
     return {
       totalAmountRequested,
       totalAmountIssued,
@@ -344,6 +348,7 @@ export class FinancialInformationServices {
       totalRequest: response.length,
       approvedRequest: approvedRequest,
       declinedRequest: declinedRequest,
+      pendingRequest,
     };
   }
 
@@ -464,7 +469,7 @@ export class FinancialInformationServices {
       limit: rows,
     };
 
-    const response = await this.businessEntityRepo.findAndCountAll(options);
+    const response = await this.fundingRequest.findAndCountAll(options);
 
     const totalPages = Math.ceil(response.count / rows) || 0;
 
