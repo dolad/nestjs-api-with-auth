@@ -491,10 +491,18 @@ export class FinancialInformationServices {
       page: query.page,
     });
 
+    const queryStatus = query.status || FundingTransationStatus.PENDING;
+
+    const whereOption = {
+      bankId: query.bankId,
+    };
+
+    if (query.status) {
+      whereOption['fundingTransactionStatus'] = queryStatus;
+    }
+
     const options = {
-      where: {
-        bankId: query.bankId,
-      },
+      where: whereOption,
       attributes: [
         'businessEntity.id',
         [
@@ -506,14 +514,8 @@ export class FinancialInformationServices {
           'totalFundAmountRequested',
         ],
         [
-          sequelize.fn(
-            'count',
-            sequelize.where(
-              sequelize.col('fundingTransactionStatus'),
-              'pending',
-            ),
-          ),
-          'pendingRequest',
+          sequelize.fn('count', sequelize.col('fundingTransactionStatus')),
+          'status',
         ],
       ],
       group: ['businessEntity.id', 'businessEntity.businessInformation.id'],
