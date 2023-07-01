@@ -500,7 +500,10 @@ export class FinancialInformationServices {
         {
           model: this.businessEntityRepo,
           as: 'businessEntity',
-          include: [BusinessInformation, Partner],
+          include: [BusinessInformation],
+        },
+        {
+          model: Partner,
         },
       ],
     });

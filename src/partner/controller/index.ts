@@ -108,7 +108,7 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, PartnerRouteGuard)
   async getFundingRequestsById(@Param('fundingId') fundingId: string) {
-    const response = await await this.financialServices.fetchFundingRequestById(
+    const response = await this.financialServices.fetchFundingRequestById(
       fundingId,
     );
     return wrapResponseMessage(
