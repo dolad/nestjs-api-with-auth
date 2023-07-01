@@ -27,6 +27,7 @@ import {
 import {
   AddFundingRequest,
   FundingPerformanceStat,
+  GetFundingRequestsByBankIdDTO,
   GetFundingRequestsParamDTO,
 } from '../dto/funding-request.dto';
 import { supportedCountryPayload } from '../mockRequest/connection';
@@ -36,6 +37,7 @@ import { BusinessInformation } from 'src/storage/postgres/business-information.s
 import { ApproveFundRequestPartnerDTO } from '../dto/approveFundingRequest.dto';
 import { FundingTransationStatus } from 'src/config/interface';
 import { Partner } from 'src/storage/postgres/partner.schema';
+import sequelize from 'sequelize';
 
 @Injectable()
 export class FinancialInformationServices {
@@ -478,6 +480,75 @@ export class FinancialInformationServices {
       totalPages,
       rows: response.rows,
       count: response.count,
+    };
+  }
+
+  async fetchFundingRequestGroupedByCustomer(
+    query: GetFundingRequestsByBankIdDTO,
+  ) {
+    const { rows, offset, page } = getPaginationParams({
+      rows: query.rows,
+      page: query.page,
+    });
+
+    const options = {
+      where: {
+        bankId: query.bankId,
+      },
+      attributes: [
+        'businessEntity.id',
+        [
+          sequelize.fn('count', sequelize.col('businessEntity.id')),
+          'fundsRequested',
+        ],
+        [
+          sequelize.fn('sum', sequelize.col('fundingAmount')),
+          'totalFundAmountRequested',
+        ],
+        [
+          sequelize.fn(
+            'count',
+            sequelize.where(
+              sequelize.col('fundingTransactionStatus'),
+              'pending',
+            ),
+          ),
+          'pendingRequest',
+        ],
+      ],
+      group: ['businessEntity.id', 'businessEntity.businessInformation.id'],
+      include: [
+        {
+          model: this.businessEntityRepo,
+          attributes: ['id'],
+          include: [
+            {
+              model: BusinessInformation,
+
+              attributes: [
+                'id',
+                'businessAddress',
+                'businessName',
+                'businessCity',
+              ],
+            },
+          ],
+        },
+      ],
+
+      offset,
+      limit: rows,
+    } as any;
+
+    const response = await this.fundingRequest.findAndCountAll(options);
+
+    const totalPages = Math.ceil((response.count as any).length / rows) || 1;
+
+    return {
+      page,
+      totalPages,
+      rows: response.rows,
+      count: (response.count as any).length,
     };
   }
 

@@ -105,6 +105,13 @@ export class GetFundingRequestsByBankIdDTO extends GetFundingRequestsParamDTO {
   bankId: string;
 }
 
+export class GetFundingRequestsByBankIdStatDTO {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  bankId: string;
+}
+
 export interface FundingPerformanceStat {
   totalAmountRequested: number;
   totalAmountIssued: number;

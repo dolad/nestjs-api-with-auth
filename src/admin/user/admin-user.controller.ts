@@ -31,9 +31,9 @@ import { FinancialInformationServices } from 'src/financial-information/services
 import { GetCustomerFundingRequestsParamDTO } from 'src/financial-information/dto/performance-stat-dto';
 import {
   GetFundingRequestsByBankIdDTO,
+  GetFundingRequestsByBankIdStatDTO,
   GetFundingRequestsByBusinessIdDTO,
   GetFundingRequestsParamDTO,
-  GetPerformanceStatParam,
 } from 'src/financial-information/dto/funding-request.dto';
 import { Op } from 'sequelize';
 
@@ -155,7 +155,6 @@ export class AdminUserController {
   }
 
   @Get('/dashboard/general-funding-request-recent-activity')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getGeneralFundingRequestRecentActivity(): Promise<any> {
     const response =
@@ -207,7 +206,6 @@ export class AdminUserController {
   }
 
   @Get('/dashboard/banks/funding-request-recent-activity/:bank_id')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getFundingRequestRecentActivity(
     @Param('bank_id') bankId: string,
@@ -240,7 +238,7 @@ export class AdminUserController {
   @Get('/dashboard/banks/customers/funding-requests-by-bank/stats')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomerStatsByBankId(
-    @Query() query: GetFundingRequestsByBankIdDTO,
+    @Query() query: GetFundingRequestsByBankIdStatDTO,
   ) {
     const { bankId } = query;
     const response = await this.financialServices.fetchFundingCustomerStats({
@@ -260,31 +258,8 @@ export class AdminUserController {
   async getFundingCustomersRequests(
     @Query() query: GetFundingRequestsByBankIdDTO,
   ) {
-    const { bankId, rows, page } = query;
-
-    const whereOption = {
-      bankId,
-    };
-
-    if (query.from && query.to) {
-      whereOption['createdAt'] = {
-        [Op.between]: [query.from, query.to],
-      };
-    }
-
-    if (query.status) {
-      whereOption['fundingTransactionStatus'] = query.status;
-    }
-
-    const response = await this.financialServices.fetchCustomerFundingRequest(
-      {
-        where: whereOption,
-      },
-      {
-        rows,
-        page,
-      },
-    );
+    const response =
+      await this.financialServices.fetchFundingRequestGroupedByCustomer(query);
 
     return wrapResponseMessage(
       'Funding customer requests retrieved successfully.',
