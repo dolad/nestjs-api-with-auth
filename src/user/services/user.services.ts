@@ -99,8 +99,8 @@ export class UserServices {
     return await this.userRepos.scope('removeSensitivePayload').findByPk(id);
   }
 
-  async getUserSession(user: IAuthUser): Promise<UserSession[]> {
-    return await this.authServices.getUserSessions(user);
+  async getUserSession(userId: string): Promise<UserSession[]> {
+    return await this.authServices.getUserSessions(userId);
   }
 
   async changePassword(

@@ -437,10 +437,10 @@ export class AuthService {
     return 'user password Updated';
   }
 
-  async getUserSessions(user: IAuthUser): Promise<UserSession[]> {
+  async getUserSessions(userId: string): Promise<UserSession[]> {
     return await this.userSession.findAll({
       where: {
-        userId: user.userId,
+        userId: userId,
       },
     });
   }

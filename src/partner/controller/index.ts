@@ -25,6 +25,8 @@ import { ApproveFundRequestPartnerDTO } from 'src/financial-information/dto/appr
 import { PartnerRouteGuard } from 'src/auth/guards/partner.guard';
 import { GetFundingRequestsPartnerParamDTO } from '../dto/getFundingRequest.dto';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
+import { UpdatePatnerInformationDTO } from 'src/admin/user/dto/updateProvider.dto';
+import { UserServices } from 'src/user/services/user.services';
 
 @Controller('partner')
 @ApiTags('Partner')
@@ -32,6 +34,7 @@ export class PartnerController {
   constructor(
     private readonly partnerService: PartnerServices,
     private readonly financialServices: FinancialInformationServices,
+    private readonly userServices: UserServices,
   ) {}
 
   @Post('/login')
@@ -142,5 +145,27 @@ export class PartnerController {
       'Funding Request approved data fetched',
       'Successfully',
     );
+  }
+
+  @Get('sessions')
+  @UseGuards(JwtAuthGuard, PartnerRouteGuard)
+  async getUserSession(@Request() req): Promise<IResponseMessage> {
+    const response = await this.partnerService.getUserSession(
+      req.user.partnerId,
+    );
+    return wrapResponseMessage('Update Creator Details', response);
+  }
+
+  @Post('update-informations')
+  @UseGuards(JwtAuthGuard, PartnerRouteGuard)
+  async updatePartnerInformation(
+    @Request() req,
+    @Body() payload: UpdatePatnerInformationDTO,
+  ): Promise<IResponseMessage> {
+    const response = await this.userServices.updatePartnerInformation(
+      payload,
+      req.user.partnerId,
+    );
+    return wrapResponseMessage('Partner user updated', response);
   }
 }

@@ -35,6 +35,9 @@ export class PartnerServices {
       country,
     });
 
+    const { twoFactorAuth } = user;
+    if (twoFactorAuth) return await this.authService.send2FAToken(user);
+
     this.logger.log('partner login successful');
     return {
       email: user.email,
@@ -112,6 +115,10 @@ export class PartnerServices {
           bankId: partnerId,
         },
       });
+    return response;
+  }
+  async getUserSession(partnerId: string) {
+    const response = await this.authService.getUserSessions(partnerId);
     return response;
   }
 }

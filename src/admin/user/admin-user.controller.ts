@@ -70,7 +70,7 @@ export class AdminUserController {
 
   @Get('sessions')
   async getUserSession(@Request() req): Promise<IResponseMessage> {
-    const response = await this.userService.getUserSession(req.user);
+    const response = await this.userService.getUserSession(req.user.userId);
     return wrapResponseMessage('Admin Session Fetched', response);
   }
 
