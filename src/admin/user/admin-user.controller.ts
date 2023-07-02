@@ -36,6 +36,8 @@ import {
   GetFundingRequestsParamDTO,
 } from 'src/financial-information/dto/funding-request.dto';
 import { Op } from 'sequelize';
+import { query } from 'express';
+import { GetCustomerInformationDto } from './dto/fetchBusinessInfoDto';
 
 @Controller('admin-user')
 @ApiTags('AdminUser')
@@ -286,17 +288,21 @@ export class AdminUserController {
   async getFundingCustomersStats(
     @Query() query: GetCustomerFundingRequestsParamDTO,
   ) {
-    const { from, to } = query;
-    const date_filter = {};
+    const { from, to, businessId } = query;
+    const queryOption = {};
 
     if (from && to) {
-      date_filter['createdAt'] = {
+      queryOption['createdAt'] = {
         [Op.between]: [from, to],
       };
     }
+
+    if (query.businessId) {
+      queryOption['businessEntityId'] = query.businessId;
+    }
     const response = await this.financialServices.fetchFundingCustomerStats({
       where: {
-        ...date_filter,
+        ...queryOption,
       },
     });
 
@@ -329,7 +335,7 @@ export class AdminUserController {
     }
 
     if (query.businessId) {
-      filter['businessId'] = query.businessId;
+      filter['businessEntityId'] = query.businessId;
     }
 
     const response = await this.financialServices.fetchFundingRequests(query, {
@@ -337,6 +343,18 @@ export class AdminUserController {
         ...filter,
       },
     });
+    return wrapResponseMessage(
+      'Funding requests retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/customers/business-information/')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getBusinessInformationById(@Query() query: GetCustomerInformationDto) {
+    const response =
+      await this.financialServices.fetchFundingRequestsByBusinessId(query);
     return wrapResponseMessage(
       'Funding requests retrieved successfully.',
       response,

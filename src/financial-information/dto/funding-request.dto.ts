@@ -52,23 +52,13 @@ export class GetPerformanceStatParam {
   @ApiProperty()
   @IsString()
   bankId: string;
-
-  @ApiProperty()
-  @IsDateString()
-  @IsOptional()
-  from?: Date;
-
-  @ApiProperty()
-  @IsDateString()
-  @IsOptional()
-  to?: Date;
 }
 
-export class GetFundingRequestsParamDTO extends GetPerformanceStatParam {
+export class GetFundingRequestsParamDTO {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  bankId: string;
+  bankId?: string;
 
   @ApiProperty()
   @IsString()
@@ -84,6 +74,16 @@ export class GetFundingRequestsParamDTO extends GetPerformanceStatParam {
   @IsString()
   @IsOptional()
   rows?: number;
+
+  @ApiProperty()
+  @IsDateString()
+  @IsOptional()
+  from?: Date;
+
+  @ApiProperty()
+  @IsDateString()
+  @IsOptional()
+  to?: Date;
 
   @ApiProperty()
   @IsString()

@@ -27,7 +27,6 @@ import {
 import {
   AddFundingRequest,
   FundingPerformanceStat,
-  GetFundingRequestsByBankIdDTO,
   GetFundingRequestsParamDTO,
 } from '../dto/funding-request.dto';
 import { supportedCountryPayload } from '../mockRequest/connection';
@@ -39,6 +38,8 @@ import { FundingTransationStatus } from 'src/config/interface';
 import { Partner } from 'src/storage/postgres/partner.schema';
 import sequelize from 'sequelize';
 import { FetchRequestByCustomerGroupDTO } from '../dto/financial-info.dto';
+import { GetCustomerInformationDto } from 'src/admin/user/dto/fetchBusinessInfoDto';
+import { query } from 'express';
 
 @Injectable()
 export class FinancialInformationServices {
@@ -622,5 +623,33 @@ export class FinancialInformationServices {
       },
     );
     return response;
+  }
+
+  async fetchFundingRequestsByBusinessId(params: GetCustomerInformationDto) {
+    const whereOption = {};
+    if (params.businessId) {
+      whereOption['businessEntityId'] = params.businessId;
+    }
+    if (params.fundingId) {
+      whereOption['id'] = params.fundingId;
+    }
+    const fundingRequest = await this.fundingRequest.findAll({
+      where: {
+        ...whereOption,
+      },
+      include: [
+        {
+          model: this.businessEntityRepo,
+          include: [
+            {
+              model: BusinessInformation,
+            },
+          ],
+          as: 'businessEntity',
+        },
+      ],
+    });
+
+    return fundingRequest;
   }
 }
