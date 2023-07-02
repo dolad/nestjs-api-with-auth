@@ -369,7 +369,20 @@ export class AdminUserController {
       businessId,
     );
     return wrapResponseMessage(
-      'Funding requests retrieved successfully.',
+      'Business requests retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/customers/get-business-details/owner-details')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async fetchBusinesOwnerDetails(@Query('businessId') businessId: string) {
+    const response = await this.financialServices.fetchBusinesOwnerDetails(
+      businessId,
+    );
+    return wrapResponseMessage(
+      'Business requests retrieved successfully.',
       response,
     );
   }

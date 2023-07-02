@@ -667,4 +667,18 @@ export class FinancialInformationServices {
 
     return fundingRequest;
   }
+
+  async fetchBusinesOwnerDetails(businessId: string) {
+    const businessEntity = await this.businessEntityRepo.findOne({
+      where: {
+        id: businessId,
+      },
+    });
+
+    const ownerInformation = await this.userServices.findById(
+      businessEntity.businessOwner,
+    );
+
+    return ownerInformation;
+  }
 }
