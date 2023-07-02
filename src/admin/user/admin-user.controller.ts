@@ -360,4 +360,17 @@ export class AdminUserController {
       response,
     );
   }
+
+  @Get('/dashboard/customers/get-business-details')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getBusinessInfoDetail(@Query('businessId') businessId: string) {
+    const response = await this.financialServices.fetchBusinessInformation(
+      businessId,
+    );
+    return wrapResponseMessage(
+      'Funding requests retrieved successfully.',
+      response,
+    );
+  }
 }

@@ -652,4 +652,19 @@ export class FinancialInformationServices {
 
     return fundingRequest;
   }
+
+  async fetchBusinessInformation(businessId: string) {
+    const fundingRequest = await this.businessEntityRepo.findOne({
+      where: {
+        id: businessId,
+      },
+      include: [
+        {
+          model: BusinessInformation,
+        },
+      ],
+    });
+
+    return fundingRequest;
+  }
 }
