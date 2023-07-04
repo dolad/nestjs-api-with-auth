@@ -8,7 +8,6 @@ import {
   HasOne,
 } from 'sequelize-typescript';
 import { BusinessInformation } from './business-information.schema';
-import { FinancialConnectDetails } from './financial-account';
 import { User } from './user.schema';
 import { FundingRequest } from './fundingRequest.schema';
 

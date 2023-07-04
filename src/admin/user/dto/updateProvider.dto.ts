@@ -125,4 +125,14 @@ export class UpdatePatnerInformationDTO {
   @IsOptional()
   @IsString()
   logoUrl: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  aboutBank: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  fundingRequirement: string;
 }

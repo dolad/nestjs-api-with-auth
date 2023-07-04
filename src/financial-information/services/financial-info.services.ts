@@ -15,7 +15,7 @@ import { UserServices } from 'src/user/services/user.services';
 import { BankProvider } from '../../storage/postgres/bank-provider';
 import { BankProviderCountries } from '../../storage/postgres/bank-provider-countries';
 import { BusinessEntity } from '../../storage/postgres/business-entity.schema';
-import { FinancialConnectDetails } from '../../storage/postgres/financial-account';
+import { FinancialConnectDetails } from '../../storage/postgres/financial-connects';
 import { IAuthUser } from '../../user/types/user.types';
 import {
   BUSINESS_ENTITY_REPOSITORY,
@@ -39,7 +39,6 @@ import { Partner } from 'src/storage/postgres/partner.schema';
 import sequelize from 'sequelize';
 import { FetchRequestByCustomerGroupDTO } from '../dto/financial-info.dto';
 import { GetCustomerInformationDto } from 'src/admin/user/dto/fetchBusinessInfoDto';
-import { query } from 'express';
 
 @Injectable()
 export class FinancialInformationServices {

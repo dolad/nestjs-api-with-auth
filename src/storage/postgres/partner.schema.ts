@@ -38,6 +38,8 @@ export interface PartnerAttributes {
   isActive: boolean;
   twoFactorAuth?: string;
   twoFaToken?: string;
+  aboutBank?: string;
+  fundingRequirement?: string;
 }
 
 export type PartnerCreateAttributes = Optional<PartnerAttributes, 'id'>;
@@ -212,6 +214,18 @@ export class Partner extends Model<PartnerAttributes, PartnerCreateAttributes> {
     allowNull: true,
   })
   logoUrl?: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  aboutBank?: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  fundingRequirement?: string;
 
   async isPasswordCorrect(password: string): Promise<boolean> {
     return await new HashManager().bCompare(this.password, password);
