@@ -114,4 +114,12 @@ export class FinancialInfoController {
     );
     return wrapResponseMessage('business Information Successfully', response);
   }
+
+  @Post('/fundingPartners')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async fetchFundingPartners(): Promise<IResponseMessage> {
+    const response = await this.financeServices.fetchFundingPartner({});
+    return wrapResponseMessage('business Information Successfully', response);
+  }
 }

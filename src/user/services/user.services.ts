@@ -331,16 +331,15 @@ export class UserServices {
   async fetchFundingPartner(
     payload: GetFundingParterParam,
   ): Promise<FundingPartnerResponse> {
-    const { businessType } = payload;
     const { rows, offset, page } = getPaginationParams({
       rows: payload.rows,
       page: payload.page,
     });
 
     const whereOption: Record<string, any> = {};
-    if (businessType) {
+    if (payload.businessType) {
       whereOption.businessTypes = {
-        [Op.contains]: [businessType],
+        [Op.contains]: [payload.businessType],
       };
     }
     const options = {
