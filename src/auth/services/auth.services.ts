@@ -439,6 +439,7 @@ export class AuthService {
 
   async getUserSessions(userId: string): Promise<UserSession[]> {
     return await this.userSession.findAll({
+      limit: 5,
       where: {
         userId: userId,
       },
