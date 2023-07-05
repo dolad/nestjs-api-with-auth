@@ -28,16 +28,18 @@ export class AdminService {
 
   async getDashBoardData(): Promise<AdminDashBoardDataParams> {
     const allPartners = await this.partnerModel.findAll();
+
     const activePartners = allPartners
       .filter((partner) => partner.isActive === true)
       .map((item) => item.id);
+
     const inactivePartners = allPartners
       .filter((partner) => partner.isActive === false)
       .map((item) => item.id);
 
     const allActiveFundResult = (await this.fundingRequest.findAll({
       attributes: [
-        [sequelize.fn('SUM', sequelize.col('issuedAmount')), 'fundsIssued'],
+        [sequelize.fn('SUM', sequelize.col('fundingAmount')), 'fundsIssued'],
       ],
       where: {
         bankId: {
@@ -49,7 +51,7 @@ export class AdminService {
 
     const inActiveFundResult = (await this.fundingRequest.findAll({
       attributes: [
-        [sequelize.fn('SUM', sequelize.col('issuedAmount')), 'fundsIssued'],
+        [sequelize.fn('SUM', sequelize.col('fundingAmount')), 'fundsIssued'],
       ],
       where: {
         bankId: {
@@ -61,7 +63,7 @@ export class AdminService {
 
     const allFundingResult = (await this.fundingRequest.findAll({
       attributes: [
-        [sequelize.fn('SUM', sequelize.col('issuedAmount')), 'fundsIssued'],
+        [sequelize.fn('SUM', sequelize.col('fundingAmount')), 'fundsIssued'],
       ],
 
       raw: true,
