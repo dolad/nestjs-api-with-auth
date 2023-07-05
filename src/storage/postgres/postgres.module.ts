@@ -11,7 +11,7 @@ import { BusinessEntity } from '../postgres/business-entity.schema';
 import { BusinessInformation } from '../postgres/business-information.schema';
 import { BankProviderCountries } from '../postgres/bank-provider-countries';
 import { BankProvider } from '../postgres/bank-provider';
-import { FinancialConnectDetails } from '../postgres/financial-account';
+import { FinancialConnectDetails } from './financial-connects';
 import { SoftwareConnectDetails } from '../postgres/software-info.schema';
 import { UserSession } from './user-session.schema';
 import { BusinessOwners } from './business-owners.dto';
