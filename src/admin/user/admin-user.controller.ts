@@ -237,6 +237,34 @@ export class AdminUserController {
     );
   }
 
+  @Get('/dashboard/banks/performance-stat/funds-graph-data/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getGraphDataForFundingRequest(
+    @Param('bank_id') bankId: string,
+  ): Promise<any> {
+    const response = await this.adminServices.getGraphDataForFundingRequest(
+      bankId,
+    );
+
+    return wrapResponseMessage(
+      'Bank information retrieved successfully.',
+      response,
+    );
+  }
+
+  @Get('/dashboard/banks/performance-stat/requests-graph-data/:bank_id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getGraphDataForRequest(@Param('bank_id') bankId: string): Promise<any> {
+    const response = await this.adminServices.getGraphDataForRequest(bankId);
+
+    return wrapResponseMessage(
+      'Bank information retrieved successfully.',
+      response,
+    );
+  }
+
   @Get('/dashboard/banks/customers/funding-requests-by-bank/stats')
   @HttpCode(HttpStatus.OK)
   async getFundingCustomerStatsByBankId(
